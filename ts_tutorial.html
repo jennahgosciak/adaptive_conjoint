@@ -578,10 +578,7 @@
 <li><p>In many cases, the posterior distribution is not possible to calculate exactly</p></li>
 <li><p>There are 4 suggested approximation methods:</p>
 <ul>
-<li><p>Gibbs sampling</p></li>
-<li><p>Langevin Monte Carlo</p></li>
-<li><p>Laplace approxmation</p></li>
-<li><p>bootstrap</p></li>
+<li>Gibbs sampling, Langevin Monte Carlo, Laplace approxmation, Bootstrap</li>
 </ul></li>
 <li><p>Consider posterior distribution <span class="math inline">\(f_{t-1}\)</span> for <span class="math inline">\(\theta\)</span> conditional on the history <span class="math inline">\(\mathbb{H}_{t-1}\)</span></p></li>
 <li><p>Approximation methods generate <span class="math inline">\(\hat{\theta}\)</span>. The distribution of <span class="math inline">\(\hat{\theta}\)</span> approximates the posterior <span class="math inline">\(\hat{f}_{t-1}\)</span></p></li>
@@ -634,7 +631,7 @@
 <h2>Modifications to TS</h2>
 <ul>
 <li><p>Time-varying constraints (e.g., road closures in shortest path problem)</p></li>
-<li><p>Contextual decisionmaking (e.g., observing a weather report prior to select path)</p></li>
+<li><p>Contextual decisionmaking, also called a contextual bandit (e.g., observing a weather report prior to select path)</p></li>
 <li><p>Baseline performance: ensure performance exceeds some baseline by constraining the possible actions</p></li>
 <li><p>Nonstationary: maybe beliefs evolve over time</p></li>
 <li><p>Concurrence: can share observations</p>
@@ -643,8 +640,16 @@
 </ul></li>
 </ul>
 </section>
-<section id="thompson-sampling-in-r-a-multi-armed-approach" class="slide level2">
-<h2>Thompson Sampling in R: A Multi-Armed Approach</h2>
+<section id="other-types-of-bandits" class="slide level2">
+<h2>Other Types of Bandits</h2>
+<ul>
+<li><p>Transfer Learning: used when the space of actions <span class="math inline">\(x\)</span> is very large, can use information gained from an action to reduce uncertainty about the other actions</p></li>
+<li><p>Cascading Bandit Model: user looks at each item sequentially and when an item is found attractive, the user exists the system</p></li>
+<li><p>Active learning with neural networks: often with ensembles of models</p></li>
+</ul>
+</section>
+<section id="a-coding-example" class="slide level2">
+<h2>A Coding Example</h2>
 <ul>
 <li>Load file on click through rates for ad service company</li>
 <li>Code is from: <a href="https://rpubs.com/markloessi/502098" class="uri">https://rpubs.com/markloessi/502098</a></li>
@@ -674,8 +679,8 @@
 <h2>Random Approach</h2>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>  Ad 3
-1 1285</code></pre>
+<pre><code>  Ad 8
+1 1242</code></pre>
 </div>
 </div>
 </section>
@@ -704,7 +709,7 @@
 <h2>Thompson Sampling</h2>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code> [1]   12   14    1   33 2367    1    8  140    0    0</code></pre>
+<pre><code> [1]   58    4    3   10 2451    1   23   50    2    4</code></pre>
 </div>
 </div>
 </section>

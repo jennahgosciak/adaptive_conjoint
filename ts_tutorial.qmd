@@ -72,7 +72,7 @@ format:
 
     -   There are three actions with mean rewards $\theta$
 
-    -   At each time $t$, generate an estimate \$\\hat{theta_k\$}\$ of the mean reward for the $k$th action
+    -   At each time $t$, generate an estimate \$\hat{\theta_k}\$ of the mean reward for the $k$th action
 
     -   Select $\text{argmax}_k \hat{\theta_k}$
 
@@ -168,13 +168,7 @@ format:
 
 -   There are 4 suggested approximation methods:
 
-    -   Gibbs sampling
-
-    -   Langevin Monte Carlo
-
-    -   Laplace approxmation
-
-    -   bootstrap
+    -   Gibbs sampling, Langevin Monte Carlo, Laplace approxmation, Bootstrap
 
 -   Consider posterior distribution $f_{t-1}$ for $\theta$ conditional on the history $\mathbb{H}_{t-1}$
 
@@ -188,7 +182,7 @@ format:
 
 -   Works even when it's not possible to sample from $f_{t-1}$ directly
 
--   Can be computational intense
+-   Can be computationally intense
 
 ## Laplace Approx.
 
@@ -230,7 +224,7 @@ format:
 
 -   Time-varying constraints (e.g., road closures in shortest path problem)
 
--   Contextual decisionmaking (e.g., observing a weather report prior to select path)
+-   Contextual decisionmaking, also called a contextual bandit (e.g., observing a weather report prior to select path)
 
 -   Baseline performance: ensure performance exceeds some baseline by constraining the possible actions
 
@@ -240,7 +234,15 @@ format:
 
     -   Ex. a system provides different versions of a service to different users
 
-## Thompson Sampling in R: A Multi-Armed Approach
+## Other Types of Bandits
+
+-   Transfer Learning: used when the space of actions $x$ is very large, can use information gained from an action to reduce uncertainty about the other actions
+
+-   Cascading Bandit Model: user looks at each item sequentially and when an item is found attractive, the user exists the system
+
+-   Active learning with neural networks: often with ensembles of models
+
+## A Coding Example
 
 -   Load file on click through rates for ad service company
 -   Code is from: <https://rpubs.com/markloessi/502098>
@@ -251,8 +253,7 @@ format:
 #| code-summary: "expand for full code"
 library(tidyverse)
 df <- read_csv("ts_tutorial_files/Ads_CTR_Optimisation.csv")
-df %>% 
-  head()
+df
 ```
 
 ## Random Approach
@@ -295,6 +296,7 @@ ggplot(data = tibble("ads" = ads_selected),
   labs(x = "arm/action/ad", y="number selected") +
   theme_classic()
 ```
+
 ## Thompson Sampling
 
 ```{r, echo = F}
@@ -304,7 +306,9 @@ ads_selected = integer(0)
 numbers_of_rewards_1 = integer(k) # vector for each arm
 numbers_of_rewards_0 = integer(k)
 total_reward = 0
+```
 
+```{r}
 for (n in 1:N) { # for N runs
   ad = 0
   max_random = 0
@@ -337,7 +341,8 @@ for (n in 1:N) { # for N runs
 # observed clicks
 numbers_of_rewards_1
 ```
-##
+
+## 
 
 ```{r, warning=FALSE, results='hide',message=FALSE}
 #| echo: true
@@ -359,7 +364,7 @@ tibble("ads" = factor(ads_selected, levels=c(1:10))) %>%
   theme_classic()
 ```
 
-##
+## 
 
 ```{r, warning=FALSE, results='hide',message=FALSE}
 #| echo: true
@@ -381,7 +386,7 @@ df %>%
   theme_classic()
 ```
 
-##
+## 
 
 ```{r, warning=FALSE, results='hide',message=FALSE}
 #| echo: true
@@ -406,6 +411,3 @@ beta_dist %>%
   theme_classic() +
   scale_colour_brewer(palette = "Set3")
 ```
-
-
-

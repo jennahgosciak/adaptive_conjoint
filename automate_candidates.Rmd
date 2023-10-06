@@ -1,0 +1,94 @@
+---
+title: "Automate Candidate Profiles"
+output:
+  pdf_document:
+    extra_dependencies: ["framed"]
+date: "2023-09-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r, setup packages, include=FALSE}
+library(officer)
+library(flextable)
+library(magrittr)
+library(tidyverse)
+
+set.seed(2023)
+```
+
+```{r, include=F}
+copies <- 2
+categories_to_vary <- c("gender", "experience", "career")
+levels_per_category <-lst("gender" = c("male", "female"), 
+                          "experience" = c("low", "high"), 
+                          "career" = c("education", "business"))
+levels_grid <- expand.grid(levels_per_category)
+levels_grid
+```
+```{r, include=F}
+first_names <- lst("male" = c("Richard", "Thomas"),
+                   "female" = c("Jessica", "Ashley"))
+
+last_names <- lst("male" = c("Wagner", "Hoffman"),
+                   "female" = c("Snyder", "Olsen"))
+
+ages <- c(39, 72)
+experience <- lst("high" = c("State legislator", "Member of Congress"),
+                  "low" = c("None", "None"))
+career <- lst("high" = c("Entrepreneur", "Small business owner"),
+              "low" = c("Educator", "Teacher"))
+
+orig_data <- lst("first_names" = first_names$male,
+                  "last_names" = last_names$male,
+                  "ages" = ages, 
+                  "experience" = experience$high, 
+                  "career" = career$business)
+```
+
+```{r, include=F}
+random_order <- function(x) {
+  return(sample(x, length(x), replace = F))
+}
+
+generate_data <- function(orig_df) {
+  return(map(orig_data, ~random_order(.)))
+}
+
+rand_data <- generate_data(orig_df)
+rand_data
+```
+
+```{r, results='asis'}
+for (c in 1:nrow(levels_grid)) {
+    fn <- first_names[[levels_grid[c,"gender"]]]
+    ln <- last_names[[levels_grid[c,"gender"]]]
+    exp <- experience[[levels_grid[c,"experience"]]]
+    car <- career[[levels_grid[c, "career"]]]
+    
+    orig_data <- lst("first_names" = fn,
+                  "last_names" = ln,
+                  "ages" = ages, 
+                  "experience" = exp, 
+                  "career" = car)
+  
+    rand_data <- generate_data(orig_df)
+  for (i in 1:copies){
+    table_text <- str_c("\\begin{framed}
+    \\noindent Imagine you are a voter in a primary election for state governor.\\\\The party you prefer puts forth two candidates: \\vskip .2in \\begin{tabular}{lll}
+        \\hline
+        Name & ", rand_data$first_names[1], " ", rand_data$last_names[1], 
+    " & ", rand_data$first_names[2], " ", rand_data$last_names[2], " \\\\ Age &",
+    rand_data$ages[1], " & ", rand_data$ages[2], "\\\\
+        Political experience & ", rand_data$experience[1], " & ", rand_data$experience[2], " \\\\
+        Career experience & ", rand_data$career[1], " & ", rand_data$career[2], " \\\\ 
+        \\hline \\end{tabular} \\vskip .2in 
+    Which of these two candidates do you prefer? 
+\\end{framed} \\vskip .5in \\clearpage")
+    
+    cat(table_text)   
+  }
+}
+```
