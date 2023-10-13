@@ -3,8 +3,11 @@ title: "Automate Candidate Profiles"
 output:
   pdf_document:
     extra_dependencies: ["framed"]
-date: "2023-09-14"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+geometry: paperheight=4in,paperwidth=8.5in,margin=1in
 ---
+
+\pagenumbering{gobble}
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -61,6 +64,8 @@ rand_data <- generate_data(orig_df)
 rand_data
 ```
 
+\newpage
+
 ```{r, results='asis'}
 for (c in 1:nrow(levels_grid)) {
     fn <- first_names[[levels_grid[c,"gender"]]]
@@ -78,6 +83,7 @@ for (c in 1:nrow(levels_grid)) {
   for (i in 1:copies){
     table_text <- str_c("\\begin{framed}
     \\noindent Imagine you are a voter in a primary election for state governor.\\\\The party you prefer puts forth two candidates: \\vskip .2in \\begin{tabular}{lll}
+        & Candidate 1 & Candidate 2 \\\\
         \\hline
         Name & ", rand_data$first_names[1], " ", rand_data$last_names[1], 
     " & ", rand_data$first_names[2], " ", rand_data$last_names[2], " \\\\ Age &",
@@ -85,7 +91,6 @@ for (c in 1:nrow(levels_grid)) {
         Political experience & ", rand_data$experience[1], " & ", rand_data$experience[2], " \\\\
         Career experience & ", rand_data$career[1], " & ", rand_data$career[2], " \\\\ 
         \\hline \\end{tabular} \\vskip .2in 
-    Which of these two candidates do you prefer? 
 \\end{framed} \\vskip .5in \\clearpage")
     
     cat(table_text)   
