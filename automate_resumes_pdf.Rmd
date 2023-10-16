@@ -1,0 +1,110 @@
+---
+title: "Automate Resume Creation"
+output: html_document
+date: "2023-09-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, setup}
+library(officer)
+library(flextable)
+library(magrittr)
+library(tidyverse)
+
+set.seed(2023)
+```
+```{r, include=F}
+copies <- 2
+categories_to_vary <- c("university", "race")
+levels_per_category <-lst("university" = c("lowrank", "highrank"), 
+                          "race" = c("black", "white"))
+levels_grid <- expand.grid(levels_per_category)
+levels_grid
+```
+
+```{r, include=F}
+first_names <- lst("white" = c("Jessica", "Ashley"),
+                   "black" = c("Ebony", "Aisha"))
+
+last_names <- lst("white" = c("Olsen", "Snyder"),
+                   "black" = c("Washington", "Jefferson"))
+
+university <- lst("high" = c("Massachusetts Institute of Technology", "University of Pennsylvania"),
+                  "low" = c("University of Denver", "University of Arizona"))
+```
+
+```{r}
+treatment <- c("Parent Teacher Association Volunteer", 
+                 "Marketing Coordinator")
+treatment_header <- c("| Creekside Elementary | Denver, CO 80014 | 2022 – present",
+                        "| Goods Delivered | Denver, CO | 2021 to Present")
+treatment_description <- c("Member of the Executive Board. Served as Secretary.",
+                             "Report directly to Marketing Manager, assisting in the development of the overall marketing strategy.")
+treatment_year <- c("(left to care for my children)", "")
+```
+
+```{r, include=F}
+random_order <- function(x) {
+  return(sample(x, length(x), replace = F))
+}
+
+generate_data <- function(orig_df) {
+  return(map(orig_df, ~random_order(.)))
+}
+```
+
+```{r}
+for (c in 1:nrow(levels_grid)) {
+    fn <- first_names[[levels_grid[c,"race"]]]
+    ln <- last_names[[levels_grid[c,"race"]]]
+    univ <- university[[levels_grid[c,"university"]]]
+    print(univ)
+    
+    treatment_order <- sample(c(1,2), replace=F)
+    t <- treatment[treatment_order]
+    
+    orig_df <- lst("first_names" = fn,
+                  "last_names" = ln,
+                  "university" = univ)
+  
+    rand_data <- generate_data(orig_df)
+    
+    format <- sample(c(1,2), replace=F)
+    t_head <- treatment_header[treatment_order]
+    t_desc <- treatment_description[treatment_order]
+    t_year <- treatment_year[treatment_order]
+    doc <- read_docx(str_glue("resume_format_combined.docx"))
+    for (j in 1:2) {
+      doc <- doc %>% 
+          body_replace_all_text(old_value = str_glue("FirstName{j}"),
+          new_value = rand_data$first_names[[j]], fixed = TRUE) %>% 
+          body_replace_all_text(old_value = str_glue("firstname{j}"),
+          new_value = str_to_lower(rand_data$first_names[j]), fixed = TRUE) %>%
+          body_replace_all_text(old_value = str_glue("LastName{j}"),
+          new_value = rand_data$last_names[j], fixed = TRUE) %>% 
+          body_replace_all_text(old_value = str_glue("lastname{j}"),
+          new_value = str_to_lower(rand_data$last_names[2]), fixed = TRUE) %>% 
+          body_replace_all_text(old_value = str_glue("University{j}"),
+          new_value = rand_data$university[j], fixed = TRUE) %>% 
+          body_replace_all_text(old_value = str_glue("TreatmentDescription{j}"),
+                                new_value = t_desc[j], fixed = TRUE) %>%
+          body_replace_all_text(old_value = str_glue("TreatmentHeader{j}"),
+                                new_value = t_head[j], fixed = TRUE) %>%
+          body_replace_all_text(old_value = str_glue("Treatment{j}"),
+                                new_value = t[j], fixed = TRUE) %>% 
+          body_replace_all_text(old_value = str_glue("YEAR{j}"),
+                                new_value = t_year[j], fixed = TRUE)
+    
+    doc %>%
+      print(target = str_glue("output/resume_output{i}_race{levels_grid[c, 'race']}_universityrank{levels_grid[c,'university']}.docx"))
+    }
+  }
+```
+
+```
+
+
+

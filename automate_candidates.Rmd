@@ -44,7 +44,7 @@ experience <- lst("high" = c("State legislator", "Member of Congress"),
 career <- lst("high" = c("Entrepreneur", "Small business owner"),
               "low" = c("Educator", "Teacher"))
 
-orig_data <- lst("first_names" = first_names$male,
+orig_df <- lst("first_names" = first_names$male,
                   "last_names" = last_names$male,
                   "ages" = ages, 
                   "experience" = experience$high, 
@@ -57,7 +57,7 @@ random_order <- function(x) {
 }
 
 generate_data <- function(orig_df) {
-  return(map(orig_data, ~random_order(.)))
+  return(map(orig_df, ~random_order(.)))
 }
 
 rand_data <- generate_data(orig_df)
@@ -73,7 +73,7 @@ for (c in 1:nrow(levels_grid)) {
     exp <- experience[[levels_grid[c,"experience"]]]
     car <- career[[levels_grid[c, "career"]]]
     
-    orig_data <- lst("first_names" = fn,
+    orig_df <- lst("first_names" = fn,
                   "last_names" = ln,
                   "ages" = ages, 
                   "experience" = exp, 
