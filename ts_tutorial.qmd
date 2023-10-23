@@ -259,20 +259,20 @@ df
 ## Random Approach
 
 ```{r, echo = F}
-#setup
-N = 10000
-k = 10
-ads_selected = integer(0)
-total_reward = 0
+# setup
+N <- 10000
+k <- 10
+ads_selected <- integer(0)
+total_reward <- 0
 ```
 
 ```{r, echo = F}
 for (n in 1:N) {
   # randomly sample
-  ad = sample(1:10, 1) # select arm to show to user
-  ads_selected = append(ads_selected, ad) # create list of arms
-  reward = df[n, ad] # observe user behavior
-  total_reward = total_reward + reward
+  ad <- sample(1:10, 1) # select arm to show to user
+  ads_selected <- append(ads_selected, ad) # create list of arms
+  reward <- df[n, ad] # observe user behavior
+  total_reward <- total_reward + reward
 }
 total_reward ## total number of users who clicked on the ad
 ```
@@ -284,58 +284,64 @@ total_reward ## total number of users who clicked on the ad
 #| code-fold: true
 #| code-summary: "expand for full code"
 library(ggplot2)
-ggplot(data = tibble("ads" = ads_selected), 
-       aes(x = ads)) + 
+ggplot(
+  data = tibble("ads" = ads_selected),
+  aes(x = ads)
+) +
   geom_histogram(stat = "count") +
-  stat_count(binwidth = 1, 
-             geom = 'text', 
-             color = 'black', 
-             aes(label = after_stat(count)),
-           position = position_stack(vjust = 1.1)) +
+  stat_count(
+    binwidth = 1,
+    geom = "text",
+    color = "black",
+    aes(label = after_stat(count)),
+    position = position_stack(vjust = 1.1)
+  ) +
   scale_x_continuous(breaks = c(1:10)) +
-  labs(x = "arm/action/ad", y="number selected") +
+  labs(x = "arm/action/ad", y = "number selected") +
   theme_classic()
 ```
 
 ## Thompson Sampling
 
 ```{r, echo = F}
-N = 10000
-k = 10
-ads_selected = integer(0)
-numbers_of_rewards_1 = integer(k) # vector for each arm
-numbers_of_rewards_0 = integer(k)
-total_reward = 0
+N <- 10000
+k <- 10
+ads_selected <- integer(0)
+numbers_of_rewards_1 <- integer(k) # vector for each arm
+numbers_of_rewards_0 <- integer(k)
+total_reward <- 0
 ```
 
 ```{r}
 for (n in 1:N) { # for N runs
-  ad = 0
-  max_random = 0
+  ad <- 0
+  max_random <- 0
   for (i in 1:k) {
     # draw from prior distribution for theta
     # for each arm
-    random_theta = rbeta(n = 1,
-                        shape1 = numbers_of_rewards_1[i] + 1,
-                        shape2 = numbers_of_rewards_0[i] + 1)
+    random_theta <- rbeta(
+      n = 1,
+      shape1 = numbers_of_rewards_1[i] + 1,
+      shape2 = numbers_of_rewards_0[i] + 1
+    )
     if (random_theta > max_random) {
       # if arm is better than all the previous ones
       # this arm is selected, choose theta
-      max_random = random_theta
-      ad = i
+      max_random <- random_theta
+      ad <- i
     }
   }
   # after selecting the argmax, add to selected ad
-  ads_selected = append(ads_selected, ad)
-  
+  ads_selected <- append(ads_selected, ad)
+
   # checking with data (what is *observed*)
-  reward = df[n, ad]
+  reward <- df[n, ad]
   if (reward == 1) {
-    numbers_of_rewards_1[ad] = numbers_of_rewards_1[ad] + 1
+    numbers_of_rewards_1[ad] <- numbers_of_rewards_1[ad] + 1
   } else {
-    numbers_of_rewards_0[ad] = numbers_of_rewards_0[ad] + 1
+    numbers_of_rewards_0[ad] <- numbers_of_rewards_0[ad] + 1
   }
-  total_reward = total_reward + reward
+  total_reward <- total_reward + reward
 }
 
 # observed clicks
@@ -348,19 +354,23 @@ numbers_of_rewards_1
 #| echo: true
 #| code-fold: true
 #| code-summary: "expand for full code"
-tibble("ads" = factor(ads_selected, levels=c(1:10))) %>% 
-  group_by(ads) %>% 
-  summarize(n = n()) %>% 
-  bind_rows(tibble(ads = factor(c(1:6), levels=c(1:10)), n = 0)) %>% 
-  ggplot(aes(ads, n, label=if_else(n>0, n, NaN))) +
+tibble("ads" = factor(ads_selected, levels = c(1:10))) %>%
+  group_by(ads) %>%
+  summarize(n = n()) %>%
+  bind_rows(tibble(ads = factor(c(1:6), levels = c(1:10)), n = 0)) %>%
+  ggplot(aes(ads, n, label = if_else(n > 0, n, NaN))) +
   geom_col() +
-  geom_text(binwidth = 1, 
-             geom = 'text', 
-             color = 'black', 
-           vjust = -0.5) +
-  scale_x_discrete(breaks = c(1:10), labels=c(1:10)) +
-  labs(x = "arm/action/ad", y="number selected", 
-       title = "Thompson Sampling") +
+  geom_text(
+    binwidth = 1,
+    geom = "text",
+    color = "black",
+    vjust = -0.5
+  ) +
+  scale_x_discrete(breaks = c(1:10), labels = c(1:10)) +
+  labs(
+    x = "arm/action/ad", y = "number selected",
+    title = "Thompson Sampling"
+  ) +
   theme_classic()
 ```
 
@@ -370,19 +380,23 @@ tibble("ads" = factor(ads_selected, levels=c(1:10))) %>%
 #| echo: true
 #| code-fold: true
 #| code-summary: "expand for full code"
-df %>% 
-  summarize(across(everything(), ~sum(., na.rm = T))) %>% 
-  pivot_longer(everything(), names_to = "ads", values_to = "n") %>% 
-  mutate(ads = as.factor(str_replace(ads, "Ad ", ""))) %>% 
-  ggplot(aes(ads, n, label=if_else(n>0, n, NaN))) +
+df %>%
+  summarize(across(everything(), ~ sum(., na.rm = T))) %>%
+  pivot_longer(everything(), names_to = "ads", values_to = "n") %>%
+  mutate(ads = as.factor(str_replace(ads, "Ad ", ""))) %>%
+  ggplot(aes(ads, n, label = if_else(n > 0, n, NaN))) +
   geom_col() +
-  geom_text(binwidth = 1, 
-             geom = 'text', 
-             color = 'black', 
-           vjust = -0.5) +
-  scale_x_discrete(breaks = c(1:10), labels=c(1:10)) +
-  labs(x = "arm/action/ad", y="number selected",
-       title = "Real clicks obesrved in the data") +
+  geom_text(
+    binwidth = 1,
+    geom = "text",
+    color = "black",
+    vjust = -0.5
+  ) +
+  scale_x_discrete(breaks = c(1:10), labels = c(1:10)) +
+  labs(
+    x = "arm/action/ad", y = "number selected",
+    title = "Real clicks obesrved in the data"
+  ) +
   theme_classic()
 ```
 
@@ -393,20 +407,25 @@ df %>%
 #| code-fold: true
 #| code-summary: "expand for full code"
 library(RColorBrewer)
-beta_dist <- map2(numbers_of_rewards_1, numbers_of_rewards_0,
-    ~dbeta(x = seq(0.01,1, 0.01), 
-      shape1 = .x,
-      shape2 = .y))
+beta_dist <- map2(
+  numbers_of_rewards_1, numbers_of_rewards_0,
+  ~ dbeta(
+    x = seq(0.01, 1, 0.01),
+    shape1 = .x,
+    shape2 = .y
+  )
+)
 
 beta_dist %>%
-    map(as_tibble) %>%
-    reduce(bind_cols) %>% 
-  rename_all(~str_c("ad",c(1:10))) %>% 
-  mutate(theta_k_hat = seq(0.01,1, 0.01)) %>% 
+  map(as_tibble) %>%
+  reduce(bind_cols) %>%
+  rename_all(~ str_c("ad", c(1:10))) %>%
+  mutate(theta_k_hat = seq(0.01, 1, 0.01)) %>%
   pivot_longer(-theta_k_hat,
-               names_to = "ads", values_to = "density") %>% 
-  mutate(ads = factor(ads, levels = str_c("ad", c(1:10)))) %>% 
-  ggplot(aes(theta_k_hat, density, color=ads)) +
+    names_to = "ads", values_to = "density"
+  ) %>%
+  mutate(ads = factor(ads, levels = str_c("ad", c(1:10)))) %>%
+  ggplot(aes(theta_k_hat, density, color = ads)) +
   geom_line() +
   theme_classic() +
   scale_colour_brewer(palette = "Set3")

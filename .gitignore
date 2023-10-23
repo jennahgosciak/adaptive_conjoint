@@ -3,5 +3,7 @@
 *.RData
 *.docx
 output/
+input/
+automate_candidates_files/
 .Rproj.user
 *.pdf
