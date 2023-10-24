@@ -29,7 +29,7 @@ levels_grid
 
 ```{r, include=F}
 first_names <- lst(
-  "white" = c("Jessica", "Ashley"),
+  "white" = c("Laurie", "Allison"),
   "black" = c("Ebony", "Aisha")
 )
 

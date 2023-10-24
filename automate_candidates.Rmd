@@ -123,14 +123,9 @@ experience <- lst(
 career <- lst("all" = sample(c("Restaurant owner", "Small business owner"), 2))
 
 ages <- c(39, 72)
-# form data
-orig_df <- lst(
-  "first_names" = first_names$male,
-  "last_names" = last_names$male,
-  "ages" = ages,
-  "experience" = experience$high,
-  "career" = career$business
-)
+
+first_names
+last_names
 ```
 
 ```{r, include=F}
@@ -156,6 +151,7 @@ for (c in 1:nrow(levels_grid)) {
     ", Political experience: ", levels_grid[c, "experience"]
   ) %>%
     str_replace("_", " "))
+  
   fn <- first_names[[levels_grid[c, ][["race_gender"]]]]
   ln <- last_names[[levels_grid[c, ][["race_gender"]]]]
   exp <- experience[[levels_grid[c, "experience"]]]
