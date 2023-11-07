@@ -1,0 +1,194 @@
+---
+title: "process_qualtrics"
+output: html_document
+date: "2023-11-07"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(qualtRics)
+
+url <- "https://ca1.qualtrics.com"
+api_key <- "3f2XnLK61vaO3nnMcpw4ulWNF8rdlYU8eAHAlAG0"
+
+qualtrics_api_credentials(api_key = api_key, 
+                          base_url = url,
+                          install = TRUE,
+                          overwrite=T)
+
+surveys <- all_surveys() 
+pc_id <- surveys[surveys['name']=='Political Candidates',][['id']]
+
+pc_survey <- fetch_survey(surveyID = pc_id, 
+                         verbose = TRUE)
+```
+```{r}
+pc_survey %>% 
+  distinct(Status)
+
+# validate survey logic
+pc_survey %>% 
+  filter(Status == 'Survey Test')
+
+pc_survey %>% 
+  filter(Status == 'Survey Test', Consent == 'I do not consent to participate') %>% 
+  distinct(`Q2`)
+
+pc_survey %>% 
+  filter(Status == 'Survey Test', PreScreen_Q1 != 'Yes',
+         StartDate >= lubridate::ymd("2023-11-06")) %>% 
+  distinct(Q1)
+```
+```{r}
+pc_survey_test <- pc_survey %>% 
+  filter(Status == 'Survey Test') %>% 
+  mutate(profile = case_when(rnum <= pi1 ~ 1,
+                            rnum > pi1 & rnum <= pi2 ~ 2,
+                            rnum > pi2 & rnum <= pi3 ~ 3,
+                            rnum > pi3 & rnum <= pi4 ~ 4,
+                            rnum > pi4 & rnum <= pi5 ~ 5,
+                            rnum > pi5 & rnum <= pi6 ~ 6,
+                            rnum > pi6 & rnum <= pi7 ~ 7,
+                            rnum > pi7 ~ 8))
+
+
+# check in large sample
+pc_survey_test %>% 
+  ggplot(aes(profile)) +
+  geom_histogram()
+```
+```{r}
+pc_survey_recode <- pc_survey_test %>% 
+  mutate(across(str_c("Q", 1:8), ~case_when(. == "Candidate 1" & rnum_age <= 0.5 ~ 1,
+                                            . == "Candidate 2" & rnum_age > 0.5 ~ 1,
+                                            TRUE ~ 0))) %>% 
+  mutate(total_Q = select(., str_c("Q", 1:8)) %>%
+           rowSums())
+
+pc_survey_recode %>% 
+  select(str_c("Q", 1:8)) %>% 
+  rowSums()
+```
+```{r}
+# create fake data
+pc_survey_fake <- data.frame(matrix(0, ncol = 8, nrow = 1000))
+names(pc_survey_fake) <- str_c("Q", 1:8)
+pc_survey_fake['profile'] <- 0
+
+for (i in 1:1000) {
+  rnum <- runif(1)
+  profile <- case_when(rnum < 0.22 ~ 1,
+                       rnum >= 0.22 & rnum < 0.25 ~ 2,
+                       rnum >= 0.25 & rnum < 0.375 ~ 3,
+                       rnum >= 0.375 & rnum < 0.5 ~ 4,
+                       rnum >= 0.5 & rnum < 0.625 ~ 5,
+                       rnum >= 0.625 & rnum < 0.75 ~ 6,
+                       rnum >= 0.75 & rnum < 0.875 ~ 7,
+                       rnum >= 0.875 ~ 8)
+  if (profile == 1) {
+    pc_survey_fake[i,str_c("Q", profile)] <- 1
+  } else {
+    pc_survey_fake[i,str_c("Q", profile)] <- if_else(runif(1) <= 0.2, 1, 0)
+  }
+  pc_survey_fake[i, 'profile'] <- profile
+}
+
+pc_survey_fake %>% 
+  ggplot(aes(profile)) +
+  geom_histogram()
+
+pc_survey_fake %>% 
+  filter(profile == 2) %>% 
+  summarize(mean = mean(Q2))
+
+pc_survey_fake %>% 
+  filter(profile == 1) %>% 
+  summarize(mean = mean(Q1))
+```
+```{r}
+c <- 8
+profiles_selected <- integer(0)
+numbers_of_rewards_1 <- integer(c) # vector for each arm
+numbers_of_rewards_0 <- integer(c)
+total_reward <- 0
+max_random <- 0
+profile <- 1
+
+for (n in 1:nrow(pc_survey_fake)) { # for N runs
+  i <- pc_survey_fake[n, 'profile']
+  
+  # draw from prior distribution for theta
+  # for each arm
+  random_theta <- rbeta(
+    n = 1,
+    shape1 = numbers_of_rewards_1[i] + 1,
+    shape2 = numbers_of_rewards_0[i] + 1
+  )
+  
+  # print(str_glue("{random_theta}"))
+  # print(str_glue("{i}"))
+  if (random_theta > max_random) {
+      # print(str_glue("better than previous for {n}, profile {i}"))
+      # if arm is better than all the previous ones
+      # this arm is selected, choose theta
+      max_random <- random_theta
+      profile <- i
+  }
+  
+  # after selecting the argmax, add to selected profile
+  profiles_selected <- append(profiles_selected, profile)
+  
+  # checking with data (what is *observed*)
+  reward <- pc_survey_fake[n, str_c("Q",profile)]
+  if (reward == 1) {
+    numbers_of_rewards_1[profile] <- numbers_of_rewards_1[profile] + 1
+  } else {
+    numbers_of_rewards_0[profile] <- numbers_of_rewards_0[profile] + 1
+  }
+  total_reward <- total_reward + reward
+}
+
+numbers_of_rewards_1
+numbers_of_rewards_0
+```
+
+```{r}
+for (n in 1:nrow(pc_survey_fake)) { # for N runs
+  profile <- 1
+  max_random <- 0
+  for (i in 1:k) {
+    # draw from prior distribution for theta
+    # for each arm
+    random_theta <- rbeta(
+      n = 1,
+      shape1 = numbers_of_rewards_1[i] + 1,
+      shape2 = numbers_of_rewards_0[i] + 1
+    )
+    if (random_theta > max_random) {
+      # if arm is better than all the previous ones
+      # this arm is selected, choose theta
+      max_random <- random_theta
+      profile <- i
+    }
+  }
+  # after selecting the argmax, add to selected profile
+  profiles_selected <- append(profiles_selected, profile)
+  
+  # checking with data (what is *observed*)
+  reward <- pc_survey_fake[n, str_c("Q",profile)]
+  if (reward == 1) {
+    numbers_of_rewards_1[profile] <- numbers_of_rewards_1[profile] + 1
+  } else {
+    numbers_of_rewards_0[profile] <- numbers_of_rewards_0[profile] + 1
+  }
+  total_reward <- total_reward + reward
+}
+
+# observed clicks
+numbers_of_rewards_1
+```
+
