@@ -12,8 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(qualtRics)
 
-url <- "https://ca1.qualtrics.com"
-api_key <- "3f2XnLK61vaO3nnMcpw4ulWNF8rdlYU8eAHAlAG0"
+url <- "https://datacenterid.qualtrics.com"
+api_key <- ""
 
 qualtrics_api_credentials(api_key = api_key, 
                           base_url = url,
