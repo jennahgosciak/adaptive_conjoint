@@ -1,0 +1,29 @@
+[[AdvancedFormat]]
+
+[[Block:Block1]]
+[[Question:MC:Select]]
+Q1. Which candidate would you be more inclined to support for President of the United States?
+[[Choices]]
+72-year-old man. Served in Army. Educated at Princeton University.
+70-year-old woman. Served in Army. Educated at Harvard University.
+
+[[PageBreak]]
+[[Question:MC:Select]]
+Q2. Which candidate would you be more inclined to support for President of the United States?
+[[Choices]]
+39-year-old man. No military service. Educated at University of Minnesota.
+72-year-old woman. Served in Air Force. Educated at Stanford University.
+
+[[Block:Block2]]
+[[Question:MC:Select]]
+Q1. Which candidate would you be more inclined to support for President of the United States?
+[[Choices]]
+72-year-old man. Served in Army. Educated at Princeton University.
+70-year-old woman. Served in Army. Educated at Harvard University.
+
+[[PageBreak]]
+[[Question:MC:Select]]
+Q2. Which candidate would you be more inclined to support for President of the United States?
+[[Choices]]
+39-year-old man. No military service. Educated at University of Minnesota.
+72-year-old woman. Served in Air Force. Educated at Stanford University.

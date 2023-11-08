@@ -2,8 +2,8 @@
 .RProj*
 *.RData
 *.docx
-output/
-input/
+02_output/
+01_input/
 automate_candidates_files/
 .Rproj.user
 *.pdf
