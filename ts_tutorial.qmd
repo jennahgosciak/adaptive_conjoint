@@ -304,7 +304,7 @@ ggplot(
 ## Thompson Sampling
 
 ```{r, echo = F}
-N <- 10000
+N <- 100
 k <- 10
 ads_selected <- integer(0)
 numbers_of_rewards_1 <- integer(k) # vector for each arm
@@ -395,7 +395,7 @@ df %>%
   scale_x_discrete(breaks = c(1:10), labels = c(1:10)) +
   labs(
     x = "arm/action/ad", y = "number selected",
-    title = "Real clicks obesrved in the data"
+    title = "Real clicks observed in the data"
   ) +
   theme_classic()
 ```

@@ -35,6 +35,11 @@ for (index in 1:200) {
     data.frame(pi = seq(0,1,.01)) %>%
       mutate(f_pi = dbeta(pi, theta[i,1], theta[i,2]),
              arm = paste("Treatment",LETTERS[i]))
+    
+    data.frame(pi = seq(0,1,.01)) %>%
+      mutate(f_pi = dbeta(pi, theta[i,1], theta[i,2]),
+             arm = paste("Treatment",LETTERS[i])) %>% 
+      print()
   }
   sampled <- data.frame(arm = paste("Treatment",LETTERS[1:3]),
                         pi =  apply(theta,1,function(x) rbeta(1,x[1],x[2])))

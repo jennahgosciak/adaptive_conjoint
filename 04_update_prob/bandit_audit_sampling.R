@@ -5,7 +5,6 @@ n_x <- 4
 truth <- data.frame(x = 1:n_x,
                     pi1 = seq(.2, .8, by = .2),
                     pi2 = seq(.8, .2, by = -.2))
-
 prior <- data.frame(x = 1:n_x,
                     alpha1 = 1,
                     beta1 = 1,
@@ -49,7 +48,7 @@ choose_highest <- function(posterior_draw) {
 data <- foreach(i = 1:n_x, .combine = "rbind") %do% draw_data(x_val = i)
 
 index <- 1
-while (index <= 250) {
+while (index <= 10) {
   # Draw a posterior
   posterior <- draw_posterior(data)
   # Pick the highest
@@ -72,6 +71,7 @@ posterior_parameters <- data %>%
   ungroup() %>%
   mutate(estimate = posterior_alpha1 / (posterior_alpha1 + posterior_beta1) -
            posterior_alpha2 / (posterior_alpha2 + posterior_beta2))
+
 posterior_ci <- foreach(i = 1:nrow(posterior_parameters), .combine = "rbind") %do% {
   sim1 <- rbeta(n_sims, 
                 posterior_parameters$posterior_alpha1[i],

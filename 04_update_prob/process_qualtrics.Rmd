@@ -8,17 +8,19 @@ date: "2023-11-07"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Setup Data Using Qualtrics API
+
 ```{r}
 library(tidyverse)
 library(qualtRics)
 
-url <- "https://datacenterid.qualtrics.com"
-api_key <- ""
-
-qualtrics_api_credentials(api_key = api_key, 
-                          base_url = url,
-                          install = TRUE,
-                          overwrite=T)
+# url <- "https://datacenterid.qualtrics.com"
+# api_key <- ""
+# 
+# qualtrics_api_credentials(api_key = api_key, 
+#                           base_url = url,
+#                           install = TRUE,
+#                           overwrite=T)
 
 surveys <- all_surveys() 
 pc_id <- surveys[surveys['name']=='Political Candidates',][['id']]
@@ -26,6 +28,9 @@ pc_id <- surveys[surveys['name']=='Political Candidates',][['id']]
 pc_survey <- fetch_survey(surveyID = pc_id, 
                          verbose = TRUE)
 ```
+
+## Survey Validation
+
 ```{r}
 pc_survey %>% 
   distinct(Status)
@@ -43,6 +48,9 @@ pc_survey %>%
          StartDate >= lubridate::ymd("2023-11-06")) %>% 
   distinct(Q1)
 ```
+
+
+
 ```{r}
 pc_survey_test <- pc_survey %>% 
   filter(Status == 'Survey Test') %>% 
@@ -75,92 +83,72 @@ pc_survey_recode %>%
 ```
 ```{r}
 # create fake data
-pc_survey_fake <- data.frame(matrix(0, ncol = 8, nrow = 1000))
+batch_size <- 100
+N <- 45
+
+pc_survey_fake <- data.frame(matrix(0, ncol = 8, nrow = (N*batch_size)))
 names(pc_survey_fake) <- str_c("Q", 1:8)
 pc_survey_fake['profile'] <- 0
 
-for (i in 1:1000) {
-  rnum <- runif(1)
-  profile <- case_when(rnum < 0.22 ~ 1,
-                       rnum >= 0.22 & rnum < 0.25 ~ 2,
-                       rnum >= 0.25 & rnum < 0.375 ~ 3,
-                       rnum >= 0.375 & rnum < 0.5 ~ 4,
-                       rnum >= 0.5 & rnum < 0.625 ~ 5,
-                       rnum >= 0.625 & rnum < 0.75 ~ 6,
-                       rnum >= 0.75 & rnum < 0.875 ~ 7,
-                       rnum >= 0.875 ~ 8)
-  if (profile == 1) {
-    pc_survey_fake[i,str_c("Q", profile)] <- 1
-  } else {
-    pc_survey_fake[i,str_c("Q", profile)] <- if_else(runif(1) <= 0.2, 1, 0)
+for (j in 1:N) {
+  for (i in 1:batch_size) {
+    rnum <- runif(1)
+    profile <- case_when(rnum < 0.125 ~ 1,
+                         rnum >= 0.125 & rnum < 0.25 ~ 2,
+                         rnum >= 0.25 & rnum < 0.375 ~ 3,
+                         rnum >= 0.375 & rnum < 0.5 ~ 4,
+                         rnum >= 0.5 & rnum < 0.625 ~ 5,
+                         rnum >= 0.625 & rnum < 0.75 ~ 6,
+                         rnum >= 0.75 & rnum < 0.875 ~ 7,
+                         rnum >= 0.875 ~ 8)
+    if (profile == 1) {
+      pc_survey_fake[(j-1)*batch_size + i,str_c("Q", profile)] <- rbinom(1, 1, 0.9)
+    } else {
+      pc_survey_fake[(j-1)*batch_size + i,str_c("Q", profile)] <- rbinom(1, 1, 0.5)
+    }
+    pc_survey_fake[(j-1)*batch_size + i, 'profile'] <- profile
+    pc_survey_fake[(j-1)*batch_size + i, 'batch'] <- j
   }
-  pc_survey_fake[i, 'profile'] <- profile
 }
+```
 
+```{r}
 pc_survey_fake %>% 
   ggplot(aes(profile)) +
   geom_histogram()
 
 pc_survey_fake %>% 
-  filter(profile == 2) %>% 
-  summarize(mean = mean(Q2))
+  pivot_longer(-c(profile, batch)) %>% 
+  group_by(profile) %>% 
+  summarize(mean = mean(value)) %>% 
+  ggplot(aes(profile, mean)) +
+  geom_col()
 
-pc_survey_fake %>% 
-  filter(profile == 1) %>% 
-  summarize(mean = mean(Q1))
+pc_survey_fake %>%
+  pivot_longer(-c(profile, batch)) %>% 
+  group_by(profile) %>% 
+  summarize(mean = mean(value),
+            total = sum(value))
 ```
 ```{r}
+# init parameters
 c <- 8
 profiles_selected <- integer(0)
 numbers_of_rewards_1 <- integer(c) # vector for each arm
 numbers_of_rewards_0 <- integer(c)
 total_reward <- 0
-max_random <- 0
-profile <- 1
 
-for (n in 1:nrow(pc_survey_fake)) { # for N runs
-  i <- pc_survey_fake[n, 'profile']
-  
-  # draw from prior distribution for theta
-  # for each arm
-  random_theta <- rbeta(
-    n = 1,
-    shape1 = numbers_of_rewards_1[i] + 1,
-    shape2 = numbers_of_rewards_0[i] + 1
-  )
-  
-  # print(str_glue("{random_theta}"))
-  # print(str_glue("{i}"))
-  if (random_theta > max_random) {
-      # print(str_glue("better than previous for {n}, profile {i}"))
-      # if arm is better than all the previous ones
-      # this arm is selected, choose theta
-      max_random <- random_theta
-      profile <- i
-  }
-  
-  # after selecting the argmax, add to selected profile
-  profiles_selected <- append(profiles_selected, profile)
-  
-  # checking with data (what is *observed*)
-  reward <- pc_survey_fake[n, str_c("Q",profile)]
-  if (reward == 1) {
-    numbers_of_rewards_1[profile] <- numbers_of_rewards_1[profile] + 1
-  } else {
-    numbers_of_rewards_0[profile] <- numbers_of_rewards_0[profile] + 1
-  }
-  total_reward <- total_reward + reward
-}
-
-numbers_of_rewards_1
-numbers_of_rewards_0
-```
-
-```{r}
-for (n in 1:nrow(pc_survey_fake)) { # for N runs
-  profile <- 1
+for (n in 1:N) { # for N runs
+  # subset data into 100 obs
   max_random <- 0
-  for (i in 1:k) {
+  profile_val <- 1
+  
+  df_subset <- pc_survey_fake %>% 
+     filter(batch == n)
+  stopifnot(nrow(df_subset)==batch_size)
+  
+  # iterate through all context arms
+  for (i in 1:c) {
     # draw from prior distribution for theta
     # for each arm
     random_theta <- rbeta(
@@ -168,27 +156,102 @@ for (n in 1:nrow(pc_survey_fake)) { # for N runs
       shape1 = numbers_of_rewards_1[i] + 1,
       shape2 = numbers_of_rewards_0[i] + 1
     )
+    
     if (random_theta > max_random) {
-      # if arm is better than all the previous ones
-      # this arm is selected, choose theta
-      max_random <- random_theta
-      profile <- i
+        # if arm is better than all the previous ones
+        # this arm is selected, choose theta
+        max_random <- random_theta
+        profile_val <- i
     }
   }
+  
   # after selecting the argmax, add to selected profile
-  profiles_selected <- append(profiles_selected, profile)
+  profiles_selected <- append(profiles_selected, profile_val)
   
   # checking with data (what is *observed*)
-  reward <- pc_survey_fake[n, str_c("Q",profile)]
-  if (reward == 1) {
-    numbers_of_rewards_1[profile] <- numbers_of_rewards_1[profile] + 1
-  } else {
-    numbers_of_rewards_0[profile] <- numbers_of_rewards_0[profile] + 1
-  }
-  total_reward <- total_reward + reward
+  # update based on reward
+  obs_outcome <- df_subset %>% 
+    filter(profile == profile_val) %>% 
+    magrittr::extract2(str_c("Q",profile_val))
+  
+  reward0 <- sum(obs_outcome == 0)
+  reward1 <- sum(obs_outcome == 1)
+  numbers_of_rewards_0[profile_val] <- numbers_of_rewards_0[profile_val] + reward0
+  numbers_of_rewards_1[profile_val] <- numbers_of_rewards_1[profile_val] + reward1
+  
+  total_reward <- total_reward + reward1
 }
 
-# observed clicks
-numbers_of_rewards_1
+numbers_of_rewards_1/total_reward
 ```
+
+```{r}
+tibble("profiles" = factor(profiles_selected, levels = c(1:c))) %>%
+  group_by(profiles) %>%
+  summarize(n = n()) %>%
+  bind_rows(tibble(profiles = factor(c(1:c), levels = c(1:c)), n = 0)) %>%
+  ggplot(aes(profiles, n, label = if_else(n > 0, n, NaN))) +
+  geom_col() +
+  geom_text(
+    binwidth = 1,
+    geom = "text",
+    color = "black",
+    vjust = -0.5
+  ) +
+  scale_x_discrete(breaks = c(1:c), labels = c(1:c)) +
+  labs(
+    x = "arm/action/ad", y = "number selected",
+    title = "Thompson Sampling"
+  ) +
+  theme_classic()
+```
+```{r}
+pc_survey_fake %>%
+  summarize(across(-c(profile, batch), ~ sum(., na.rm = T))) %>%
+  pivot_longer(everything(), names_to = "profiles", values_to = "n") %>%
+  mutate(profiles = as.factor(str_replace(profiles, "Q", ""))) %>%
+  ggplot(aes(profiles, n, label = if_else(n > 0, n, NaN))) +
+  geom_col() +
+  geom_text(
+    binwidth = 1,
+    geom = "text",
+    color = "black",
+    vjust = -0.5
+  ) +
+  scale_x_discrete(breaks = c(1:10), labels = c(1:10)) +
+  labs(
+    x = "arm/action/ad", y = "number selected",
+    title = "Real clicks observed in the data"
+  ) +
+  theme_classic()
+```
+
+
+```{r}
+library(RColorBrewer)
+beta_dist <- map2(
+  numbers_of_rewards_1, numbers_of_rewards_0,
+  ~ dbeta(
+    x = seq(0.01, 1, 0.01),
+    shape1 = .x,
+    shape2 = .y
+  )
+)
+beta_dist
+
+beta_dist %>%
+  map(as_tibble) %>%
+  reduce(bind_cols) %>%
+  rename_all(~ str_c("profile", c(1:c))) %>%
+  mutate(theta_k_hat = seq(0.01, 1, 0.01)) %>%
+  pivot_longer(-theta_k_hat,
+    names_to = "profiles", values_to = "density"
+  ) %>%
+  mutate(profiles = factor(profiles, levels = str_c("profile", c(1:c)))) %>%
+  ggplot(aes(theta_k_hat, density, color = profiles)) +
+  geom_line() +
+  theme_classic() +
+  scale_colour_brewer(palette = "Set3")
+```
+
 
