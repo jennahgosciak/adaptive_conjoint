@@ -182,16 +182,15 @@ for (n in 1:N) { # for N runs (in our case 45)
   total_reward <- total_reward + reward1
 }
 
-numbers_of_rewards_1/total_reward
-
 # generate new probabilities
-pi <- random_theta <- rbeta(
-      n = 1,
-      shape1 = numbers_of_rewards_1[i] + 1,
-      shape2 = numbers_of_rewards_0[i] + 1
+pi <- rbeta(
+      n = rep(1, c),
+      shape1 = numbers_of_rewards_1 + 1,
+      shape2 = numbers_of_rewards_0 + 1
     )
-pi1_post = rbeta(n(), alpha1_post, beta1_post),
-           pi2_post = rbeta(n(), alpha2_post, beta2_post)
+pi
+
+(numbers_of_rewards_1 + 1)/(numbers_of_rewards_1 + 1 + numbers_of_rewards_0 + 1)
 ```
 
 ```{r}
@@ -239,7 +238,7 @@ pc_survey_fake %>%
 ```{r}
 library(RColorBrewer)
 beta_dist <- map2(
-  numbers_of_rewards_1, numbers_of_rewards_0,
+  numbers_of_rewards_1 + 1, numbers_of_rewards_0 + 1,
   ~ dbeta(
     x = seq(0.01, 1, 0.01),
     shape1 = .x,
