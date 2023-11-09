@@ -183,6 +183,15 @@ for (n in 1:N) { # for N runs (in our case 45)
 }
 
 numbers_of_rewards_1/total_reward
+
+# generate new probabilities
+pi <- random_theta <- rbeta(
+      n = 1,
+      shape1 = numbers_of_rewards_1[i] + 1,
+      shape2 = numbers_of_rewards_0[i] + 1
+    )
+pi1_post = rbeta(n(), alpha1_post, beta1_post),
+           pi2_post = rbeta(n(), alpha2_post, beta2_post)
 ```
 
 ```{r}
