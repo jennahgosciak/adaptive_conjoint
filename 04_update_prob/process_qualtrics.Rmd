@@ -1,5 +1,5 @@
 ---
-title: "process_qualtrics"
+title: "Process Qualtrics Data, Treatment Assignment Updating"
 output: rmarkdown::github_document
 date: "2023-11-07"
 ---
@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 * Load data directly from Qualtrics
 * Can store API Key and credentials in `.renviron`
 
-```{r}
+```{r, load packages, message=F, warning=F}
 library(tidyverse)
 library(qualtRics)
 library(magrittr)
@@ -21,8 +21,10 @@ library(RColorBrewer)
 
 knitr::opts_chunk$set(cache.extra = 2023)
 
-source("../plotting_functions.R")
+source("./plotting_functions.R")
+```
 
+```{r, setup qualtrics}
 # datacenterid <- ""
 # url <- str_glue("https://{datacenterid}.qualtrics.com")
 # api_key <- ""
@@ -309,7 +311,7 @@ plot_observed_profiles(df_list)
 
 plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
 
-plot_regret(regret_exp)
+plot_regret(regret_exp, name="Experiment (no probability assignment updating)")
 ```
 
 ## Greedy Algorithm
@@ -401,6 +403,8 @@ plot_selected_profiles(profiles_selected)
 plot_observed_profiles(df_list)
 
 plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
+
+plot_regret(regret_greedy, name="Greedy TS")
 ```
 
 ## Thompson Sampling
@@ -573,7 +577,7 @@ plot_observed_profiles(df_list)
 
 plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
 
-plot_regret(regret_eg)
+plot_regret(regret_eg, name="Epsilon Greedy Regret")
 ```
 
 ## UCB (Upper Confidence Bound)

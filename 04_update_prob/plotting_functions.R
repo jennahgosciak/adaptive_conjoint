@@ -13,7 +13,7 @@ plot_selected_profiles <- function(profiles_selected, name="Thompson Sampling") 
     ) +
     scale_x_discrete(breaks = c(1:c), labels = c(1:c)) +
     labs(
-      x = "arm/action/ad", y = "number selected",
+      x = "Profile", y = "Number of profiles selected",
       title = name
     ) +
     theme_classic()
@@ -34,7 +34,7 @@ plot_observed_profiles <- function(observed_profiles) {
     ) +
     scale_x_discrete(breaks = c(1:10), labels = c(1:10)) +
     labs(
-      x = "arm/action/ad", y = "number selected",
+      x = "Profile", y = "Number of Profiles Selected",
       title = "Real actions observed in the data"
     ) +
     theme_classic()

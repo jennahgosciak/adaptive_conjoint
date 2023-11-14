@@ -1,4 +1,4 @@
-process_qualtrics
+Process Qualtrics Data, Treatment Assignment Updating
 ================
 2023-11-07
 
@@ -9,45 +9,16 @@ process_qualtrics
 
 ``` r
 library(tidyverse)
-```
-
-    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
-    ## ✔ ggplot2 3.4.0      ✔ purrr   0.3.5 
-    ## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
-    ## ✔ tidyr   1.2.1      ✔ stringr 1.4.1 
-    ## ✔ readr   2.1.3      ✔ forcats 0.5.2 
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## ✖ dplyr::filter() masks stats::filter()
-    ## ✖ dplyr::lag()    masks stats::lag()
-
-``` r
 library(qualtRics)
-```
-
-    ## Warning: package 'qualtRics' was built under R version 4.2.3
-
-``` r
 library(magrittr)
-```
-
-    ## 
-    ## Attaching package: 'magrittr'
-    ## 
-    ## The following object is masked from 'package:purrr':
-    ## 
-    ##     set_names
-    ## 
-    ## The following object is masked from 'package:tidyr':
-    ## 
-    ##     extract
-
-``` r
 library(RColorBrewer)
 
 knitr::opts_chunk$set(cache.extra = 2023)
 
-source("../plotting_functions.R")
+source("./plotting_functions.R")
+```
 
+``` r
 # datacenterid <- ""
 # url <- str_glue("https://{datacenterid}.qualtrics.com")
 # api_key <- ""
@@ -200,7 +171,7 @@ pc_survey_test %>%
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 ``` r
 # create numeric versions of the profiles
@@ -277,12 +248,12 @@ pc_survey_fake %>%
 ```
 
     ##   Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 profile
-    ## 1  0  0  0  1  0  0  0  0       4
-    ## 2  0  0  0  0  0  1  0  0       6
-    ## 3  0  0  0  0  0  1  0  0       6
-    ## 4  0  0  0  0  0  0  0  0       2
-    ## 5  1  0  0  0  0  0  0  0       1
-    ## 6  0  0  0  0  0  0  0  1       8
+    ## 1  0  0  0  0  0  0  0  0       5
+    ## 2  0  0  1  0  0  0  0  0       3
+    ## 3  0  0  0  0  0  0  0  0       1
+    ## 4  0  1  0  0  0  0  0  0       2
+    ## 5  0  0  1  0  0  0  0  0       3
+    ## 6  0  0  0  0  0  0  1  0       7
 
 ### Examine fake data
 
@@ -297,7 +268,7 @@ pc_survey_fake %>%
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 pc_survey_fake %>%
@@ -309,7 +280,7 @@ pc_survey_fake %>%
   theme_classic()
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
 
 ``` r
 pc_survey_fake %>%
@@ -326,14 +297,14 @@ pc_survey_fake %>%
     ## # A tibble: 8 × 3
     ##   profile   mean total
     ##     <dbl>  <dbl> <dbl>
-    ## 1       1 0.103     14
-    ## 2       2 0.0521     5
-    ## 3       3 0.0312     2
-    ## 4       4 0.0735    10
-    ## 5       5 0.0357     4
-    ## 6       6 0.125      9
-    ## 7       7 0.0521     5
-    ## 8       8 0.0795     7
+    ## 1       1 0.107     12
+    ## 2       2 0.0312     2
+    ## 3       3 0.0625     6
+    ## 4       4 0.075      6
+    ## 5       5 0.0417     4
+    ## 6       6 0.0938     9
+    ## 7       7 0.075      9
+    ## 8       8 0.0368     5
 
 # Algorithms
 
@@ -433,25 +404,25 @@ regret_exp <- regret
 plot_selected_profiles(profiles_selected_exp)
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 plot_observed_profiles(df_list)
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->
 
 ``` r
 plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-10-3.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-9-3.png)<!-- -->
 
 ``` r
-plot_regret(regret_exp)
+plot_regret(regret_exp, name="Experiment (no probability assignment updating)")
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-10-4.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-9-4.png)<!-- -->
 
 ## Greedy Algorithm
 
@@ -540,13 +511,13 @@ regret_greedy <- regret
 plot_selected_profiles(profiles_selected)
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 ``` r
 plot_observed_profiles(df_list)
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
 
 ``` r
 plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
@@ -562,7 +533,13 @@ plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
     ## • `value` -> `value...1`
     ## • `value` -> `value...2`
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-13-3.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-12-3.png)<!-- -->
+
+``` r
+plot_regret(regret_greedy, name="Greedy TS")
+```
+
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-12-4.png)<!-- -->
 
 ## Thompson Sampling
 
@@ -653,25 +630,25 @@ regret_ts <- regret
 plot_selected_profiles(profiles_selected_ts)
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
 plot_observed_profiles(df_list)
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-16-2.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-15-2.png)<!-- -->
 
 ``` r
 plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-16-3.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-15-3.png)<!-- -->
 
 ``` r
 plot_regret(regret_ts)
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-16-4.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-15-4.png)<!-- -->
 
 ## Epsilon Greedy
 
@@ -748,25 +725,25 @@ regret_eg <- regret
 plot_selected_profiles(profiles_selected_eg, name="Epsilon Greedy")
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ``` r
 plot_observed_profiles(df_list)
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-19-2.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-18-2.png)<!-- -->
 
 ``` r
 plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-19-3.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-18-3.png)<!-- -->
 
 ``` r
-plot_regret(regret_eg)
+plot_regret(regret_eg, name="Epsilon Greedy Regret")
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-19-4.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-18-4.png)<!-- -->
 
 ## UCB (Upper Confidence Bound)
 
@@ -845,25 +822,25 @@ regret_ucb <- regret
 plot_selected_profiles(profiles_selected_ucb, name="UCB")
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 ``` r
 plot_observed_profiles(df_list)
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-22-2.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-21-2.png)<!-- -->
 
 ``` r
 plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-22-3.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-21-3.png)<!-- -->
 
 ``` r
 plot_regret(regret_ucb, name = "UCB Regret")
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-22-4.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-21-4.png)<!-- -->
 
 ## Compare treatment assignments over time
 
@@ -882,7 +859,7 @@ tibble('pi' = map(2:T, ~pi_greedy[[.]]),
   scale_y_continuous(limits=c(0,1), breaks=seq(0,1,0.2))
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 ``` r
 tibble('pi' = map(2:T, ~pi_ts[[.]]),
@@ -899,7 +876,7 @@ tibble('pi' = map(2:T, ~pi_ts[[.]]),
   scale_y_continuous(limits=c(0,1), breaks=seq(0,1,0.2))
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-23-2.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-22-2.png)<!-- -->
 
 ``` r
 tibble('pi' = map(2:T, ~pi_eg[[.]]),
@@ -916,7 +893,7 @@ tibble('pi' = map(2:T, ~pi_eg[[.]]),
   scale_y_continuous(limits=c(0,1), breaks=seq(0,1,0.2))
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-23-3.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-22-3.png)<!-- -->
 
 ``` r
 # put all types of regret onto one plot
@@ -932,4 +909,4 @@ tibble("t" = c(1:length(regret_exp)),
   theme_classic()
 ```
 
-![](process_qualtrics_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
