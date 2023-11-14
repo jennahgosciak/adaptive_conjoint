@@ -1,22 +1,47 @@
----
-title: "process_qualtrics"
-output: rmarkdown::github_document
-date: "2023-11-07"
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+process_qualtrics
+================
+2023-11-07
 
 # Setup Data Using Qualtrics API
 
-* Load data directly from Qualtrics
-* Can store API Key and credentials in `.renviron`
+- Load data directly from Qualtrics
+- Can store API Key and credentials in `.renviron`
 
-```{r}
+``` r
 library(tidyverse)
+```
+
+    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+    ## ✔ ggplot2 3.4.0      ✔ purrr   0.3.5 
+    ## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
+    ## ✔ tidyr   1.2.1      ✔ stringr 1.4.1 
+    ## ✔ readr   2.1.3      ✔ forcats 0.5.2 
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ✖ dplyr::filter() masks stats::filter()
+    ## ✖ dplyr::lag()    masks stats::lag()
+
+``` r
 library(qualtRics)
+```
+
+    ## Warning: package 'qualtRics' was built under R version 4.2.3
+
+``` r
 library(magrittr)
+```
+
+    ## 
+    ## Attaching package: 'magrittr'
+    ## 
+    ## The following object is masked from 'package:purrr':
+    ## 
+    ##     set_names
+    ## 
+    ## The following object is masked from 'package:tidyr':
+    ## 
+    ##     extract
+
+``` r
 library(RColorBrewer)
 
 knitr::opts_chunk$set(cache.extra = 2023)
@@ -44,16 +69,78 @@ pc_survey <- fetch_survey(
 )
 ```
 
+    ##   |                                                                              |                                                                      |   0%  |                                                                              |===========================================                           |  62%  |                                                                              |======================================================================| 100%
+
+    ## 
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## cols(
+    ##   .default = col_character(),
+    ##   StartDate = col_datetime(format = ""),
+    ##   EndDate = col_datetime(format = ""),
+    ##   Progress = col_double(),
+    ##   `Duration (in seconds)` = col_double(),
+    ##   Finished = col_logical(),
+    ##   RecordedDate = col_datetime(format = ""),
+    ##   RecipientLastName = col_logical(),
+    ##   RecipientFirstName = col_logical(),
+    ##   RecipientEmail = col_logical(),
+    ##   ExternalReference = col_logical(),
+    ##   LocationLatitude = col_double(),
+    ##   LocationLongitude = col_double(),
+    ##   QD2_1_TEXT = col_double(),
+    ##   rnum = col_double(),
+    ##   pi1 = col_double(),
+    ##   pi2 = col_double(),
+    ##   pi3 = col_double(),
+    ##   pi4 = col_double(),
+    ##   pi5 = col_double(),
+    ##   pi6 = col_double()
+    ##   # ... with 16 more columns
+    ## )
+    ## ℹ Use `spec()` for the full column specifications.
+
 ## Survey Validation
 
-```{r}
+``` r
 pc_survey %>%
   distinct(Status)
+```
 
+    ## # A tibble: 3 × 1
+    ##   Status        
+    ##   <chr>         
+    ## 1 Survey Preview
+    ## 2 IP Address    
+    ## 3 Survey Test
+
+``` r
 # validate survey logic on test data
 pc_survey %>%
   filter(Status == "Survey Test")
+```
 
+    ## # A tibble: 105 × 71
+    ##    StartDate           EndDate             Status      IPAddress Progr…¹ Durat…²
+    ##    <dttm>              <dttm>              <chr>       <chr>       <dbl>   <dbl>
+    ##  1 2023-11-03 11:03:07 2023-11-03 11:03:07 Survey Test <NA>          100       0
+    ##  2 2023-11-03 11:03:07 2023-11-03 11:03:07 Survey Test <NA>          100       0
+    ##  3 2023-11-03 11:03:07 2023-11-03 11:03:07 Survey Test <NA>          100       0
+    ##  4 2023-11-03 11:03:07 2023-11-03 11:03:07 Survey Test <NA>          100       0
+    ##  5 2023-11-03 11:03:07 2023-11-03 11:03:07 Survey Test <NA>          100       0
+    ##  6 2023-11-03 11:03:08 2023-11-03 11:03:08 Survey Test <NA>          100       0
+    ##  7 2023-11-03 11:03:08 2023-11-03 11:03:08 Survey Test <NA>          100       0
+    ##  8 2023-11-03 11:03:08 2023-11-03 11:03:08 Survey Test <NA>          100       0
+    ##  9 2023-11-03 11:03:08 2023-11-03 11:03:08 Survey Test <NA>          100       0
+    ## 10 2023-11-03 11:03:08 2023-11-03 11:03:08 Survey Test <NA>          100       0
+    ## # … with 95 more rows, 65 more variables: Finished <lgl>, RecordedDate <dttm>,
+    ## #   ResponseId <chr>, RecipientLastName <lgl>, RecipientFirstName <lgl>,
+    ## #   RecipientEmail <lgl>, ExternalReference <lgl>, LocationLatitude <dbl>,
+    ## #   LocationLongitude <dbl>, DistributionChannel <chr>, UserLanguage <chr>,
+    ## #   Consent <ord>, `Prolific ID Q` <chr>, PreScreen_Q1 <ord>,
+    ## #   Commitment_Q1 <ord>, Commitment_Q2 <chr>, Q1 <ord>, Q2 <ord>, Q3 <ord>,
+    ## #   Q4 <ord>, Q5 <ord>, Q6 <ord>, Q7 <ord>, Q8 <ord>, Manipulation_Q1 <ord>, …
+
+``` r
 # should be missing if do not consent
 pc_survey %>%
   filter(Status == "Survey Test", Consent == "I do not consent to participate") %>%
@@ -78,9 +165,9 @@ pc_survey %>%
 
 # Examine the test data
 
-* Check if `rnum` and `pi_i` values are working properly
+- Check if `rnum` and `pi_i` values are working properly
 
-```{r}
+``` r
 pc_survey_test <- pc_survey %>%
   filter(Status == "Survey Test") %>%
   # create 'profile' variable
@@ -100,13 +187,22 @@ pc_survey_test <- pc_survey %>%
 # this should be evenly distributed
 # each should be about 1/8 of the data
 nrow(pc_survey_test)/8
+```
 
+    ## [1] 13.125
+
+``` r
 pc_survey_test %>%
   ggplot(aes(profile)) +
   geom_histogram() +
   theme_classic()
 ```
-```{r}
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+``` r
 # create numeric versions of the profiles
 # should be =1 if selecting the younger candidate
 # this depends on whether the younger candidate
@@ -132,13 +228,13 @@ pc_survey_recode %>%
 
 ## Create fake data
 
-```{r, setup fake data}
+``` r
 # create fake data
 # batch size is the size of the batches (here = 100)
 batch_size <- 100
 ```
 
-```{r}
+``` r
 # pi is a vector of probabilities
 # size is the number of observations
 # C is number of arms
@@ -171,7 +267,7 @@ assign_treatment <- function(pi, profile_prob, size, C=8) {
 }
 ```
 
-```{r}
+``` r
 profile_prob <- c(0.9, 0.5, 0.3, 0.5, 0.4, 0.7, 0.5, 0.44)
 pi <- rep(0.125, 8)
 
@@ -180,16 +276,30 @@ pc_survey_fake %>%
   head()
 ```
 
+    ##   Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 profile
+    ## 1  0  0  0  1  0  0  0  0       4
+    ## 2  0  0  0  0  0  1  0  0       6
+    ## 3  0  0  0  0  0  1  0  0       6
+    ## 4  0  0  0  0  0  0  0  0       2
+    ## 5  1  0  0  0  0  0  0  0       1
+    ## 6  0  0  0  0  0  0  0  1       8
+
 ### Examine fake data
 
-* Check distribution of profiles overll and by batch
+- Check distribution of profiles overll and by batch
 
-```{r}
+``` r
 pc_survey_fake %>%
   ggplot(aes(profile)) +
   geom_histogram()  +
   theme_classic()
+```
 
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
 pc_survey_fake %>%
   pivot_longer(-c(profile)) %>%
   group_by(profile) %>%
@@ -197,7 +307,11 @@ pc_survey_fake %>%
   ggplot(aes(profile, mean)) +
   geom_col()  +
   theme_classic()
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+
+``` r
 pc_survey_fake %>%
   # share of respondents who select
   # the younger candidate
@@ -209,15 +323,28 @@ pc_survey_fake %>%
   )
 ```
 
+    ## # A tibble: 8 × 3
+    ##   profile   mean total
+    ##     <dbl>  <dbl> <dbl>
+    ## 1       1 0.103     14
+    ## 2       2 0.0521     5
+    ## 3       3 0.0312     2
+    ## 4       4 0.0735    10
+    ## 5       5 0.0357     4
+    ## 6       6 0.125      9
+    ## 7       7 0.0521     5
+    ## 8       8 0.0795     7
+
 # Algorithms
 
-Much of the following code comes from this [tutorial](https://mollyow.shinyapps.io/adaptive)
+Much of the following code comes from this
+[tutorial](https://mollyow.shinyapps.io/adaptive)
 
 ## Normal Experiment
 
-* The treatment assignment probabilities do not change
+- The treatment assignment probabilities do not change
 
-```{r, global params}
+``` r
 c <- 8
 R <- 1000
 eps <- 0.1 # for epsilon greedy alg
@@ -229,7 +356,7 @@ T <- N/batch_size
 pi_init <- rep(0.125, 8)
 ```
 
-```{r}
+``` r
 # init parameters
 profiles_selected <- integer(0)
 numbers_of_rewards_1 <- integer(c) # vector for each arm
@@ -293,7 +420,7 @@ for (n in 1:T) { # for T runs (in our case 45)
 }
 ```
 
-```{r}
+``` r
 # store impt values for comparison
 pi_exp <- pi
 profiles_selected_exp <- profiles_selected
@@ -302,21 +429,35 @@ regret_exp <- regret
 
 ### Normal experiment: plotting results
 
-```{r, message = F, warning=F}
+``` r
 plot_selected_profiles(profiles_selected_exp)
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+``` r
 plot_observed_profiles(df_list)
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
+
+``` r
 plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-10-3.png)<!-- -->
+
+``` r
 plot_regret(regret_exp)
 ```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-10-4.png)<!-- -->
+
 ## Greedy Algorithm
 
-* use the expected values of the Beta distribution
+- use the expected values of the Beta distribution
 
-```{r}
+``` r
 # init parameters
 profiles_selected <- integer(0)
 numbers_of_rewards_1 <- integer(c) # vector for each arm
@@ -386,7 +527,7 @@ for (n in 1:T) { # for T runs (in our case 45)
 }
 ```
 
-```{r}
+``` r
 # store impt values for comparison
 pi_greedy <- pi
 profiles_selected_greedy <- profiles_selected
@@ -395,17 +536,37 @@ regret_greedy <- regret
 
 ### Greedy Bernoulli: plotting results
 
-```{r, warning=F}
+``` r
 plot_selected_profiles(profiles_selected)
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+``` r
 plot_observed_profiles(df_list)
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
+
+``` r
 plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
 ```
 
+    ## New names:
+    ## New names:
+    ## New names:
+    ## New names:
+    ## New names:
+    ## New names:
+    ## New names:
+    ## • `value` -> `value...1`
+    ## • `value` -> `value...2`
+
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-13-3.png)<!-- -->
+
 ## Thompson Sampling
 
-```{r}
+``` r
 # init parameters
 profiles_selected <- integer(0)
 numbers_of_rewards_1 <- integer(c) # vector for each arm
@@ -479,7 +640,7 @@ for (n in 1:T) { # for T runs (in our case 45)
 }
 ```
 
-```{r}
+``` r
 # store impt values for comparison
 pi_ts <- pi
 profiles_selected_ts <- profiles_selected
@@ -488,22 +649,39 @@ regret_ts <- regret
 
 ### TS: plotting results
 
-```{r, message = F, warning=F}
+``` r
 plot_selected_profiles(profiles_selected_ts)
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+``` r
 plot_observed_profiles(df_list)
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-16-2.png)<!-- -->
+
+``` r
 plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-16-3.png)<!-- -->
+
+``` r
 plot_regret(regret_ts)
 ```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-16-4.png)<!-- -->
+
 ## Epsilon Greedy
 
-* From Offer-Westort et al. (2020): in the Epsilon Greedy algorithm, we identify which arm has the highest mean outcome. We assign treatment to that arm in (1−\epsilon)  portion of assignments, and assign treatment uniformly at random in the remaining \epsilon assignments.
-* Note: can also allow epsilon to decay over time
+- From Offer-Westort et al. (2020): in the Epsilon Greedy algorithm, we
+  identify which arm has the highest mean outcome. We assign treatment
+  to that arm in (1−) portion of assignments, and assign treatment
+  uniformly at random in the remaining assignments.
+- Note: can also allow epsilon to decay over time
 
-```{r}
+``` r
 # init parameters
 profiles_selected <- integer(0)
 numbers_of_rewards_1 <- integer(c) # vector for each arm
@@ -557,7 +735,7 @@ for (n in 1:T) { # for T runs (in our case 45)
 }
 ```
 
-```{r}
+``` r
 # store impt values for comparison
 pi_eg <- pi
 profiles_selected_eg <- profiles_selected
@@ -566,22 +744,38 @@ regret_eg <- regret
 
 ### Epsilon-Greedy: plotting results
 
-```{r, message = F, warning=F}
+``` r
 plot_selected_profiles(profiles_selected_eg, name="Epsilon Greedy")
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+
+``` r
 plot_observed_profiles(df_list)
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-19-2.png)<!-- -->
+
+``` r
 plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-19-3.png)<!-- -->
+
+``` r
 plot_regret(regret_eg)
 ```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-19-4.png)<!-- -->
+
 ## UCB (Upper Confidence Bound)
 
-* observe sample means under each of the arms, and then we compute uncertainty bounds around each of those estimates (note that these are not the same as confidence intervals under a normal approximation)
-* goal is to reduce uncertainty
+- observe sample means under each of the arms, and then we compute
+  uncertainty bounds around each of those estimates (note that these are
+  not the same as confidence intervals under a normal approximation)
+- goal is to reduce uncertainty
 
-```{r}
+``` r
 # init parameters
 profiles_selected <- integer(0)
 numbers_of_rewards_1 <- integer(c) # vector for each arm
@@ -638,7 +832,7 @@ for (n in 1:T) { # for T runs (in our case 45)
 }
 ```
 
-```{r}
+``` r
 # store impt values for comparison
 pi_ucb <- pi
 profiles_selected_ucb <- profiles_selected
@@ -647,19 +841,33 @@ regret_ucb <- regret
 
 ### UCB: plotting results
 
-```{r, message = F, warning=F}
+``` r
 plot_selected_profiles(profiles_selected_ucb, name="UCB")
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+
+``` r
 plot_observed_profiles(df_list)
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-22-2.png)<!-- -->
+
+``` r
 plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-22-3.png)<!-- -->
+
+``` r
 plot_regret(regret_ucb, name = "UCB Regret")
 ```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-22-4.png)<!-- -->
+
 ## Compare treatment assignments over time
 
-```{r}
+``` r
 tibble('pi' = map(2:T, ~pi_greedy[[.]]),
        'arm' = map(2:T, ~c(1:8))) %>% 
   mutate(id = row_number()) %>% 
@@ -672,7 +880,11 @@ tibble('pi' = map(2:T, ~pi_greedy[[.]]),
        x = "Time",
        y = "Probability of being the best arm")  +
   scale_y_continuous(limits=c(0,1), breaks=seq(0,1,0.2))
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+
+``` r
 tibble('pi' = map(2:T, ~pi_ts[[.]]),
        'arm' = map(2:T, ~c(1:8))) %>% 
   mutate(id = row_number()) %>% 
@@ -685,7 +897,11 @@ tibble('pi' = map(2:T, ~pi_ts[[.]]),
        x = "Time",
        y = "Probability of being the best arm")  +
   scale_y_continuous(limits=c(0,1), breaks=seq(0,1,0.2))
+```
 
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-23-2.png)<!-- -->
+
+``` r
 tibble('pi' = map(2:T, ~pi_eg[[.]]),
        'arm' = map(2:T, ~c(1:8))) %>% 
   mutate(id = row_number()) %>% 
@@ -700,7 +916,9 @@ tibble('pi' = map(2:T, ~pi_eg[[.]]),
   scale_y_continuous(limits=c(0,1), breaks=seq(0,1,0.2))
 ```
 
-```{r}
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-23-3.png)<!-- -->
+
+``` r
 # put all types of regret onto one plot
 tibble("t" = c(1:length(regret_exp)),
        "Regret (no update)" = unlist(regret_exp),
@@ -714,4 +932,4 @@ tibble("t" = c(1:length(regret_exp)),
   theme_classic()
 ```
 
-
+![](process_qualtrics_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
