@@ -1,4 +1,4 @@
-plot_selected_profiles <- function(profiles_selected, name="Thompson Sampling") {
+plot_selected_profiles <- function(profiles_selected, name = "Thompson Sampling") {
   tibble("profiles" = factor(profiles_selected, levels = c(1:c))) %>%
     group_by(profiles) %>%
     summarize(n = n()) %>%
@@ -49,14 +49,14 @@ plot_dist <- function(numbers_of_rewards_1, numbers_of_rewards_0, c) {
       shape2 = .y
     )
   )
-  
+
   beta_dist %>%
     map(as_tibble) %>%
     reduce(bind_cols) %>%
     rename_all(~ str_c("profile", c(1:c))) %>%
     mutate(theta_k_hat = seq(0.01, 1, 0.01)) %>%
     pivot_longer(-theta_k_hat,
-                 names_to = "profiles", values_to = "density"
+      names_to = "profiles", values_to = "density"
     ) %>%
     mutate(profiles = factor(profiles, levels = str_c("profile", c(1:c)))) %>%
     ggplot(aes(theta_k_hat, density, color = profiles)) +
@@ -65,10 +65,10 @@ plot_dist <- function(numbers_of_rewards_1, numbers_of_rewards_0, c) {
     scale_colour_brewer(palette = "Set3")
 }
 
-plot_regret <- function(regret, name="TS Regret") {
-  tibble("regret" = regret)  %>% 
-    mutate(t = row_number()) %>% 
-    unnest() %>% 
+plot_regret <- function(regret, name = "TS Regret") {
+  tibble("regret" = regret) %>%
+    mutate(t = row_number()) %>%
+    unnest() %>%
     ggplot(aes(t, regret)) +
     geom_line() +
     theme_classic() +
