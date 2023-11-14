@@ -10,75 +10,88 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Setup Data Using Qualtrics API
 
+* Load data directly from Qualtrics
+* Can store API Key and credentials in `.renviron`
+
 ```{r}
 library(tidyverse)
 library(qualtRics)
 
 # url <- "https://datacenterid.qualtrics.com"
 # api_key <- ""
-# 
-# qualtrics_api_credentials(api_key = api_key, 
+#
+# qualtrics_api_credentials(api_key = api_key,
 #                           base_url = url,
 #                           install = TRUE,
 #                           overwrite=T)
 
-surveys <- all_surveys() 
-pc_id <- surveys[surveys['name']=='Political Candidates',][['id']]
+# load survey data
+surveys <- all_surveys()
+# select political candidates
+pc_id <- surveys[surveys["name"] == "Political Candidates", ][["id"]]
 
-pc_survey <- fetch_survey(surveyID = pc_id, 
-                         verbose = TRUE)
+pc_survey <- fetch_survey(
+  surveyID = pc_id,
+  verbose = TRUE
+)
 ```
 
 ## Survey Validation
 
 ```{r}
-pc_survey %>% 
+pc_survey %>%
   distinct(Status)
 
 # validate survey logic
-pc_survey %>% 
-  filter(Status == 'Survey Test')
+pc_survey %>%
+  filter(Status == "Survey Test")
 
-pc_survey %>% 
-  filter(Status == 'Survey Test', Consent == 'I do not consent to participate') %>% 
+pc_survey %>%
+  filter(Status == "Survey Test", Consent == "I do not consent to participate") %>%
   distinct(`Q2`)
 
-pc_survey %>% 
-  filter(Status == 'Survey Test', PreScreen_Q1 != 'Yes',
-         StartDate >= lubridate::ymd("2023-11-06")) %>% 
+pc_survey %>%
+  filter(
+    Status == "Survey Test", PreScreen_Q1 != "Yes",
+    StartDate >= lubridate::ymd("2023-11-06")
+  ) %>%
   distinct(Q1)
 ```
 
 
 
 ```{r}
-pc_survey_test <- pc_survey %>% 
-  filter(Status == 'Survey Test') %>% 
-  mutate(profile = case_when(rnum <= pi1 ~ 1,
-                            rnum > pi1 & rnum <= pi2 ~ 2,
-                            rnum > pi2 & rnum <= pi3 ~ 3,
-                            rnum > pi3 & rnum <= pi4 ~ 4,
-                            rnum > pi4 & rnum <= pi5 ~ 5,
-                            rnum > pi5 & rnum <= pi6 ~ 6,
-                            rnum > pi6 & rnum <= pi7 ~ 7,
-                            rnum > pi7 ~ 8))
+pc_survey_test <- pc_survey %>%
+  filter(Status == "Survey Test") %>%
+  mutate(profile = case_when(
+    rnum <= pi1 ~ 1,
+    rnum > pi1 & rnum <= pi2 ~ 2,
+    rnum > pi2 & rnum <= pi3 ~ 3,
+    rnum > pi3 & rnum <= pi4 ~ 4,
+    rnum > pi4 & rnum <= pi5 ~ 5,
+    rnum > pi5 & rnum <= pi6 ~ 6,
+    rnum > pi6 & rnum <= pi7 ~ 7,
+    rnum > pi7 ~ 8
+  ))
 
 
 # check in large sample
-pc_survey_test %>% 
+pc_survey_test %>%
   ggplot(aes(profile)) +
   geom_histogram()
 ```
 ```{r}
-pc_survey_recode <- pc_survey_test %>% 
-  mutate(across(str_c("Q", 1:8), ~case_when(. == "Candidate 1" & rnum_age <= 0.5 ~ 1,
-                                            . == "Candidate 2" & rnum_age > 0.5 ~ 1,
-                                            TRUE ~ 0))) %>% 
+pc_survey_recode <- pc_survey_test %>%
+  mutate(across(str_c("Q", 1:8), ~ case_when(
+    . == "Candidate 1" & rnum_age <= 0.5 ~ 1,
+    . == "Candidate 2" & rnum_age > 0.5 ~ 1,
+    TRUE ~ 0
+  ))) %>%
   mutate(total_Q = select(., str_c("Q", 1:8)) %>%
-           rowSums())
+    rowSums())
 
-pc_survey_recode %>% 
-  select(str_c("Q", 1:8)) %>% 
+pc_survey_recode %>%
+  select(str_c("Q", 1:8)) %>%
   rowSums()
 ```
 ```{r}
@@ -86,49 +99,53 @@ pc_survey_recode %>%
 batch_size <- 100
 N <- 45
 
-pc_survey_fake <- data.frame(matrix(0, ncol = 8, nrow = (N*batch_size)))
+pc_survey_fake <- data.frame(matrix(0, ncol = 8, nrow = (N * batch_size)))
 names(pc_survey_fake) <- str_c("Q", 1:8)
-pc_survey_fake['profile'] <- 0
+pc_survey_fake["profile"] <- 0
 
 for (j in 1:N) {
   for (i in 1:batch_size) {
     rnum <- runif(1)
-    profile <- case_when(rnum < 0.125 ~ 1,
-                         rnum >= 0.125 & rnum < 0.25 ~ 2,
-                         rnum >= 0.25 & rnum < 0.375 ~ 3,
-                         rnum >= 0.375 & rnum < 0.5 ~ 4,
-                         rnum >= 0.5 & rnum < 0.625 ~ 5,
-                         rnum >= 0.625 & rnum < 0.75 ~ 6,
-                         rnum >= 0.75 & rnum < 0.875 ~ 7,
-                         rnum >= 0.875 ~ 8)
+    profile <- case_when(
+      rnum < 0.125 ~ 1,
+      rnum >= 0.125 & rnum < 0.25 ~ 2,
+      rnum >= 0.25 & rnum < 0.375 ~ 3,
+      rnum >= 0.375 & rnum < 0.5 ~ 4,
+      rnum >= 0.5 & rnum < 0.625 ~ 5,
+      rnum >= 0.625 & rnum < 0.75 ~ 6,
+      rnum >= 0.75 & rnum < 0.875 ~ 7,
+      rnum >= 0.875 ~ 8
+    )
     if (profile == 1) {
-      pc_survey_fake[(j-1)*batch_size + i,str_c("Q", profile)] <- rbinom(1, 1, 0.9)
+      pc_survey_fake[(j - 1) * batch_size + i, str_c("Q", profile)] <- rbinom(1, 1, 0.9)
     } else {
-      pc_survey_fake[(j-1)*batch_size + i,str_c("Q", profile)] <- rbinom(1, 1, 0.5)
+      pc_survey_fake[(j - 1) * batch_size + i, str_c("Q", profile)] <- rbinom(1, 1, 0.5)
     }
-    pc_survey_fake[(j-1)*batch_size + i, 'profile'] <- profile
-    pc_survey_fake[(j-1)*batch_size + i, 'batch'] <- j
+    pc_survey_fake[(j - 1) * batch_size + i, "profile"] <- profile
+    pc_survey_fake[(j - 1) * batch_size + i, "batch"] <- j
   }
 }
 ```
 
 ```{r}
-pc_survey_fake %>% 
+pc_survey_fake %>%
   ggplot(aes(profile)) +
   geom_histogram()
 
-pc_survey_fake %>% 
-  pivot_longer(-c(profile, batch)) %>% 
-  group_by(profile) %>% 
-  summarize(mean = mean(value)) %>% 
+pc_survey_fake %>%
+  pivot_longer(-c(profile, batch)) %>%
+  group_by(profile) %>%
+  summarize(mean = mean(value)) %>%
   ggplot(aes(profile, mean)) +
   geom_col()
 
 pc_survey_fake %>%
-  pivot_longer(-c(profile, batch)) %>% 
-  group_by(profile) %>% 
-  summarize(mean = mean(value),
-            total = sum(value))
+  pivot_longer(-c(profile, batch)) %>%
+  group_by(profile) %>%
+  summarize(
+    mean = mean(value),
+    total = sum(value)
+  )
 ```
 ```{r}
 # init parameters
@@ -142,11 +159,11 @@ for (n in 1:N) { # for N runs (in our case 45)
   # subset data into 100 obs
   max_random <- 0
   profile_val <- 1
-  
-  df_subset <- pc_survey_fake %>% 
-     filter(batch == n)
-  stopifnot(nrow(df_subset)==batch_size)
-  
+
+  df_subset <- pc_survey_fake %>%
+    filter(batch == n)
+  stopifnot(nrow(df_subset) == batch_size)
+
   # iterate through all context arms
   for (i in 1:c) {
     # draw from prior distribution for theta
@@ -156,41 +173,41 @@ for (n in 1:N) { # for N runs (in our case 45)
       shape1 = numbers_of_rewards_1[i] + 1,
       shape2 = numbers_of_rewards_0[i] + 1
     )
-    
+
     if (random_theta > max_random) {
-        # if arm is better than all the previous ones
-        # this arm is selected, choose theta
-        max_random <- random_theta
-        profile_val <- i
+      # if arm is better than all the previous ones
+      # this arm is selected, choose theta
+      max_random <- random_theta
+      profile_val <- i
     }
   }
-  
+
   # after selecting the argmax, add to selected profile
   profiles_selected <- append(profiles_selected, profile_val)
-  
+
   # checking with data (what is *observed*)
   # update based on reward
-  obs_outcome <- df_subset %>% 
-    filter(profile == profile_val) %>% 
-    magrittr::extract2(str_c("Q",profile_val))
-  
+  obs_outcome <- df_subset %>%
+    filter(profile == profile_val) %>%
+    magrittr::extract2(str_c("Q", profile_val))
+
   reward0 <- sum(obs_outcome == 0)
   reward1 <- sum(obs_outcome == 1)
   numbers_of_rewards_0[profile_val] <- numbers_of_rewards_0[profile_val] + reward0
   numbers_of_rewards_1[profile_val] <- numbers_of_rewards_1[profile_val] + reward1
-  
+
   total_reward <- total_reward + reward1
 }
 
 # generate new probabilities
 pi <- rbeta(
-      n = rep(1, c),
-      shape1 = numbers_of_rewards_1 + 1,
-      shape2 = numbers_of_rewards_0 + 1
-    )
+  n = rep(1, c),
+  shape1 = numbers_of_rewards_1 + 1,
+  shape2 = numbers_of_rewards_0 + 1
+)
 pi
 
-(numbers_of_rewards_1 + 1)/(numbers_of_rewards_1 + 1 + numbers_of_rewards_0 + 1)
+(numbers_of_rewards_1 + 1) / (numbers_of_rewards_1 + 1 + numbers_of_rewards_0 + 1)
 ```
 
 ```{r}

@@ -151,7 +151,7 @@ for (c in 1:nrow(levels_grid)) {
     ", Political experience: ", levels_grid[c, "experience"]
   ) %>%
     str_replace("_", " "))
-  
+
   fn <- first_names[[levels_grid[c, ][["race_gender"]]]]
   ln <- last_names[[levels_grid[c, ][["race_gender"]]]]
   exp <- experience[[levels_grid[c, "experience"]]]
