@@ -19,6 +19,8 @@ library(qualtRics)
 library(magrittr)
 library(RColorBrewer)
 
+knitr::opts_chunk$set(cache.extra = 2023)
+
 source("../plotting_functions.R")
 
 # datacenterid <- ""
@@ -134,11 +136,6 @@ pc_survey_recode %>%
 # create fake data
 # batch size is the size of the batches (here = 100)
 batch_size <- 100
-
-# if our full sample is 4500
-# then our no. of time steps is 45
-N <- 4500
-T <- N/batch_size
 ```
 
 ```{r}
@@ -177,6 +174,7 @@ assign_treatment <- function(pi, profile_prob, size, C=8) {
 ```{r}
 profile_prob <- c(0.9, 0.5, 0.3, 0.5, 0.4, 0.7, 0.5, 0.44)
 pi <- rep(0.125, 8)
+
 pc_survey_fake <- assign_treatment(pi, profile_prob, batch_size)
 pc_survey_fake %>% 
   head()
@@ -211,17 +209,33 @@ pc_survey_fake %>%
   )
 ```
 
+# Algorithms
+
+Much of the following code comes from this [tutorial](https://mollyow.shinyapps.io/adaptive)
+
 ## Normal Experiment
+
+* The treatment assignment probabilities do not change
+
+```{r, global params}
+c <- 8
+R <- 1000
+eps <- 0.1 # for epsilon greedy alg
+
+# if our full sample is 4500
+# then our no. of time steps is 45
+N <- 4500
+T <- N/batch_size
+pi_init <- rep(0.125, 8)
+```
 
 ```{r}
 # init parameters
-c <- 8
 profiles_selected <- integer(0)
 numbers_of_rewards_1 <- integer(c) # vector for each arm
 numbers_of_rewards_0 <- integer(c)
 total_reward <- 0
-pi <- lst(rep(0.125, 8)) # init uniform treatment assignment
-R <- 1000
+pi <- lst(pi_init) # init uniform treatment assignment
 regret <- lst()
 
 df_list <- tibble()
@@ -275,7 +289,7 @@ for (n in 1:T) { # for T runs (in our case 45)
   
   # calculate per-period regret
   # expectation of best arm vs. expectation of chosen arm
-  regret[n] <- max(profile_prob) - profile_prob[profile_val]
+  regret[n] <- max(profile_prob) - mean(profile_prob[profiles_selected])
 }
 ```
 
@@ -304,13 +318,12 @@ plot_regret(regret_exp)
 
 ```{r}
 # init parameters
-c <- 8
 profiles_selected <- integer(0)
 numbers_of_rewards_1 <- integer(c) # vector for each arm
 numbers_of_rewards_0 <- integer(c)
 total_reward <- 0
-pi <- lst(rep(0.125, 8)) # init uniform treatment assignment
-R <- 1000
+pi <- lst(pi_init) # init uniform treatment assignment
+regret <- lst()
 
 for (n in 1:T) { # for T runs (in our case 45)
   # subset data into 100 obs and assign treatment randomly
@@ -366,6 +379,10 @@ for (n in 1:T) { # for T runs (in our case 45)
   argmax <- apply(draws, 2, which.max)
   # 3) Tally up the probabilities
   pi[n + 1] <- lst(table(cut(argmax, 0:c)) / R)
+  
+  # calculate per-period regret
+  # expectation of best arm vs. expectation of chosen arm
+  regret[n] <- max(profile_prob) - mean(profile_prob[profiles_selected])
 }
 ```
 
@@ -373,6 +390,7 @@ for (n in 1:T) { # for T runs (in our case 45)
 # store impt values for comparison
 pi_greedy <- pi
 profiles_selected_greedy <- profiles_selected
+regret_greedy <- regret
 ```
 
 ### Greedy Bernoulli: plotting results
@@ -389,13 +407,11 @@ plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
 
 ```{r}
 # init parameters
-c <- 8
 profiles_selected <- integer(0)
 numbers_of_rewards_1 <- integer(c) # vector for each arm
 numbers_of_rewards_0 <- integer(c)
 total_reward <- 0
-pi <- lst(rep(0.125, 8)) # init uniform treatment assignment
-R <- 1000
+pi <- lst(pi_init) # init uniform treatment assignment
 regret <- lst()
 
 df_list <- tibble()
@@ -459,7 +475,7 @@ for (n in 1:T) { # for T runs (in our case 45)
   
   # calculate per-period regret
   # expectation of best arm vs. expectation of chosen arm
-  regret[n] <- max(profile_prob) - profile_prob[profile_val]
+  regret[n] <- max(profile_prob) - mean(profile_prob[profiles_selected])
 }
 ```
 
@@ -489,14 +505,12 @@ plot_regret(regret_ts)
 
 ```{r}
 # init parameters
-c <- 8
-eps <- 0.1
 profiles_selected <- integer(0)
 numbers_of_rewards_1 <- integer(c) # vector for each arm
 numbers_of_rewards_0 <- integer(c)
 total_reward <- 0
-pi <- lst(rep(0.125, 8)) # init uniform treatment assignment
-R <- 1000
+pi <- lst(pi_init) # init uniform treatment assignment
+regret <- lst()
 
 for (n in 1:T) { # for T runs (in our case 45)
   # subset data into 100 obs and assign treatment randomly
@@ -536,6 +550,10 @@ for (n in 1:T) { # for T runs (in our case 45)
   pi_n <- rep(eps, c)
   pi_n[profile_val] <- 1 - eps
   pi[n+1] <- lst(pi_n)
+  
+  # calculate per-period regret
+  # expectation of best arm vs. expectation of chosen arm
+  regret[n] <- max(profile_prob) - mean(profile_prob[profiles_selected])
 }
 ```
 
@@ -543,6 +561,7 @@ for (n in 1:T) { # for T runs (in our case 45)
 # store impt values for comparison
 pi_eg <- pi
 profiles_selected_eg <- profiles_selected
+regret_eg <- regret
 ```
 
 ### Epsilon-Greedy: plotting results
@@ -553,6 +572,8 @@ plot_selected_profiles(profiles_selected_eg, name="Epsilon Greedy")
 plot_observed_profiles(df_list)
 
 plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
+
+plot_regret(regret_eg)
 ```
 
 ## UCB (Upper Confidence Bound)
@@ -562,13 +583,12 @@ plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
 
 ```{r}
 # init parameters
-c <- 8
 profiles_selected <- integer(0)
 numbers_of_rewards_1 <- integer(c) # vector for each arm
 numbers_of_rewards_0 <- integer(c)
 total_reward <- 0
-pi <- lst(rep(0.125, 8)) # init uniform treatment assignment
-R <- 1000
+pi <- lst(pi_init) # init uniform treatment assignment
+regret <- lst()
 
 for (n in 1:T) { # for T runs (in our case 45)
   # subset data into 100 obs and assign treatment randomly
@@ -611,6 +631,10 @@ for (n in 1:T) { # for T runs (in our case 45)
   pi_n <- rep(0, c)
   pi_n[profile_val] <- 1
   pi[n+1] <- lst(pi_n)
+  
+  # calculate per-period regret
+  # expectation of best arm vs. expectation of chosen arm
+  regret[n] <- max(profile_prob) - mean(profile_prob[profiles_selected])
 }
 ```
 
@@ -618,9 +642,10 @@ for (n in 1:T) { # for T runs (in our case 45)
 # store impt values for comparison
 pi_ucb <- pi
 profiles_selected_ucb <- profiles_selected
+regret_ucb <- regret
 ```
 
-### Epsilon-Greedy: plotting results
+### UCB: plotting results
 
 ```{r, message = F, warning=F}
 plot_selected_profiles(profiles_selected_ucb, name="UCB")
@@ -628,6 +653,8 @@ plot_selected_profiles(profiles_selected_ucb, name="UCB")
 plot_observed_profiles(df_list)
 
 plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
+
+plot_regret(regret_ucb, name = "UCB Regret")
 ```
 
 ## Compare treatment assignments over time
@@ -643,7 +670,8 @@ tibble('pi' = map(2:T, ~pi_greedy[[.]]),
   theme_classic() +
   labs(title = "Greedy Bernoulli Treatment Assignments over time",
        x = "Time",
-       y = "Probability of being the best arm")
+       y = "Probability of being the best arm")  +
+  scale_y_continuous(limits=c(0,1), breaks=seq(0,1,0.2))
 
 tibble('pi' = map(2:T, ~pi_ts[[.]]),
        'arm' = map(2:T, ~c(1:8))) %>% 
@@ -655,7 +683,8 @@ tibble('pi' = map(2:T, ~pi_ts[[.]]),
   theme_classic() +
   labs(title = "TS Treatment Assignments over time",
        x = "Time",
-       y = "Probability of being the best arm")
+       y = "Probability of being the best arm")  +
+  scale_y_continuous(limits=c(0,1), breaks=seq(0,1,0.2))
 
 tibble('pi' = map(2:T, ~pi_eg[[.]]),
        'arm' = map(2:T, ~c(1:8))) %>% 
@@ -667,6 +696,22 @@ tibble('pi' = map(2:T, ~pi_eg[[.]]),
   theme_classic() +
   labs(title = "Epsilon-Greedy Treatment Assignments over time",
        x = "Time",
-       y = "Probability of being the best arm")
+       y = "Probability of being the best arm") +
+  scale_y_continuous(limits=c(0,1), breaks=seq(0,1,0.2))
 ```
+
+```{r}
+# put all types of regret onto one plot
+tibble("t" = c(1:length(regret_exp)),
+       "Regret (no update)" = unlist(regret_exp),
+       "Greedy TS" = unlist(regret_greedy),
+       "Thompson Sampling Regret" = unlist(regret_ts),
+       "Epsilon Greedy Regret" = unlist(regret_eg),
+       "UCB Regret" = unlist(regret_ucb)) %>% 
+  pivot_longer(-t, names_to = "Algorithm", values_to = "Regret") %>% 
+  ggplot(aes(t, Regret, color=Algorithm)) +
+  geom_line() +
+  theme_classic()
+```
+
 
