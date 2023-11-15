@@ -1,0 +1,713 @@
+---
+title: "Process Qualtrics Data, Treatment Assignment Updating"
+output: rmarkdown::github_document
+date: "2023-11-07"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Setup Data Using Qualtrics API
+
+* Load data directly from Qualtrics
+* Can store API Key and credentials in `.renviron`
+
+```{r, load packages, message=F, warning=F}
+library(tidyverse)
+library(qualtRics)
+library(magrittr)
+library(RColorBrewer)
+
+knitr::opts_chunk$set(cache.extra = 2023)
+
+source("./plotting_functions.R")
+```
+
+```{r, setup qualtrics}
+# datacenterid <- ""
+# url <- str_glue("https://{datacenterid}.qualtrics.com")
+# api_key <- ""
+#
+# qualtrics_api_credentials(api_key = api_key,
+#                           base_url = url,
+#                           install = TRUE,
+#                           overwrite=T)
+
+readRenviron("~/.Renviron")
+# load survey data
+surveys <- all_surveys()
+# select political candidates survey ID
+pc_id <- surveys[surveys["name"] == "Political Candidates", ][["id"]]
+
+pc_survey <- fetch_survey(
+  surveyID = pc_id,
+  verbose = TRUE
+)
+```
+
+## Survey Validation
+
+```{r}
+pc_survey %>%
+  distinct(Status)
+
+# validate survey logic on test data
+pc_survey %>%
+  filter(Status == "Survey Test")
+
+# should be missing if do not consent
+pc_survey %>%
+  filter(Status == "Survey Test", Consent == "I do not consent to participate") %>%
+  mutate(Q2 = as.character(Q2)) %>%
+  distinct(`Q2`) %>%
+  is.na() %>%
+  stopifnot()
+
+# note: question was different prior to 11/06
+# check that if failing prescreen question about location in the US
+# this should be missing
+pc_survey %>%
+  filter(
+    Status == "Survey Test", PreScreen_Q1 != "Yes",
+    StartDate >= lubridate::ymd("2023-11-06")
+  ) %>%
+  mutate(Q1 = as.character(Q1)) %>%
+  distinct(Q1) %>%
+  is.na() %>%
+  stopifnot()
+```
+
+# Examine the test data
+
+* Check if `rnum` and `pi_i` values are working properly
+
+```{r}
+pc_survey_test <- pc_survey %>%
+  filter(Status == "Survey Test") %>%
+  # create 'profile' variable
+  mutate(profile = case_when(
+    rnum <= pi1 ~ 1,
+    rnum > pi1 & rnum <= pi2 ~ 2,
+    rnum > pi2 & rnum <= pi3 ~ 3,
+    rnum > pi3 & rnum <= pi4 ~ 4,
+    rnum > pi4 & rnum <= pi5 ~ 5,
+    rnum > pi5 & rnum <= pi6 ~ 6,
+    rnum > pi6 & rnum <= pi7 ~ 7,
+    rnum > pi7 ~ 8
+  ))
+
+
+# check distribution
+# this should be evenly distributed
+# each should be about 1/8 of the data
+nrow(pc_survey_test) / 8
+
+pc_survey_test %>%
+  ggplot(aes(profile)) +
+  geom_histogram() +
+  theme_classic()
+```
+```{r}
+# create numeric versions of the profiles
+# should be =1 if selecting the younger candidate
+# this depends on whether the younger candidate
+# is candidate 1 or candidate 2
+pc_survey_recode <- pc_survey_test %>%
+  mutate(across(str_c("Q", 1:8), ~ case_when(
+    . == "Candidate 1" & rnum_age <= 0.5 ~ 1,
+    . == "Candidate 2" & rnum_age > 0.5 ~ 1,
+    # explicitly write out all the other conditions
+    TRUE ~ NA_integer_
+  ))) %>%
+  mutate(total_Q = select(., str_c("Q", 1:8)) %>%
+    rowSums())
+
+pc_survey_test
+# check every respondent has exactly one non-missing value
+# of Q1-Q8
+
+# check profile matches non-missing value
+pc_survey_test %>%
+  filter(Status == "Survey Test") %>%
+  select(str_c("Q", 1:8), profile)
+
+# investigate why profile does not match positive question selction
+pc_survey_recode %>%
+  filter(Status == "Survey Test") %>%
+  select(str_c("Q", 1:8), profile)
+
+# check row total is not more than 1
+# 0 if selected the older candidate
+pc_survey_recode %>%
+  select(str_c("Q", 1:8)) %>%
+  rowSums() %>%
+  is_weakly_less_than(1) %>%
+  all() %>%
+  stopifnot()
+```
+
+## Create fake data
+
+```{r, setup fake data}
+# create fake data
+# batch size is the size of the batches (here = 100)
+batch_size <- 100
+```
+
+```{r}
+# pi is a vector of probabilities
+# size is the number of observations
+# C is number of arms
+create_fake_data <- function(pi, profile_prob, size, C = 8) {
+  # initialize empty dataframe
+  df_fake <- data.frame(matrix(0, ncol = C, nrow = (size)))
+  names(df_fake) <- str_c("Q", 1:C)
+  df_fake["profile"] <- NA
+
+  # randomly generate profile based on pi cdf
+  for (i in 1:batch_size) {
+    rnum <- runif(1)
+    profile <- case_when(
+      rnum < pi[1] ~ 1,
+      rnum >= pi[1] & rnum < pi[2] ~ 2,
+      rnum >= pi[2] & rnum < pi[3] ~ 3,
+      rnum >= pi[3] & rnum < pi[4] ~ 4,
+      rnum >= pi[4] & rnum < pi[5] ~ 5,
+      rnum >= pi[5] & rnum < pi[6] ~ 6,
+      rnum >= pi[6] & rnum < pi[7] ~ 7,
+      rnum >= pi[7] ~ 8
+    )
+
+    # assign based on probability of choosing a younger profile
+    df_fake[i, str_c("Q", profile)] <- rbinom(1, 1, profile_prob[profile])
+    df_fake[i, "profile"] <- profile
+  }
+  return(df_fake)
+}
+```
+
+```{r}
+profile_prob <- c(0.9, 0.5, 0.3, 0.5, 0.4, 0.7, 0.5, 0.44) # probabilities of selecting younger candidate
+pi <- cumsum(rep(0.125, 8)) # treatment assignment probabilities (CDF)
+
+pc_survey_fake <- create_fake_data(pi, profile_prob, batch_size)
+pc_survey_fake %>%
+  head()
+```
+
+### Examine fake data
+
+* Check distribution of profiles overll and by batch
+
+```{r}
+pc_survey_fake %>%
+  ggplot(aes(profile)) +
+  geom_histogram() +
+  theme_classic()
+
+pc_survey_fake %>%
+  pivot_longer(-c(profile)) %>%
+  group_by(profile) %>%
+  summarize(mean = mean(value)) %>%
+  ggplot(aes(profile, mean)) +
+  geom_col() +
+  theme_classic()
+
+pc_survey_fake %>%
+  # share of respondents who select
+  # the younger candidate
+  pivot_longer(-c(profile)) %>%
+  group_by(profile) %>%
+  summarize(
+    mean = mean(value),
+    total = sum(value)
+  )
+```
+
+# Algorithms
+
+Much of the following code comes from this [tutorial](https://mollyow.shinyapps.io/adaptive)
+
+## Normal Experiment
+
+* The treatment assignment probabilities do not change
+
+```{r, global params}
+# define with comments
+num_profiles <- 8 # number of profiles
+num_sim <- 1000 # number of simulations for Monte Carlo simulation
+eps <- 0.1 # for epsilon greedy alg
+
+N <- 4500 # total number of observations
+num_batches <- N / batch_size # total number of batches
+pi_init <- cumsum(rep(0.125, 8)) # initial pi cdf
+```
+
+```{r}
+# init parameters
+num_outcome1 <- integer(num_profiles) # vector for each arm
+num_outcome0 <- integer(num_profiles)
+pi <- lst(pi_init) # init uniform treatment assignment
+
+df_list <- tibble()
+for (n in 1:T) { # for T runs (in our case 45)
+  # subset data into 100 obs and assign treatment randomly
+  df_subset <- assign_treatment(pi[[n]], profile_prob, batch_size, C = c)
+  df_list <- bind_rows(df_list, df_subset)
+  stopifnot(nrow(df_subset) == batch_size)
+  max_random <- 0
+  profile_val <- 1
+
+  # iterate through all context arms
+  for (i in 1:c) {
+    # draw from prior distribution for theta
+    # for each arm
+    # alpha, beta parameters depend
+    # on the number of prior rewards
+    random_theta <- rbeta(
+      n = 1,
+      shape1 = numbers_of_rewards_1[i] + 1,
+      shape2 = numbers_of_rewards_0[i] + 1
+    )
+
+    if (random_theta > max_random) {
+      # if arm is better than all the previous ones
+      # this arm is selected, choose theta
+      max_random <- random_theta
+      profile_val <- i
+    }
+  }
+
+  # after selecting the argmax, add to selected profile
+  profiles_selected <- append(profiles_selected, profile_val)
+
+  # checking with data (what is *observed*)
+  # update based on reward
+  obs_outcome <- df_subset %>%
+    filter(profile == profile_val) %>%
+    magrittr::extract2(str_c("Q", profile_val))
+
+  reward0 <- sum(obs_outcome == 0)
+  reward1 <- sum(obs_outcome == 1)
+  numbers_of_rewards_0[profile_val] <- numbers_of_rewards_0[profile_val] + reward0
+  numbers_of_rewards_1[profile_val] <- numbers_of_rewards_1[profile_val] + reward1
+
+  total_reward <- total_reward + reward1
+
+  # need to generate new pi
+  # will preserve as unfirom
+  pi[n + 1] <- lst(c(0.125, c))
+
+  # calculate per-period regret
+  # expectation of best arm vs. expectation of chosen arm
+  regret[n] <- max(profile_prob) - mean(profile_prob[profiles_selected])
+}
+```
+
+```{r}
+# store impt values for comparison
+pi_exp <- pi
+profiles_selected_exp <- profiles_selected
+regret_exp <- regret
+```
+
+### Normal experiment: plotting results
+
+```{r, message = F, warning=F}
+plot_selected_profiles(profiles_selected_exp)
+
+plot_observed_profiles(df_list)
+
+plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
+
+plot_regret(regret_exp, name = "Experiment (no probability assignment updating)")
+```
+
+## Greedy Algorithm
+
+* use the expected values of the Beta distribution
+
+```{r}
+# init parameters
+profiles_selected <- integer(0)
+numbers_of_rewards_1 <- integer(c) # vector for each arm
+numbers_of_rewards_0 <- integer(c)
+total_reward <- 0
+pi <- lst(pi_init) # init uniform treatment assignment
+regret <- lst()
+
+for (n in 1:T) { # for T runs (in our case 45)
+  # subset data into 100 obs and assign treatment randomly
+  df_subset <- assign_treatment(pi[[n]], profile_prob, batch_size, C = c)
+  stopifnot(nrow(df_subset) == batch_size)
+  max_random <- 0
+  profile_val <- 1
+
+  # iterate through all context arms
+  for (i in 1:c) {
+    # draw from prior distribution for theta
+    # for each arm
+    # alpha, beta parameters depend
+    # on the number of prior rewards
+    alpha <- numbers_of_rewards_1[i] + 1
+    beta <- numbers_of_rewards_0[i] + 1
+    exp_theta <- alpha / (alpha + beta)
+
+    if (exp_theta > max_random) {
+      # if arm is better than all the previous ones
+      # this arm is selected, choose theta
+      max_random <- random_theta
+      profile_val <- i
+    }
+  }
+
+  # after selecting the argmax, add to selected profile
+  profiles_selected <- append(profiles_selected, profile_val)
+
+  # checking with data (what is *observed*)
+  # update based on reward
+  obs_outcome <- df_subset %>%
+    filter(profile == profile_val) %>%
+    magrittr::extract2(str_c("Q", profile_val))
+
+  reward0 <- sum(obs_outcome == 0)
+  reward1 <- sum(obs_outcome == 1)
+  numbers_of_rewards_0[profile_val] <- numbers_of_rewards_0[profile_val] + reward0
+  numbers_of_rewards_1[profile_val] <- numbers_of_rewards_1[profile_val] + reward1
+
+  total_reward <- total_reward + reward1
+
+  # need to generate new pi
+  # this is the probability each arm is the best
+  # we can do this by simulating R random samples and calculating the probability
+  # that each arm is optimal
+
+  # Approximate Thompson Sampling probabilities (i.e. prob. that each arm is maximal)
+  # (this is from Offer-Westort et al.)
+  # 1) Sample from each of the posteriors R times
+  draws <- replicate(R, rbeta(c, numbers_of_rewards_1, numbers_of_rewards_0))
+  # 2) Check how many times each arm was maximal
+  argmax <- apply(draws, 2, which.max)
+  # 3) Tally up the probabilities
+  pi[n + 1] <- lst(table(cut(argmax, 0:c)) / R)
+
+  # calculate per-period regret
+  # expectation of best arm vs. expectation of chosen arm
+  regret[n] <- max(profile_prob) - mean(profile_prob[profiles_selected])
+}
+```
+
+```{r}
+# store impt values for comparison
+pi_greedy <- pi
+profiles_selected_greedy <- profiles_selected
+regret_greedy <- regret
+```
+
+### Greedy Bernoulli: plotting results
+
+```{r, warning=F}
+plot_selected_profiles(profiles_selected)
+
+plot_observed_profiles(df_list)
+
+plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
+
+plot_regret(regret_greedy, name = "Greedy TS")
+```
+
+## Thompson Sampling
+
+```{r}
+# init parameters
+profiles_selected <- integer(0)
+numbers_of_rewards_1 <- integer(c) # num_outcome1
+numbers_of_rewards_0 <- integer(c) # num_outcome0
+total_reward <- 0 # delete if not being used
+pi <- lst(pi_init) # init uniform treatment assignment
+regret <- lst()
+
+df_list <- tibble()
+for (n in 1:T) { # for T runs (in our case 45)
+  # subset data into 100 obs and assign treatment randomly
+  df_subset <- assign_treatment(pi[[n]], profile_prob, batch_size, C = c)
+  df_list <- bind_rows(df_list, df_subset)
+  stopifnot(nrow(df_subset) == batch_size)
+
+
+  # second function to generate pi cdf
+  # put the rest in a function
+  # make sure to update numbers_of_rewards_1, numbers_of_rewards_0
+
+  # need to generate new pi
+  # this is the probability each arm is the best
+  # we can do this by simulating R random samples and calculating the probability
+  # that each arm is optimal
+
+  # Approximate Thompson Sampling probabilities (i.e. prob. that each arm is maximal)
+  # (this is from Offer-Westort et al.)
+  # 1) Sample from each of the posteriors R times
+  draws <- replicate(R, rbeta(c, numbers_of_rewards_1, numbers_of_rewards_0))
+  # 2) Check how many times each arm was maximal
+  argmax <- apply(draws, 2, which.max)
+  # 3) Tally up the probabilities
+  pi[n + 1] <- lst(table(cut(argmax, 0:c)) / R)
+
+  # calculate per-period regret
+  # expectation of best arm vs. expectation of chosen arm
+  regret[n] <- max(profile_prob) - mean(profile_prob[profiles_selected])
+}
+```
+
+```{r}
+# store impt values for comparison
+pi_ts <- pi
+regret_ts <- regret
+```
+
+### TS: plotting results
+
+```{r, message = F, warning=F}
+plot_selected_profiles(profiles_selected_ts)
+
+plot_observed_profiles(df_list)
+
+plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
+
+plot_regret(regret_ts)
+```
+
+## Epsilon Greedy
+
+* From Offer-Westort et al. (2020): in the Epsilon Greedy algorithm, we identify which arm has the highest mean outcome. We assign treatment to that arm in (1−\epsilon)  portion of assignments, and assign treatment uniformly at random in the remaining \epsilon assignments.
+* Note: can also allow epsilon to decay over time
+
+```{r}
+# init parameters
+profiles_selected <- integer(0)
+numbers_of_rewards_1 <- integer(c) # vector for each arm
+numbers_of_rewards_0 <- integer(c)
+total_reward <- 0
+pi <- lst(pi_init) # init uniform treatment assignment
+regret <- lst()
+
+for (n in 1:T) { # for T runs (in our case 45)
+  # subset data into 100 obs and assign treatment randomly
+  df_subset <- assign_treatment(pi[[n]], profile_prob, batch_size, C = c)
+  df_list <- bind_rows(df_list, df_subset)
+  stopifnot(nrow(df_subset) == batch_size)
+  max_random <- 0
+  profile_val <- 1
+
+  # identify which arm has highest mean outcome
+  sorted_df <- df_subset %>%
+    pivot_longer(-profile, names_to = "arm", values_to = "reward") %>%
+    group_by(profile) %>%
+    summarize(mean_reward = mean(reward)) %>%
+    arrange(desc(mean_reward))
+
+  # highest arm is the first one
+  profile_val <- sorted_df[1, ][["profile"]]
+
+  # after selecting the argmax, add to selected profile
+  profiles_selected <- append(profiles_selected, profile_val)
+
+  # checking with data (what is *observed*)
+  # update based on reward
+  obs_outcome <- df_subset %>%
+    filter(profile == profile_val) %>%
+    magrittr::extract2(str_c("Q", profile_val))
+
+  reward0 <- sum(obs_outcome == 0)
+  reward1 <- sum(obs_outcome == 1)
+  numbers_of_rewards_0[profile_val] <- numbers_of_rewards_0[profile_val] + reward0
+  numbers_of_rewards_1[profile_val] <- numbers_of_rewards_1[profile_val] + reward1
+
+  total_reward <- total_reward + reward1
+
+  # need to generate new pi
+  pi_n <- rep(eps, c)
+  pi_n[profile_val] <- 1 - eps
+  pi[n + 1] <- lst(pi_n)
+
+  # calculate per-period regret
+  # expectation of best arm vs. expectation of chosen arm
+  regret[n] <- max(profile_prob) - mean(profile_prob[profiles_selected])
+}
+```
+
+```{r}
+# store impt values for comparison
+pi_eg <- pi
+profiles_selected_eg <- profiles_selected
+regret_eg <- regret
+```
+
+### Epsilon-Greedy: plotting results
+
+```{r, message = F, warning=F}
+plot_selected_profiles(profiles_selected_eg, name = "Epsilon Greedy")
+
+plot_observed_profiles(df_list)
+
+plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
+
+plot_regret(regret_eg, name = "Epsilon Greedy Regret")
+```
+
+## UCB (Upper Confidence Bound)
+
+* observe sample means under each of the arms, and then we compute uncertainty bounds around each of those estimates (note that these are not the same as confidence intervals under a normal approximation)
+* goal is to reduce uncertainty
+
+```{r}
+# init parameters
+profiles_selected <- integer(0)
+numbers_of_rewards_1 <- integer(c) # vector for each arm
+numbers_of_rewards_0 <- integer(c)
+total_reward <- 0
+pi <- lst(pi_init) # init uniform treatment assignment
+regret <- lst()
+
+for (n in 1:T) { # for T runs (in our case 45)
+  # subset data into 100 obs and assign treatment randomly
+  df_subset <- assign_treatment(pi[[n]], profile_prob, batch_size, C = c)
+  df_list <- bind_rows(df_list, df_subset)
+  stopifnot(nrow(df_subset) == batch_size)
+  max_random <- 0
+  profile_val <- 1
+
+  # identify ucb arm
+  sorted_df <- df_subset %>%
+    pivot_longer(-profile, names_to = "arm", values_to = "success") %>%
+    group_by(profile) %>%
+    summarize(
+      successes = sum(success),
+      trials = n()
+    ) %>%
+    ungroup() %>%
+    mutate(ucb_arm = successes / trials + sqrt(1 * log(sum(trials)) / trials)) %>%
+    arrange(desc(ucb_arm))
+
+  # update selected arm
+  profile_val <- sorted_df[1, ][["profile"]]
+
+  # after selecting the argmax, add to selected profile
+  profiles_selected <- append(profiles_selected, profile_val)
+
+  # checking with data (what is *observed*)
+  # update based on reward
+  obs_outcome <- df_subset %>%
+    filter(profile == profile_val) %>%
+    magrittr::extract2(str_c("Q", profile_val))
+
+  reward0 <- sum(obs_outcome == 0)
+  reward1 <- sum(obs_outcome == 1)
+  numbers_of_rewards_0[profile_val] <- numbers_of_rewards_0[profile_val] + reward0
+  numbers_of_rewards_1[profile_val] <- numbers_of_rewards_1[profile_val] + reward1
+
+  total_reward <- total_reward + reward1
+
+  # need to generate new pi
+  pi_n <- rep(0, c)
+  pi_n[profile_val] <- 1
+  pi[n + 1] <- lst(pi_n)
+
+  # calculate per-period regret
+  # expectation of best arm vs. expectation of chosen arm
+  regret[n] <- max(profile_prob) - mean(profile_prob[profiles_selected])
+}
+```
+
+```{r}
+# store impt values for comparison
+pi_ucb <- pi
+profiles_selected_ucb <- profiles_selected
+regret_ucb <- regret
+```
+
+### UCB: plotting results
+
+```{r, message = F, warning=F}
+plot_selected_profiles(profiles_selected_ucb, name = "UCB")
+
+plot_observed_profiles(df_list)
+
+plot_dist(numbers_of_rewards_1, numbers_of_rewards_0, c)
+
+plot_regret(regret_ucb, name = "UCB Regret")
+```
+
+## Compare treatment assignments over time
+
+```{r}
+tibble(
+  "pi" = map(2:T, ~ pi_greedy[[.]]),
+  "arm" = map(2:T, ~ c(1:8))
+) %>%
+  mutate(id = row_number()) %>%
+  unnest(cols = c(pi, arm)) %>%
+  ggplot(aes(id, pi)) +
+  geom_line() +
+  facet_wrap(~arm) +
+  theme_classic() +
+  labs(
+    title = "Greedy Bernoulli Treatment Assignments over time",
+    x = "Time",
+    y = "Probability of being the best arm"
+  ) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2))
+
+tibble(
+  "pi" = map(2:T, ~ pi_ts[[.]]),
+  "arm" = map(2:T, ~ c(1:8))
+) %>%
+  mutate(id = row_number()) %>%
+  unnest(cols = c(pi, arm)) %>%
+  ggplot(aes(id, pi)) +
+  geom_line() +
+  facet_wrap(~arm) +
+  theme_classic() +
+  labs(
+    title = "TS Treatment Assignments over time",
+    x = "Time",
+    y = "Probability of being the best arm"
+  ) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2))
+
+tibble(
+  "pi" = map(2:T, ~ pi_eg[[.]]),
+  "arm" = map(2:T, ~ c(1:8))
+) %>%
+  mutate(id = row_number()) %>%
+  unnest(cols = c(pi, arm)) %>%
+  ggplot(aes(id, pi)) +
+  geom_line() +
+  facet_wrap(~arm) +
+  theme_classic() +
+  labs(
+    title = "Epsilon-Greedy Treatment Assignments over time",
+    x = "Time",
+    y = "Probability of being the best arm"
+  ) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2))
+```
+
+```{r}
+# put all types of regret onto one plot
+tibble(
+  "t" = c(1:length(regret_exp)),
+  "Regret (no update)" = unlist(regret_exp),
+  "Greedy TS" = unlist(regret_greedy),
+  "Thompson Sampling Regret" = unlist(regret_ts),
+  "Epsilon Greedy Regret" = unlist(regret_eg),
+  "UCB Regret" = unlist(regret_ucb)
+) %>%
+  pivot_longer(-t, names_to = "Algorithm", values_to = "Regret") %>%
+  ggplot(aes(t, Regret, color = Algorithm)) +
+  geom_line() +
+  theme_classic()
+```
+
+
