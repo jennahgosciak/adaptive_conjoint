@@ -165,15 +165,62 @@ num_batches <- N / batch_size # total number of batches
 pi_init <- cumsum(rep(0.125, 8)) # initial pi cdf
 ```
 
+```{r, message = F}
+# init parameters
+pi_list <- lst(rep(0.125, num_profiles))
+num_outcome1 <- integer(num_profiles) # vector for each arm
+num_outcome0 <- integer(num_profiles)
+  
+# generate pi on fake data
+for (i in 1:num_batches) {
+  output <- c(run_ts(batch_size, num_profiles, pi_list[[i]], num_outcome1, num_outcome0, fake_data = T, cdf=F))
+  pi_list[i + 1] <- lst(output$pi)
+  num_outcome1 <- output$num_outcome1
+  num_outcome0 <- output$num_outcome0
+}
+```
 
 ```{r}
-# generate pi on fake data
-pi_ts_fake <- run_ts(batch_size, pi_init, fake_data = T)
-pi_ts_fake
+num_outcome1 <- integer(num_profiles) # vector for each arm
+num_outcome0 <- integer(num_profiles)
+pi_cdf_list <- lst(pi_init)
+for (i in 1:num_batches) {
+  output <- c(run_ts(batch_size, num_profiles, pi_cdf_list[[i]], num_outcome1, num_outcome0, fake_data = T))
+  pi_cdf_list[i + 1] <- lst(output$pi)
+  num_outcome1 <- output$num_outcome1
+  num_outcome0 <- output$num_outcome0
+}
+```
 
+
+```{r, message=F, warning=T}
 # generate pi on real data
-pi_ts <- run_ts(batch_size, pi_init, fake_data = F)
+pi_ts <- run_ts(batch_size, num_profiles, pi_init, fake_data = F)$pi
 pi_ts
 ```
+
+```{r}
+tibble(
+  "pi" = map(1:num_batches, ~ map(pi_list, ~as.numeric(.))[[.]]),
+  "arm" = map(1:num_batches, ~ c(1:8))
+) %>%
+  mutate(id = row_number()) %>% 
+  unnest(cols = c(pi, arm)) %>%
+  mutate(arm_text = str_c("Context Profile", arm)) %>% 
+  ggplot(aes(id, pi, color=arm_text)) +
+  geom_line() +
+  #facet_wrap(~arm_text) +
+  theme_classic() +
+  labs(
+    title = "Thompson Sampling Treatment Assignments Over Time by Context Arm",
+    x = "Time",
+    y = "Probability of being the best arm",
+    color = ""
+  ) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2))
+
+ggsave("treatment_assignment_prob.png")
+```
+
 
 

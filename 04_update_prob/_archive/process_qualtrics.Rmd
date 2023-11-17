@@ -21,7 +21,7 @@ library(RColorBrewer)
 
 knitr::opts_chunk$set(cache.extra = 2023)
 
-source("./plotting_functions.R")
+source("../plotting_functions.R")
 ```
 
 ```{r, setup qualtrics}
@@ -118,11 +118,15 @@ pc_survey_recode <- pc_survey_test %>%
     . == "Candidate 1" & rnum_age <= 0.5 ~ 1,
     . == "Candidate 2" & rnum_age > 0.5 ~ 1,
     # explicitly write out all the other conditions
-    TRUE ~ NA_integer_
+    TRUE ~ 0
   ))) %>%
   mutate(total_Q = select(., str_c("Q", 1:8)) %>%
     rowSums())
 
+pc_survey_test
+```
+
+```{r}
 pc_survey_test
 # check every respondent has exactly one non-missing value
 # of Q1-Q8
