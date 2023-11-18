@@ -1,12 +1,12 @@
 load_qualtrics <- function(survey_name) {
   # load api key permissions
   readRenviron("~/.Renviron")
-  
+
   # load survey data
   surveys <- all_surveys()
   # select survey ID
   pc_id <- surveys[surveys["name"] == survey_name, ][["id"]]
-  
+
   return(fetch_survey(
     surveyID = pc_id,
     verbose = TRUE,
@@ -31,12 +31,12 @@ clean_qualtrics_data <- function(df) {
       TRUE ~ NA_real_
     ))) %>%
     mutate(candidate_response = select(., str_c("Q", 1:8)) %>%
-             rowSums(na.rm = T))
+      rowSums(na.rm = T))
 }
 
 select_batch <- function(df) {
-  df %>% 
-    arrange(desc(StartDate)) %>% 
+  df %>%
+    arrange(desc(StartDate)) %>%
     head(100)
 }
 
@@ -85,7 +85,7 @@ create_profile_var <- function(df, pi) {
     ))
 }
 
-create_fake_data <- function(pi, profile_prob, batch_size, num_profiles = 8, cdf=T) {
+create_fake_data <- function(pi, profile_prob, batch_size, num_profiles = 8, cdf = T) {
   # initialize empty dataframe
   df_fake <- tibble("candidate_response" = rep(NA, batch_size))
   df_fake["profile"] <- NA
@@ -117,7 +117,7 @@ create_fake_data <- function(pi, profile_prob, batch_size, num_profiles = 8, cdf
       )
       # profile <- match(1, rmultinom(1, size = 1, prob = pi))
     }
-    
+
     # assign based on probability of choosing a younger profile
     df_fake[i, "candidate_response"] <- rbinom(1, 1, profile_prob[profile])
     df_fake[i, "profile"] <- profile

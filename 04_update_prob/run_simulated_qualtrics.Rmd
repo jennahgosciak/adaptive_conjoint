@@ -170,10 +170,10 @@ pi_init <- cumsum(rep(0.125, 8)) # initial pi cdf
 pi_list <- lst(rep(0.125, num_profiles))
 num_outcome1 <- integer(num_profiles) # vector for each arm
 num_outcome0 <- integer(num_profiles)
-  
+
 # generate pi on fake data
 for (i in 1:num_batches) {
-  output <- c(run_ts(batch_size, num_profiles, pi_list[[i]], num_outcome1, num_outcome0, fake_data = T, cdf=F))
+  output <- c(run_ts(batch_size, num_profiles, pi_list[[i]], num_outcome1, num_outcome0, fake_data = T, cdf = F))
   pi_list[i + 1] <- lst(output$pi)
   num_outcome1 <- output$num_outcome1
   num_outcome0 <- output$num_outcome0
@@ -201,15 +201,15 @@ pi_ts
 
 ```{r}
 tibble(
-  "pi" = map(1:num_batches, ~ map(pi_list, ~as.numeric(.))[[.]]),
+  "pi" = map(1:num_batches, ~ map(pi_list, ~ as.numeric(.))[[.]]),
   "arm" = map(1:num_batches, ~ c(1:8))
 ) %>%
-  mutate(id = row_number()) %>% 
+  mutate(id = row_number()) %>%
   unnest(cols = c(pi, arm)) %>%
-  mutate(arm_text = str_c("Context Profile", arm)) %>% 
-  ggplot(aes(id, pi, color=arm_text)) +
+  mutate(arm_text = str_c("Context Profile", arm)) %>%
+  ggplot(aes(id, pi, color = arm_text)) +
   geom_line() +
-  #facet_wrap(~arm_text) +
+  # facet_wrap(~arm_text) +
   theme_classic() +
   labs(
     title = "Thompson Sampling Treatment Assignments Over Time by Context Arm",
