@@ -93,7 +93,7 @@ df_clean %>%
 
 ```{r}
 # check every respondent has exactly one non-missing value
-df %>%
+df_clean %>%
   select(str_c("Q", 1:8)) %>%
   mutate(across(everything(), ~ as.character(.))) %>%
   is.na() %>%
@@ -165,7 +165,21 @@ num_batches <- N / batch_size # total number of batches
 pi_init <- cumsum(rep(0.125, 8)) # initial pi cdf
 ```
 
-```{r, message = F}
+
+```{r}
+# generate pi on fake data
+pi_ts_fake <- run_ts(batch_size, num_profiles, pi_init, fake_data = T)$pi
+pi_ts_fake
+```
+
+
+```{r, message=F, warning=T}
+# generate pi on real data
+pi_ts <- run_ts(batch_size, num_profiles, pi_init, fake_data = F)$pi
+pi_ts
+```
+
+```{r}
 # init parameters
 pi_list <- lst(rep(0.125, num_profiles))
 num_outcome1 <- integer(num_profiles) # vector for each arm
@@ -178,28 +192,7 @@ for (i in 1:num_batches) {
   num_outcome1 <- output$num_outcome1
   num_outcome0 <- output$num_outcome0
 }
-```
 
-```{r}
-num_outcome1 <- integer(num_profiles) # vector for each arm
-num_outcome0 <- integer(num_profiles)
-pi_cdf_list <- lst(pi_init)
-for (i in 1:num_batches) {
-  output <- c(run_ts(batch_size, num_profiles, pi_cdf_list[[i]], num_outcome1, num_outcome0, fake_data = T))
-  pi_cdf_list[i + 1] <- lst(output$pi)
-  num_outcome1 <- output$num_outcome1
-  num_outcome0 <- output$num_outcome0
-}
-```
-
-
-```{r, message=F, warning=T}
-# generate pi on real data
-pi_ts <- run_ts(batch_size, num_profiles, pi_init, fake_data = F)$pi
-pi_ts
-```
-
-```{r}
 tibble(
   "pi" = map(1:num_batches, ~ map(pi_list, ~ as.numeric(.))[[.]]),
   "arm" = map(1:num_batches, ~ c(1:8))
@@ -214,7 +207,7 @@ tibble(
   labs(
     title = "Thompson Sampling Treatment Assignments Over Time by Context Arm",
     x = "Time",
-    y = "Probability of being the best arm",
+    y = "Probability of being the most discriminatory context",
     color = ""
   ) +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2))
