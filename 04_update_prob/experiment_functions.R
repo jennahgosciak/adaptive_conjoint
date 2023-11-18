@@ -14,6 +14,8 @@ update_outcomes <- function(df, num_profiles, num_outcome, outcome_value) {
 }
 
 update_outcomes_loop <- function(df, num_profiles, num_outcome1, num_outcome0) {
+  # iterate through each profile number
+  # update the number of 1,0 responses based on the data
   for (i in 1:num_profiles) {
     obs_responses <- df %>%
       filter(profile == i) %>%
@@ -31,9 +33,12 @@ update_outcomes_loop <- function(df, num_profiles, num_outcome1, num_outcome0) {
 update_ts <- function(df, num_sim, num_profiles, num_outcome1, num_outcome0, cdf) {
   # with the data provided
   # calculated the observed outcomes = 1, and outcomes = 0
+  
+  # uncomment this for the vectorized approach
   # num_outcome1 <- update_outcomes(df, num_profiles, num_outcome1, 1)
   # num_outcome0 <- update_outcomes(df, num_profiles, num_outcome0, 0)
-
+  
+  # this approach uses a for loop
   upd_outcomes <- update_outcomes_loop(df, num_profiles, num_outcome1, num_outcome0)
   num_outcome1 <- upd_outcomes$num_outcome1
   num_outcome0 <- upd_outcomes$num_outcome0
@@ -51,27 +56,6 @@ update_ts <- function(df, num_sim, num_profiles, num_outcome1, num_outcome0, cdf
   stopifnot(length(pi) == num_profiles)
   return(lst(pi, num_outcome1, num_outcome0))
 }
-
-# same version of function but with a for loop
-# update_ts <- function(df, num_sim, num_profiles, num_outcome1, num_outcome0, cdf) {
-#   # with the data provided
-#   # calculated the observed outcomes = 1, and outcomes = 0
-#
-#
-#
-#   # calculate the probability that each arm is the best
-#   draws <- replicate(num_sim, rbeta(num_profiles, num_outcome1, num_outcome0))
-#   # calculate argmax across draws
-#   argmax <- apply(draws, 2, which.max)
-#
-#   # generate new pi
-#   pi <- unname(table(cut(argmax, 0:num_profiles)) / num_sim)
-#   if (cdf == T) {
-#     pi <- cumsum(pi)
-#   }
-#   stopifnot(length(pi) == num_profiles)
-#   return(lst(pi, num_outcome1, num_outcome0))
-# }
 
 run_ts <- function(batch_size, num_profiles, pi_init, num_outcome1 = NULL, num_outcome0 = NULL, fake_data = T, cdf = T) {
   # if null, init number of outcomes in previous rounds to 0
