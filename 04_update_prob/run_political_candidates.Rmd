@@ -1,5 +1,5 @@
 ---
-title: "Process Qualtrics Data, Treatment Assignment Updating"
+title: "Process Qualtrics Data and Treatment Assignment Updating for Political Candidates Survey"
 output: rmarkdown::github_document
 date: "2023-11-07"
 ---
@@ -29,16 +29,16 @@ source("./_functions/populate_probs.R")
 ```
 
 ```{r, setup qualtrics}
-config <- config::get()
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
+survey_name <- "Political Candidates"
 
-qualtrics_api_credentials(api_key = config$api_key,
-                          base_url = url,
-                          install = TRUE,
-                          overwrite=T)
+# can comment out after running once
+# qualtrics_api_credentials(api_key = config$api_key,
+#                           base_url = url,
+#                           install = TRUE,
+#                           overwrite=T)
 
-
-df <- load_qualtrics("Political Candidates")
+df <- load_qualtrics(survey_name)
 df %>%
   head()
 ```
@@ -153,6 +153,9 @@ df_fake %>%
 ```
 
 # Update treatment probabilities
+* TODO: update this so it generates a vector of probabilities based on **real** data
+* TODO: automate probabilities in Qualtrics
+* TODO: remove fake data/simulated data and keep only in `run_simulated_qulatrics.Rmd`
 
 ```{r, global params}
 # define with comments

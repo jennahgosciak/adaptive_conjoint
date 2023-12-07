@@ -1,5 +1,5 @@
 ---
-title: "Process Qualtrics Data, Treatment Assignment Updating"
+title: "Process Qualtrics Data and Treatment Assignment Updating for Political Candidates Survey"
 output: rmarkdown::github_document
 date: "2023-11-07"
 ---
@@ -25,25 +25,27 @@ knitr::opts_chunk$set(cache.extra = 2023)
 source("./_functions/data_cleaning.R")
 source("./_functions/experiment_functions.R")
 source("./_functions/plotting_functions.R")
-source("./_functions/populate_probs.R")
+# source("./_functions/populate_probs.R")
 ```
 
 ```{r, setup qualtrics}
-config <- config::get()
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
+survey_name <- "Job Applicants"
 
-qualtrics_api_credentials(api_key = config$api_key,
-                          base_url = url,
-                          install = TRUE,
-                          overwrite=T)
+# can comment out after running once
+# qualtrics_api_credentials(api_key = config$api_key,
+#                           base_url = url,
+#                           install = TRUE,
+#                           overwrite=T)
 
-
-df <- load_qualtrics("Political Candidates")
+df <- load_qualtrics(survey_name)
 df %>%
   head()
 ```
 
 ## Survey Validation
+
+* TODO: update for job applicants survey (these are for poltical candidates)
 
 ```{r}
 df %>%
@@ -80,6 +82,10 @@ df %>%
 ```
 
 ## Clean Qualtrics Data
+
+* TODO: update for job applicants survey (these are for political candidates survey)
+* maybe we should have two functions for data cleaning?
+
 ```{r}
 df_clean <- clean_qualtrics_data(df)
 
@@ -153,6 +159,9 @@ df_fake %>%
 ```
 
 # Update treatment probabilities
+* TODO: update this so it generates a vector of probabilities based on **real** data
+* TODO: automate probabilities in Qualtrics
+* TODO: remove fake data/simulated data and keep only in `run_simulated_qulatrics.Rmd`
 
 ```{r, global params}
 # define with comments
