@@ -40,8 +40,42 @@ survey_id <- config$pol_candidates_survey_id
 #                           overwrite=T)
 
 df <- load_qualtrics(survey_name)
+
 df %>%
   head()
+
+df %>% 
+  nrow()
+```
+
+```{r}
+# drop my test response
+df <- df %>% 
+  mutate(StartDate_clean = ymd_hms(StartDate)) %>% 
+  verify(is.na(StartDate_clean) == is.na(StartDate)) %>% 
+  filter(StartDate_clean >= ymd_hms('2023-12-08-13-58-00'))
+
+df %>% 
+  nrow()
+```
+
+```{r}
+# average finished rate
+mean(df$Finished)
+
+# average time to complete
+mean(df$`Duration (in seconds)`)
+
+# compare amount of time spent
+df %>% 
+  summarize(across(c(`Duration (in seconds)`), 
+                   .fns = lst(mean = ~mean(.)/60, 
+                              min = ~min(.)/60, 
+                              max = ~max(.)/60, 
+                              median = ~median(.)/60)))
+
+# check ID uniquely identifies rows in data
+stopifnot(length(unique(df$`Prolific ID Q`)) == nrow(df))
 ```
 
 ## Survey Validation
@@ -49,11 +83,6 @@ df %>%
 ```{r}
 df %>%
   distinct(Status)
-
-# filter for test data
-# replace with real data when running hte survey
-df <- df %>%
-  filter_test_data()
 
 # check consent means their responses are missing
 df %>%
@@ -64,8 +93,6 @@ df %>%
   check_completion()
 
 df %>%
-  # note: question was different prior to 11/06
-  filter(StartDate >= lubridate::ymd("2023-11-06")) %>%
   check_location_screen()
 ```
 
@@ -98,7 +125,10 @@ df_clean %>%
   select(str_c("Q", 1:8)) %>%
   mutate(across(everything(), ~ as.character(.))) %>%
   is.na() %>%
-  rowSums(na.rm = T)
+  rowSums(na.rm = T) %>% 
+  unique() %>% 
+  equals(7) %>% 
+  stopifnot()
 
 # check row total is not more than 1
 # 0 if selected the older candidate
@@ -112,31 +142,33 @@ df_clean %>%
 
 
 # Update treatment probabilities
-* TODO: update this so it generates a vector of probabilities based on **real** data
-* TODO: automate probabilities in Qualtrics
-* TODO: remove fake data/simulated data and keep only in `run_simulated_qulatrics.Rmd`
 
 ```{r, global params}
 # define with comments
 num_profiles <- 8 # number of profiles
 num_sim <- 1000 # number of simulations for Monte Carlo simulation
-eps <- 0.1 # for epsilon greedy alg
 
-N <- 4500 # total number of observations
-num_batches <- N / batch_size # total number of batches
-pi_init <- cumsum(rep(0.125, 8)) # initial pi cdf
+# init to 0 each time since we are using the full data
+# to update the number of outcomes = 1 and = 0
+num_outcome1 <- integer(num_profiles)
+num_outcome0 <- integer(num_profiles)
 ```
 
 ```{r, message=F, warning=T}
+set.seed(2023)
 # generate pi on real data
-output <- update_ts(df_clean, num_sim, num_profiles, num_outcome1, num_outcome0, cdf = TRUE)
+output <- update_ts(df_clean, num_sim, num_profiles, num_outcome1, 
+                    num_outcome0, 
+                    cdf = TRUE)
 output
 
 # vector of new probabilities
 # assign names (impt for checking replacement in survey flow)
-pi_ts <- pi_init[1:(num_profiles-1)] 
 pi_ts <- output$pi[1:(num_profiles-1)]
 names(pi_ts) <- str_c("pi", 1:(num_profiles-1))
+
+# check total is equal to 50
+stopifnot((sum(output$num_outcome1) + sum(output$num_outcome0)) == 50)
 ```
 ```{r}
 # Retrieve current survey flow (full structure)
