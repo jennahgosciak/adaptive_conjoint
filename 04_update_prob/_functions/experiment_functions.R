@@ -33,11 +33,11 @@ update_outcomes_loop <- function(df, num_profiles, num_outcome1, num_outcome0) {
 update_ts <- function(df, num_sim, num_profiles, num_outcome1, num_outcome0, cdf) {
   # with the data provided
   # calculated the observed outcomes = 1, and outcomes = 0
-  
+
   # uncomment this for the vectorized approach
   # num_outcome1 <- update_outcomes(df, num_profiles, num_outcome1, 1)
   # num_outcome0 <- update_outcomes(df, num_profiles, num_outcome0, 0)
-  
+
   # this approach uses a for loop
   upd_outcomes <- update_outcomes_loop(df, num_profiles, num_outcome1, num_outcome0)
   num_outcome1 <- upd_outcomes$num_outcome1
