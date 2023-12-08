@@ -32,10 +32,10 @@ source("./_functions/populate_probs.R")
 config <- config::get()
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
 
-qualtrics_api_credentials(api_key = config$api_key,
-                          base_url = url,
-                          install = TRUE,
-                          overwrite=T)
+# qualtrics_api_credentials(api_key = config$api_key,
+#                           base_url = url,
+#                           install = TRUE,
+#                           overwrite=T)
 
 
 df <- load_qualtrics("Political Candidates")
