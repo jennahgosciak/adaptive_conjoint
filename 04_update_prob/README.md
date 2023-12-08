@@ -1,10 +1,10 @@
 # Bayesian updating of context/treatment assignment probabilites:
 
 ## Step 1: Data Export
-After we have generated **100** responses to the survey questions from Qualtrics, we load the data locally in R using a function from the `qualtRics` package.
+After we have generated new **100** responses to the survey questions from Qualtrics, we load the data locally in R using a function from the `qualtRics` package.
 
 ## Step 2: Survey Validation
-Ensure only the last 100 responses are loaded from Qualtrics. Additionally, we implement the following checks:
+Ensure all responses are loaded from Qualtrics. Drop any participants from before the time stamp of the study start (i.e., excluding participants in the pilot study). Additionally, we implement the following checks and drop participants who do not meet the following criteria:
 * The status is not one of "Survey Preview" or "Survey Test"
 * We have received consent from all respondents
 * Respondents do not fail the age and location checks for eligibility (i.e., they are over 18 and in the U.S.)
