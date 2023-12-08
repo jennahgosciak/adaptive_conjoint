@@ -31,6 +31,7 @@ source("./_functions/populate_probs.R")
 ```{r, setup qualtrics}
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
 survey_name <- "Political Candidates"
+survey_id <- config$pol_candidates_survey_id
 
 # can comment out after running once
 # qualtrics_api_credentials(api_key = config$api_key,
@@ -109,48 +110,6 @@ df_clean %>%
   stopifnot()
 ```
 
-## Create fake data
-
-```{r, setup fake data}
-# batch size is the size of the batches (here = 100)
-batch_size <- 100
-
-# probabilities of selecting younger candidate
-profile_prob <- c(0.9, 0.5, 0.3, 0.5, 0.4, 0.3, 0.5, 0.44)
-pi <- cumsum(rep(0.125, 8)) # treatment assignment probabilities (CDF)
-```
-
-```{r}
-df_fake <- create_fake_data(pi, profile_prob, batch_size)
-df_fake
-```
-
-### Examine fake data
-
-* Check distribution of profiles overall and by batch
-
-```{r}
-df_fake %>%
-  ggplot(aes(profile)) +
-  geom_histogram() +
-  theme_classic()
-
-df_fake %>%
-  group_by(profile) %>%
-  summarize(mean = mean(candidate_response)) %>%
-  ggplot(aes(profile, mean)) +
-  geom_col() +
-  theme_classic()
-
-df_fake %>%
-  # share of respondents who select
-  # the younger candidate
-  group_by(profile) %>%
-  summarize(
-    mean = mean(candidate_response),
-    total = sum(candidate_response)
-  )
-```
 
 # Update treatment probabilities
 * TODO: update this so it generates a vector of probabilities based on **real** data
@@ -168,55 +127,44 @@ num_batches <- N / batch_size # total number of batches
 pi_init <- cumsum(rep(0.125, 8)) # initial pi cdf
 ```
 
-
-```{r}
-# generate pi on fake data
-pi_ts_fake <- run_ts(batch_size, num_profiles, pi_init, fake_data = T)$pi
-pi_ts_fake
-```
-
-
 ```{r, message=F, warning=T}
 # generate pi on real data
-pi_ts <- run_ts(batch_size, num_profiles, pi_init, fake_data = F)$pi
-pi_ts
-```
+output <- update_ts(df_clean, num_sim, num_profiles, num_outcome1, num_outcome0, cdf = TRUE)
+output
 
+# vector of new probabilities
+# assign names (impt for checking replacement in survey flow)
+pi_ts <- pi_init[1:(num_profiles-1)] 
+pi_ts <- output$pi[1:(num_profiles-1)]
+names(pi_ts) <- str_c("pi", 1:(num_profiles-1))
+```
 ```{r}
-# init parameters
-pi_list <- lst(rep(0.125, num_profiles))
-num_outcome1 <- integer(num_profiles) # vector for each arm
-num_outcome0 <- integer(num_profiles)
+# Retrieve current survey flow (full structure)
+current_flow <- get_survey_flow(config$api_token, survey_id, config$datacenter_id)
+# Extract just the flow part for modification
+current_flow_data <- current_flow$result$Flow
 
-# generate pi on fake data
-for (i in 1:num_batches) {
-  output <- c(run_ts(batch_size, num_profiles, pi_list[[i]], num_outcome1, num_outcome0, fake_data = T, cdf = F))
-  pi_list[i + 1] <- lst(output$pi)
-  num_outcome1 <- output$num_outcome1
-  num_outcome0 <- output$num_outcome0
-}
+# Update the flow data with new probabilities
+modified_flow_data <- update_flow_with_probabilities(
+  current_flow_data,
+  "FL_10",
+  pi_ts,
+  names(pi_ts)
+)
 
-tibble(
-  "pi" = map(1:num_batches, ~ map(pi_list, ~ as.numeric(.))[[.]]),
-  "arm" = map(1:num_batches, ~ c(1:8))
-) %>%
-  mutate(id = row_number()) %>%
-  unnest(cols = c(pi, arm)) %>%
-  mutate(arm_text = str_c("Context Profile", arm)) %>%
-  ggplot(aes(id, pi, color = arm_text)) +
-  geom_line() +
-  # facet_wrap(~arm_text) +
-  theme_classic() +
-  labs(
-    title = "Thompson Sampling Treatment Assignments Over Time by Context Arm",
-    x = "Time",
-    y = "Probability of being the most discriminatory context",
-    color = ""
-  ) +
-  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2))
+# Reconstruct the full survey configuration with the modified flow part
+current_flow$result$Flow <- modified_flow_data
 
-ggsave("treatment_assignment_prob.png")
+# Convert the entire modified survey configuration to JSON
+json_payload <- toJSON(current_flow$result, auto_unbox = TRUE)
+
+# Make the PUT request to update the survey flow
+update_response <- update_survey_flow(config$api_token, survey_id, current_flow$result, config$datacenter_id)
+
+# Check the response
+print(update_response)
 ```
+
 
 
 

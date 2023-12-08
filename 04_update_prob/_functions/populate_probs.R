@@ -2,9 +2,6 @@ library(httr)
 library(jsonlite)
 config <- config::get()
 
-# survey_id <- config$pol_candidates_survey_id
-survey_id <- config$job_applicants_survey_id
-
 # Retrieves survey flow
 get_survey_flow <- function(api_token, survey_id, datacenter_id) {
   base_url <- paste0("https://", datacenter_id, ".qualtrics.com/API/v3/survey-definitions/", survey_id, "/flow")
@@ -61,34 +58,3 @@ update_flow_with_probabilities <- function(flow, flow_id, new_probabilities,
   }
   return(flow)
 }
-
-# From run_simulated_qualtrics
-# vector of new probabilities
-new_probabilities <- cumsum(rep(0.25, 3))
-# assign names (impt for checking replacement in survey flow)
-names(new_probabilities) <- str_c("pi", 1:3)
-
-# Retrieve current survey flow (full structure)
-current_flow <- get_survey_flow(config$api_token, survey_id, config$datacenter_id)
-# Extract just the flow part for modification
-current_flow_data <- current_flow$result$Flow
-
-# Update the flow data with new probabilities
-modified_flow_data <- update_flow_with_probabilities(
-  current_flow_data,
-  "FL_10",
-  new_probabilities,
-  names(new_probabilities)
-)
-
-# Reconstruct the full survey configuration with the modified flow part
-current_flow$result$Flow <- modified_flow_data
-
-# Convert the entire modified survey configuration to JSON
-json_payload <- toJSON(current_flow$result, auto_unbox = TRUE)
-
-# Make the PUT request to update the survey flow
-update_response <- update_survey_flow(config$api_token, survey_id, current_flow$result, config$datacenter_id)
-
-# Check the response
-print(update_response)
