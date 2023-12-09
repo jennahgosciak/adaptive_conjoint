@@ -105,8 +105,21 @@ df %>%
   ggplot(aes(profile)) +
   geom_histogram() +
   theme_classic()
-```
 
+df %>% 
+  arrange(StartDate_clean) %>% 
+  head(50) %>%
+  ggplot(aes(profile)) +
+  geom_histogram() +
+  theme_classic()
+
+df %>% 
+  arrange(StartDate_clean) %>% 
+  tail(10) %>%
+  ggplot(aes(profile)) +
+  geom_histogram() +
+  theme_classic()
+```
 ## Clean Qualtrics Data
 ```{r}
 df_clean <- clean_qualtrics_data(df)
@@ -115,6 +128,57 @@ df_clean <- clean_qualtrics_data(df)
 df_clean %>%
   select(candidate_response, str_c("Q", 1:8), profile) %>%
   verify(!is.na(candidate_response))
+
+df_clean %>% 
+  arrange(StartDate_clean) %>% 
+  tail(10) %>% 
+  group_by(profile) %>% 
+  summarize(n = n(),
+            resp1 = sum(candidate_response),
+            resp0 = sum(candidate_response == 0))
+```
+```{r}
+# examine demographcs
+df_clean %>% 
+  group_by(profile) %>% 
+  summarize(select_younger = sum(candidate_response),
+            percent_select_younger = mean(candidate_response))
+
+df_clean %>% 
+  mutate(older_candidate = if_else(rnum_age <= 0.5, 'Candidate 2', 'Candidate 1')) %>% 
+  mutate(pass_attention_check = if_else(Manipulation_Q1 == older_candidate, 1, 0)) %>% 
+  summarize(per_pass_attention_check = mean(pass_attention_check))
+
+df_clean %>% 
+  mutate(age = QD2_1_TEXT) %>% 
+  ggplot(aes(age)) +
+  geom_histogram()
+
+df_clean %>% 
+  group_by(QD5) %>% 
+  summarize(count = n())
+
+df_clean %>% 
+  mutate(hispanic_latino = if_else(QD4 == 'Yes', 1, 0)) %>% 
+  summarize(count_hispanic_latino = sum(hispanic_latino),
+            per_hispanic_latino = mean(hispanic_latino))
+
+df_clean %>% 
+  mutate(across(starts_with("QD3_"), .fns = lst(race_num = ~if_else(!is.na(.), 1, 0)))) %>% 
+  mutate(race_count = rowSums(select(., ends_with('race_num'))),
+         race = case_when(race_count > 1 ~ 'Multiracial',
+                          !is.na(QD3_1) ~ 'American Indian or Alaskan Native',
+                          !is.na(QD3_2) ~ 'Asian',
+                          !is.na(QD3_3) ~ 'Black or African American',
+                          !is.na(QD3_4) ~ 'Native Hawaiian',
+                          !is.na(QD3_5) ~ 'White',
+                          !is.na(QD3_6) ~ 'Other',
+                          !is.na(QD3_7) ~ 'Prefer not to disclose')) %>% 
+  group_by(race) %>% 
+  summarize(n = n()) %>% 
+  ungroup() %>% 
+  mutate(per = n/sum(n)) %>% 
+  arrange(desc(per))
 ```
 
 ## Clean Data Validation
@@ -146,7 +210,7 @@ df_clean %>%
 ```{r, global params}
 # define with comments
 num_profiles <- 8 # number of profiles
-num_sim <- 1000 # number of simulations for Monte Carlo simulation
+num_sim <- 1e6 # number of simulations for Monte Carlo simulation
 
 # init to 0 each time since we are using the full data
 # to update the number of outcomes = 1 and = 0
@@ -164,11 +228,11 @@ output
 
 # vector of new probabilities
 # assign names (impt for checking replacement in survey flow)
-pi_ts <- output$pi[1:(num_profiles-1)]
+pi_ts <- round(output$pi[1:(num_profiles-1)], 3)
 names(pi_ts) <- str_c("pi", 1:(num_profiles-1))
 
 # check total is equal to 50
-stopifnot((sum(output$num_outcome1) + sum(output$num_outcome0)) == 50)
+stopifnot((sum(output$num_outcome1) + sum(output$num_outcome0)) == 60)
 ```
 ```{r}
 # Retrieve current survey flow (full structure)

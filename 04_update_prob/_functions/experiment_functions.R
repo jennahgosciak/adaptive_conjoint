@@ -50,10 +50,10 @@ update_ts <- function(df, num_sim, num_profiles, num_outcome1, num_outcome0, cdf
 
   # generate new pi
   pi <- unname(table(cut(argmax, 0:num_profiles)) / num_sim)
-  print(str_c("PDF:", pi))
+  print(str_c("PDF: ", str_c(pi, collapse=',')))
   if (cdf == TRUE) {
     pi <- cumsum(pi)
-    print(str_c("CDF:", pi))
+    print(str_c("CDF: ", str_c(pi, collapse=',')))
   }
   stopifnot(length(pi) == num_profiles)
   return(lst(pi, num_outcome1, num_outcome0))
