@@ -99,7 +99,7 @@ df %>%
 ```{r}
 # create profile variable
 df <- df %>%
-  create_profile_var()
+  create_profile_var_political()
 
 df %>%
   ggplot(aes(profile)) +
@@ -122,7 +122,7 @@ df %>%
 ```
 ## Clean Qualtrics Data
 ```{r}
-df_clean <- clean_qualtrics_data(df)
+df_clean <- clean_political_data(df)
 
 # each question number is the random ordering of the context attributes
 df_clean %>%

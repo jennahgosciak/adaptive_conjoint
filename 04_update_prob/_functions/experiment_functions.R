@@ -23,10 +23,10 @@ update_outcomes_loop <- function(df, num_profiles, num_outcome1, num_outcome0) {
     num_outcome1[i] <- num_outcome1[i] + sum(obs_responses)
     num_outcome0[i] <- num_outcome0[i] + sum(obs_responses == 0)
   }
-
+  
   # check each vector is the length of the number of profiles
-  stopifnot(length(obs_outcome1) == num_profiles)
-  stopifnot(length(obs_outcome0) == num_profiles)
+  stopifnot(length(num_outcome1) == num_profiles) 
+  stopifnot(length(num_outcome0) == num_profiles)
   return(lst(num_outcome1, num_outcome0))
 }
 

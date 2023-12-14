@@ -36,8 +36,8 @@ clean_political_data <- function(df) {
 
 clean_job_data <- function(df) {
   df %>%
-    # = 1 if selecting non-mother
-    # = 0 if selecting mother candidate
+    # = 1 if selecting mother candidate
+    # = 0 if selecting no-mother candidate
     mutate(across(str_c("Q", 1:8), ~ case_when(
       . == "Candidate 1" & rnum_mother <= 0.5 ~ 1,
       . == "Candidate 2" & rnum_mother > 0.5 ~ 1,
@@ -68,10 +68,13 @@ check_consent <- function(df) {
 # should be missing if they are not in the US
 check_location_screen <- function(df) {
   df %>%
-    filter(Status == "Survey Test", PreScreen_Q1 != "Yes")
-  if (!all(is.na(filtered_df$Q1))) {
-    stop("Not all Q1 values are missing.")
-  }
+    filter(
+      Status == "Survey Test", PreScreen_Q1 != "Yes",
+    ) %>%
+    mutate(Q1 = as.character(Q1)) %>%
+    distinct(Q1) %>%
+    is.na() %>%
+    stopifnot()
 }
 
 check_completion <- function(df) {
@@ -82,24 +85,8 @@ check_completion <- function(df) {
     stopifnot()
 }
 
-create_profile_var_political <- function(df, pi) {
-  df %>%
-    # create 'profile' variable
-    mutate(profile = case_when(
-      rnum <= pi1 ~ 1,
-      rnum > pi1 & rnum <= pi2 ~ 2,
-      rnum > pi2 & rnum <= pi3 ~ 3,
-      rnum > pi3 & rnum <= pi4 ~ 4,
-      rnum > pi4 & rnum <= pi5 ~ 5,
-      rnum > pi5 & rnum <= pi6 ~ 6,
-      rnum > pi6 & rnum <= pi7 ~ 7,
-      rnum > pi7 ~ 8
-    ))
-}
-
 create_profile_var_jobs <- function(df, pi) {
   df %>%
-    # create 'profile' variable
     mutate(profile = case_when(
       rnum <= pi1 ~ 1,
       rnum > pi1 & rnum <= pi2 ~ 2,
