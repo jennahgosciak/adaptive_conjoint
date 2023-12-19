@@ -44,7 +44,7 @@ update_ts <- function(df, num_sim, num_profiles, num_outcome1, num_outcome0, cdf
   num_outcome0 <- upd_outcomes$num_outcome0
 
   # calculate the probability that each arm is the best
-  draws <- replicate(num_sim, rbeta(num_profiles, num_outcome1 + 1, num_outcome0 + 1))
+  draws <- replicate(num_sim, rbeta(num_profiles, num_outcome1 + 10, num_outcome0 + 10))
   # calculate argmax across draws
   argmax <- apply(draws, 2, which.max)
 

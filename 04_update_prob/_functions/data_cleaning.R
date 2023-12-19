@@ -58,7 +58,7 @@ select_batch <- function(df) {
 # should be missing if participants do not consent
 check_consent <- function(df) {
   df %>%
-    filter(Status == "Survey Test", Consent == "I do not consent to participate") %>%
+    filter(Consent == "I do not consent to participate") %>%
     mutate(Q2 = as.character(Q2)) %>%
     distinct(`Q2`) %>%
     is.na() %>%
@@ -67,8 +67,9 @@ check_consent <- function(df) {
 
 # should be missing if they are not in the US
 check_location_screen <- function(df) {
-  df %>%
-    filter(Status == "Survey Test", PreScreen_Q1 != "Yes")
+  filtered_df <- df %>%
+    filter(PreScreen_Q1 != "Yes")
+  
   if (!all(is.na(filtered_df$Q1))) {
     stop("Not all Q1 values are missing.")
   }
