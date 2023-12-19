@@ -4,6 +4,7 @@
 *.docx
 02_output/
 01_input/
+run_political_candidates_files/
 automate_candidates_files/
 .Rproj.user
 *.pdf
