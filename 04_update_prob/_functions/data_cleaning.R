@@ -46,7 +46,7 @@ clean_job_data <- function(df) {
       TRUE ~ NA_real_
     ))) %>%
     mutate(candidate_response = select(., str_c("Q", 1:8)) %>%
-             rowSums(na.rm = T))
+      rowSums(na.rm = T))
 }
 
 select_batch <- function(df) {
@@ -69,7 +69,7 @@ check_consent <- function(df) {
 check_location_screen <- function(df) {
   filtered_df <- df %>%
     filter(PreScreen_Q1 != "Yes")
-  
+
   if (!all(is.na(filtered_df$Q1))) {
     stop("Not all Q1 values are missing.")
   }

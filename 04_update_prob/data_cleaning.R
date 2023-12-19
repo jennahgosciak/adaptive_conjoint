@@ -46,7 +46,7 @@ clean_job_data <- function(df) {
       TRUE ~ NA_real_
     ))) %>%
     mutate(candidate_response = select(., str_c("Q", 1:8)) %>%
-             rowSums(na.rm = T))
+      rowSums(na.rm = T))
 }
 
 select_batch <- function(df) {

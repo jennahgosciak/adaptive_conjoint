@@ -26,7 +26,6 @@ source("./_functions/data_cleaning.R")
 source("./_functions/experiment_functions.R")
 source("./_functions/plotting_functions.R")
 source("./_functions/populate_probs.R")
-
 ```
 
 ```{r, setup qualtrics}
@@ -131,15 +130,16 @@ num_outcome0 <- integer(num_profiles)
 ```{r, message=F, warning=T}
 set.seed(2023)
 # generate pi on real data
-output <- update_ts(df_clean, num_sim, num_profiles, num_outcome1, 
-                    num_outcome0, 
-                    cdf = TRUE)
+output <- update_ts(df_clean, num_sim, num_profiles, num_outcome1,
+  num_outcome0,
+  cdf = TRUE
+)
 output
 
 # vector of new probabilities
 # assign names (impt for checking replacement in survey flow)
-pi_ts <- round(output$pi[1:(num_profiles-1)], 3)
-names(pi_ts) <- str_c("pi", 1:(num_profiles-1))
+pi_ts <- round(output$pi[1:(num_profiles - 1)], 3)
+names(pi_ts) <- str_c("pi", 1:(num_profiles - 1))
 
 # check total is equal to 50
 stopifnot((sum(output$num_outcome1) + sum(output$num_outcome0)) == 60)

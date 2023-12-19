@@ -23,9 +23,9 @@ update_outcomes_loop <- function(df, num_profiles, num_outcome1, num_outcome0) {
     num_outcome1[i] <- num_outcome1[i] + sum(obs_responses)
     num_outcome0[i] <- num_outcome0[i] + sum(obs_responses == 0)
   }
-  
+
   # check each vector is the length of the number of profiles
-  stopifnot(length(num_outcome1) == num_profiles) 
+  stopifnot(length(num_outcome1) == num_profiles)
   stopifnot(length(num_outcome0) == num_profiles)
   return(lst(num_outcome1, num_outcome0))
 }
@@ -50,10 +50,10 @@ update_ts <- function(df, num_sim, num_profiles, num_outcome1, num_outcome0, cdf
 
   # generate new pi
   pi <- unname(table(cut(argmax, 0:num_profiles)) / num_sim)
-  print(str_c("PDF: ", str_c(pi, collapse=',')))
+  print(str_c("PDF: ", str_c(pi, collapse = ",")))
   if (cdf == TRUE) {
     pi <- cumsum(pi)
-    print(str_c("CDF: ", str_c(pi, collapse=',')))
+    print(str_c("CDF: ", str_c(pi, collapse = ",")))
   }
   stopifnot(length(pi) == num_profiles)
   return(lst(pi, num_outcome1, num_outcome0))
