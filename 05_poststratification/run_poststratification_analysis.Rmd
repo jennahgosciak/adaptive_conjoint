@@ -208,6 +208,7 @@ pred_prob_df %>%
 ```
 
 ```{r, clean wgts}
+# clean weight data for merging
 wgts_clean <- wgts %>% 
   mutate(hispanic_latino = if_else(hispanic == TRUE, 1, 0),
          female = if_else(sex == 'Female', 1, 0),
