@@ -115,15 +115,15 @@ df_clean <- clean_political_data(df)
 
 # each question number is the random ordering of the context attributes
 df_clean %>%
-  select(candidate_response, str_c("Q", 1:8), profile) %>%
-  verify(!is.na(candidate_response))
+  select(chose_younger_candidate, str_c("Q", 1:8), profile) %>%
+  verify(!is.na(chose_younger_candidate))
 
 df_clean %>%
   group_by(profile) %>%
   summarize(
     n = n(),
-    resp1 = sum(candidate_response),
-    resp0 = sum(candidate_response == 0)
+    resp1 = sum(chose_younger_candidate),
+    resp0 = sum(chose_younger_candidate == 0)
   )
 ```
 

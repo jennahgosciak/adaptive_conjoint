@@ -56,7 +56,7 @@ df_race_form <- micro_data %>%
     # Palauan, Tahitian, Chuukese, Pohnpeian, Saipanese, Yapese, etc.
     RACED %in% c(
       630, 680, 681, 682, 683, 684, 685, 686, 687, 688,
-      689, 690, 691, 692, 698, 699, 700
+      689, 690, 691, 692, 698, 699
     ) ~ "Native Hawaiian or Other Pacific Islander",
     RACE == 7 ~ "Other",
     RACE %in% c(8, 9) ~ "Two or More Races",

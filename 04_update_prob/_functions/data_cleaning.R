@@ -30,7 +30,7 @@ clean_political_data <- function(df) {
       . == "Candidate 2" & rnum_age <= 0.5 ~ 0,
       TRUE ~ NA_real_
     ))) %>%
-    mutate(candidate_response = select(., str_c("Q", 1:8)) %>%
+    mutate(chose_younger_candidate = select(., str_c("Q", 1:8)) %>%
       rowSums(na.rm = T))
 }
 
@@ -80,6 +80,19 @@ check_completion <- function(df) {
     select("Finished") %>%
     equals(TRUE) %>%
     all() %>%
+    stopifnot()
+}
+
+check_commitment <- function(df) {
+  df %>% 
+    mutate(Commitment_Q2 = str_to_lower(Commitment_Q2)) %>% 
+    distinct(Commitment_Q2) %>% 
+    equals('purple') %>% 
+    stopifnot()
+  
+  df %>% 
+    distinct(Commitment_Q1) %>% 
+    equals('Yes, I will') %>% 
     stopifnot()
 }
 
