@@ -2,7 +2,7 @@
 .RProj*
 *.RData
 *.docx
-02_output/
+02_output/figures/
 01_input/
 run_political_candidates_files/
 automate_candidates_files/
