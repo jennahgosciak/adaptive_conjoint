@@ -1,0 +1,7 @@
+default:
+  api_token: 
+  pol_candidates_survey_id: 
+  job_applicants_survey_id: 
+  datacenter_id: 
+  census_api_key: 
+  ipums_usa_api_key: 
