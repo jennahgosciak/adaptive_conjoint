@@ -171,8 +171,7 @@ stopifnot(length(unique(df_demo_drop$race)) == (length(unique(df_demo$race)) - 1
 # running logistic regression
 # dropping 'two or more race' category for multicollinearity
 # other categories that don't change will be dropped as well
-lm <- glm(formula = chose_younger_candidate ~ female + hispanic_latino + age + race_white
-          + race_black + race_aian + race_asian + race_nhpi + race_other, family = "binomial",
+lm <- glm(formula = chose_younger_candidate ~ female + hispanic_latino + age + race, family = "binomial",
           data = df_demo_drop)
 
 summary(lm)
