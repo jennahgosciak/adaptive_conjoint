@@ -27,7 +27,10 @@ df_clean %>%
 ###############################################
 
 # create outcome variable
-df_clean <- clean_political_data(df_clean)
+df_clean <- create_outcome_var(df_clean)
+
+# create profile context variable
+df_clean <- create_context_var(df_clean)
 
 # validation of outcome variable
 # each question number is the random ordering of the context attributes
@@ -38,7 +41,7 @@ df_clean %>%
 # create cleaned demographic variables
 df_demo <- df_clean %>%
   mutate(
-    hispanic_latino = if_else(QD4 == "Yes", TRUE, FALSE),
+    hispanic = if_else(QD4 == "Yes", TRUE, FALSE),
     female = if_else(QD5 == "Female", TRUE, FALSE)
   ) %>%
   mutate(age = QD2_1_TEXT) %>%
@@ -71,7 +74,10 @@ df_demo <- df_clean %>%
 
 # filter to only the variables we need
 df_demo <- df_demo %>%
-  select(id, chose_younger, race, female, age, hispanic_latino, drop_demo_flag)
+  select(
+    id, chose_younger, race, female, age, hispanic, drop_demo_flag,
+    context, context_label
+  )
 
 # saving locally
 df_demo %>%

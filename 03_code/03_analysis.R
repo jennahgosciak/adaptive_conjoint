@@ -12,27 +12,46 @@ config <- config::get()
 source("./03_code/_data_cleaning.R")
 
 ###############################################
-# Simple Mean and Poststratification Estimate
+# Load Data
 ###############################################
 survey_lab <- "political_candidates"
 df_analysis <- readRDS(str_glue("01_intermediate/qualtrics_data_{survey_lab}_clean.RDS"))
+
+# identify the distinct contexts in the data
+distinct_contexts <- df_analysis %>% 
+  distinct(context, context_label) %>% 
+  arrange(context)
+c_val <- pull(distinct_contexts, context)
+c_desc <- pull(distinct_contexts, context_label)
+
+log_info(str_c("Distinct contexts: ", str_c(c_val, collapse=", ")))
 
 # load poststratification weights from ipums acs survey
 wgts <- readRDS("00_data/ipums_strata_sizes.RDS")
 wgts %>%
   head()
 
-# (1) simple mean
+###############################################
+# (1) Simple Mean
+###############################################
 df_simple_mean <- df_analysis %>%
+  group_by(context, context_label) %>%
   summarize(
-    Mean = mean(chose_younger),
-    `Standard Error` = sqrt((Mean * (1 - Mean)) / length(chose_younger))
+    mean = mean(chose_younger),
+    se = sqrt((mean * (1 - mean)) / length(chose_younger))
   ) %>%
-  pivot_longer(everything(), names_to = "type", values_to = "Simple Mean")
+  mutate(Mean = as.character(round(mean, 2)),
+         `Confidence Interval (95%)` = str_glue("({round(mean - (qnorm(.975) * se), 2)}, {round(mean + (qnorm(.975) * se), 2)})")) %>% 
+  select(context, context_label, Mean, `Confidence Interval (95%)`) %>% 
+  pivot_longer(-c(context, context_label),
+    names_to = "type", values_to = "Simple Mean"
+  )
 
 df_simple_mean
 
-# (2) poststratified estimate
+###############################################
+# (2) Poststratified Estimate
+###############################################
 
 # first, drop people who choose not to disclose for any of the demographic features
 df_filter <- df_analysis %>%
@@ -44,22 +63,42 @@ wgts <- wgts %>%
   filter(race %in% unique(df_filter$race))
 
 # running logistic regression for predicting probability of choosing younger candidate
-lm <- glm(
-  formula = chose_younger ~ female + hispanic + age + race, family = "binomial",
-  data = df_filter
-)
+glm_drop_cons_factors <- function(df, vars) {
+  # need to drop factors that don't vary (e.g., only one racial category appears)
+  if (length(unique(df$race)) <= 1) vars <- vars[vars != "race"]
+  form <- str_c(vars, collapse = " + ")
 
-summary(lm)
+  glm(
+    formula = str_c("chose_younger ~ ", form),
+    family = "binomial",
+    data = df
+  )
+}
+
+df_models <- df_filter %>%
+  arrange(context) %>% 
+  group_by(context, context_label) %>%
+  nest() %>%
+  mutate(glm = map(
+    data,
+    ~ glm_drop_cons_factors(
+      .x,
+      c("female", "hispanic", "age", "race")
+    )
+  ))
 
 # predict based on population weight categories
-df_prob <- cbind(wgts, prob_chose_younger = predict(lm, newdata = wgts, type = "response"))
+w_mean <- map2(df_models$data, df_models$glm, ~ compute_weighted_prob(.x, wgts, .y)) %>%
+  unlist()
 
 # compute weighted mean
-df_post <- df_prob %>%
-  summarize(`Poststratified Estimate (probabilty chose younger)` = weighted.mean(prob_chose_younger, weight))
+df_post <- tibble(context=c_val,
+                  context_label=c_desc,
+                  `Poststratified Estimate (probabilty chose younger)` = w_mean)
+df_post
 
 ###############################################
-# SE with Bootstrapping
+# CI with Bootstrapping
 ###############################################
 compute_weighted_prob <- function(df, wgts, lm) {
   # exclude race categories that aren't in the data we have
@@ -72,25 +111,42 @@ compute_weighted_prob <- function(df, wgts, lm) {
   return(weighted.mean(prob, w = wgts$weight))
 }
 
-# predict on all resampled datasets
-iter <- 1000
-df_bootstrap <- df_filter %>%
-  bootstrap(iter) %>%
-  mutate(glm = map(strap, ~ glm(chose_younger ~ female + hispanic + age + race,
-    family = "binomial",
-    data = .
-  )))
+produce_bootstrap_estimates <- function(df, context, iter = 1000) {
+  df %>%
+    filter(context == context) %>%
+    bootstrap(iter) %>%
+    mutate(glm = map(
+      strap,
+      ~ glm_drop_cons_factors(
+        .x,
+        c("female", "hispanic", "age", "race")
+      )
+    ))
 
-# produce bootstrap estimate
-bootstrap_est <- map2(df_bootstrap$strap, df_bootstrap$glm, ~ compute_weighted_prob(.x, wgts, .y)) %>%
-  unlist()
+  # produce bootstrap estimate
+  bootstrap_est <- map2(
+    df_bootstrap$strap, df_bootstrap$glm,
+    ~ compute_weighted_prob(.x, wgts, .y)
+  ) %>%
+    unlist()
 
-# produce mean and sd
-df_post_bootstrap <- tibble(
-  Mean = mean(bootstrap_est),
-  `Standard Error` = sd(bootstrap_est)
-) %>%
-  pivot_longer(everything(), names_to = "type", values_to = "PostStratification Estimate (Bootstrapped)")
+  # produce mean and sd
+  tibble(
+    mean = mean(bootstrap_est),
+    se = sd(bootstrap_est),
+    context = context,
+  ) %>%
+    mutate(Mean = as.character(round(mean, 2)),
+           `Confidence Interval (95%)` = str_glue("({round(mean - (qnorm(.975) * se), 2)}, {round(mean + (qnorm(.975) * se), 2)})")) %>% 
+    select(context, Mean, `Confidence Interval (95%)`) %>% 
+    pivot_longer(-context,
+      names_to = "type",
+      values_to = "PostStratification Estimate (Bootstrapped)"
+    )
+}
+
+df_post_bootstrap <- map_dfr(c_val, ~ produce_bootstrap_estimates(df_filter, .))
 
 # present both simple mean and poststratification results
-left_join(df_simple_mean, df_post_bootstrap, by = "type")
+df_final <- left_join(df_simple_mean, df_post_bootstrap, by = c("context", "type"))
+df_final

@@ -49,20 +49,6 @@ create_context_var <- function(df) {
       rowSums(na.rm = T))
 }
 
-clean_job_data <- function(df) {
-  df %>%
-    # = 1 if selecting mother candidate
-    # = 0 if selecting no-mother candidate
-    mutate(across(str_c("Q", 1:8), ~ case_when(
-      . == "Candidate 1" & rnum_mother <= 0.5 ~ 1,
-      . == "Candidate 2" & rnum_mother > 0.5 ~ 1,
-      . == "Candidate 1" & rnum_mother > 0.5 ~ 0,
-      . == "Candidate 2" & rnum_mother <= 0.5 ~ 0,
-      TRUE ~ NA_real_
-    ))) %>%
-    mutate(candidate_response = select(., str_c("Q", 1:8)) %>%
-      rowSums(na.rm = T))
-}
 
 # should be missing if participants do not consent
 check_consent <- function(df) {
@@ -175,4 +161,36 @@ check_commitment <- function(df) {
     log_warn(str_glue("{num_respondents} survey respondents did not pass commitment check 2; not dropping"))
     log_info(str_glue("{nrow(df)} respondents in the data"))
   }
+}
+
+create_context_var <- function(df) {
+  df %>%
+    # create profile context variable
+    mutate(
+      context = case_when(
+        rnum <= pi1 ~ 1,
+        rnum > pi1 & rnum <= pi2 ~ 2,
+        rnum > pi2 & rnum <= pi3 ~ 3,
+        rnum > pi3 & rnum <= pi4 ~ 4,
+        rnum > pi4 & rnum <= pi5 ~ 5,
+        rnum > pi5 & rnum <= pi6 ~ 6,
+        rnum > pi6 & rnum <= pi7 ~ 7,
+        rnum > pi7 ~ 8
+      ),
+      # create profile context label
+      context_label = case_when(
+        context == 1 ~ "white_woman_political_experience",
+        context == 2 ~ "white_woman_no_experience",
+        context == 3 ~ "black_woman_political_experience",
+        context == 4 ~ "black_woman_no_experience",
+        context == 5 ~ "black_man_political_experience",
+        context == 6 ~ "black_man_no_experience",
+        context == 7 ~ "white_man_political_experience",
+        context == 8 ~ "white_man_no_experience"
+      ),
+      context = factor(context,
+        levels = c(1:8),
+        ordered = TRUE
+      )
+    )
 }

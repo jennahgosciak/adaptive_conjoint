@@ -5,7 +5,7 @@ library(tidyverse)
 library(qualtRics)
 library(magrittr)
 library(assertr)
-library(futile.logger)
+library(logger)
 
 set.seed(2023)
 config <- config::get()

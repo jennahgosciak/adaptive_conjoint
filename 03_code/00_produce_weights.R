@@ -24,7 +24,7 @@ usa_ext_complete$status
 
 # download extract and save in the input folder
 filepath <- download_extract(usa_ext_submitted,
-  download_dir = "./00_data/"
+  download_dir = "./_data_private/"
 )
 ddi <- read_ipums_ddi(filepath)
 micro_data <- read_ipums_micro(ddi)
@@ -95,7 +95,7 @@ df_wgt <- df_race_form %>%
   filter(age >= 18) %>%
   mutate_if(is.labelled, as_factor) %>%
   # create hispanic or latino variable
-  mutate(hispanic_latino = case_when(
+  mutate(hispanic = case_when(
     HISPAN == "Not Hispanic" ~ FALSE,
     HISPAN %in% c(
       "Mexican", "Other",
