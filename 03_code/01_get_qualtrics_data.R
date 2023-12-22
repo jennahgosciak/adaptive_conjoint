@@ -5,18 +5,20 @@ library(tidyverse)
 library(qualtRics)
 library(magrittr)
 library(assertr)
+library(futile.logger)
 
 set.seed(2023)
 config <- config::get()
 
 source("./03_code/_data_cleaning.R")
 
-# load survey data
+###############################################
+# Load Qualtrics
+###############################################
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
 survey_name <- "Political Candidates"
 survey_lab <- "political_candidates"
 survey_id <- config$pol_candidates_survey_id
-
 
 df_survey <- load_qualtrics(survey_name)
 
@@ -25,13 +27,46 @@ nrow(df_survey)
 df_survey %>%
   head()
 
-# drop test cases
+# dropping test cases
 df_survey <- df_survey %>%
   mutate(StartDate_clean = ymd_hms(StartDate)) %>%
   verify(is.na(StartDate_clean) == is.na(StartDate)) %>%
-  filter(StartDate_clean >= ymd_hms("2024-12-14-00-00-00"))
+  filter(StartDate_clean >= ymd_hms("2023-12-14-17-20-00"))
 
 nrow(df_survey)
+
+###############################################
+# Survey Validation
+###############################################
+
+# check ID uniquely identifies rows in data
+if (length(unique(df_survey$`Prolific ID Q`)) != nrow(df_survey)) {
+  log_warn("ID is not unique")
+}
+
+if (unique(df_survey$Status) != 'IP Address') {
+  log_warn("Test data included in the analysis file")
+}
+
+# check consent means their responses are missing
+df_survey <- df_survey %>%
+  check_consent()
+
+# check that all completed
+df_survey <- df_survey %>%
+  check_completion()
+
+# check all are in the US
+df_survey <- df_survey %>%
+  check_location_screen()
+
+# check commitment
+df_survey %>% 
+  check_commitment()
+
+###############################################
+# Generate new ID
+###############################################
 
 # create cleaned version for saving locally
 df_clean <- df_survey %>% 
@@ -42,6 +77,7 @@ df_clean <- df_survey %>%
   mutate(id = row_number()) %>% 
   select(id, everything())
 
+# saving locally
 df_clean %>% 
   saveRDS(str_glue('00_data/qualtrics_data_{survey_lab}.RDS'))
 

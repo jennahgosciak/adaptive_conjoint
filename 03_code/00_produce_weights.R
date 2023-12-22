@@ -24,7 +24,7 @@ usa_ext_complete$status
 
 # download extract and save in the input folder
 filepath <- download_extract(usa_ext_submitted,
-  download_dir = "./01_input/"
+  download_dir = "./00_data/"
 )
 ddi <- read_ipums_ddi(filepath)
 micro_data <- read_ipums_micro(ddi)
@@ -38,7 +38,7 @@ max(micro_data$AGE)
 # https://usa.ipums.org/usa-action/variables/RACE#codes_section
 df_race_form <- micro_data %>%
   # create race vars in ipums data to match acs
-  mutate(race_acs = case_when(
+  mutate(race = case_when(
     RACE == 1 ~ "White",
     RACE == 2 ~ "Black or African American",
     RACE == 3 ~ "American Indian or Alaska Native",
@@ -61,14 +61,19 @@ df_race_form <- micro_data %>%
     RACE == 7 ~ "Other",
     RACE %in% c(8, 9) ~ "Two or More Races",
     TRUE ~ NA_character_
-  ))
+  ),
+  race = factor(race, levels = c("Black or African American",
+                                 "White", "American Indian or Alaska Native",
+                                 "Asian", "Native Hawaiian or Other Pacific Islander",
+                                 "Other", "Two or More Races", "Prefer not to disclose"))) %>% 
+  verify(!is.na(race))
 
 # check not missing (i.e., enumerated all categories)
-stopifnot(sum(is.na(df_race_form$race_acs)) == 0)
+stopifnot(sum(is.na(df_race_form$race)) == 0)
 
 # check mapping from race (general) to new race var
 df_race_form %>%
-  distinct(RACE, race_acs) %>%
+  distinct(RACE, race) %>%
   arrange(RACE) %>%
   table()
 
@@ -80,11 +85,13 @@ df_race_form %>%
   distinct(HISPAN)
 
 df_wgt <- df_race_form %>%
+  # create numeric age variable
   mutate(age = as.numeric(AGE)) %>%
   assertr::verify(!is.na(age)) %>%
   filter(age >= 18) %>%
   mutate_if(is.labelled, as_factor) %>%
-  mutate(hispanic = case_when(
+  # create hispanic or latino variable
+  mutate(hispanic_latino = case_when(
     HISPAN == "Not Hispanic" ~ FALSE,
     HISPAN %in% c(
       "Mexican", "Other",
@@ -92,10 +99,10 @@ df_wgt <- df_race_form %>%
     ) ~ TRUE
   )) %>%
   assertr::verify(!is.na(hispanic)) %>%
-  rename(
-    sex = SEX
-  ) %>%
-  group_by(race_acs, sex, hispanic, age) %>%
+  # create female variable from sex
+  mutate(female = if_else(SEX == 'Female', TRUE, FALSE)) %>%
+  verify(is.na(female) == is.na(SEX)) %>% 
+  group_by(race, female, hispanic, age) %>%
   summarize(
     weight = sum(PERWT),
     num = n(),
@@ -103,7 +110,8 @@ df_wgt <- df_race_form %>%
   ) %>%
   mutate(weight = weight / sum(weight))
 
-write_csv(df_wgt, "./02_output/ipums_strata_sizes.csv")
+saveRDS(df_wgt, "./00_data/ipums_strata_sizes.RDS")
+write_csv(df_wgt, "./00_data/ipums_strata_sizes.csv")
 
 # checking age requirements
 # must at least 18 years old or older
@@ -113,17 +121,17 @@ df_wgt %>%
 stopifnot(min(df_wgt$age) >= 18)
 
 df_wgt %>%
-  group_by(race_acs) %>%
+  group_by(race) %>%
   summarize(weight = sum(weight)) %>%
   arrange(desc(weight))
 
 # add plot
 df_wgt %>%
-  group_by(race_acs) %>%
+  group_by(race) %>%
   summarize(weight = sum(weight)) %>%
   arrange(desc(weight)) %>%
   ggplot(aes(
-    x = reorder(race_acs, weight),
+    x = reorder(race, weight),
     y = weight, label = format(round(weight, 2), nsmall = 2)
   )) +
   geom_bar(stat = "identity") +
@@ -131,4 +139,4 @@ df_wgt %>%
   coord_flip() +
   labs(x = "Race", y = "Weight") +
   ylim(c(0, 1))
-ggsave("./02_output/figures/ipums_weights_by_race.png")
+ggsave("_figures/ipums_weights_by_race.png", width=7)

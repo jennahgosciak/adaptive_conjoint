@@ -19,7 +19,22 @@ filter_test_data <- function(df) {
     filter(Status == "Survey Test")
 }
 
-clean_political_data <- function(df) {
+create_outcome_var <- function(df) {
+  df %>%
+    # = 1 if selecting the younger candidate
+    # = 0 if selecting the older candidate
+    mutate(across(str_c("Q", 1:8), ~ case_when(
+      . == "Candidate 1" & rnum_age <= 0.5 ~ 1,
+      . == "Candidate 2" & rnum_age > 0.5 ~ 1,
+      . == "Candidate 1" & rnum_age > 0.5 ~ 0,
+      . == "Candidate 2" & rnum_age <= 0.5 ~ 0,
+      TRUE ~ NA_real_
+    ))) %>%
+    mutate(chose_younger = select(., str_c("Q", 1:8)) %>%
+             rowSums(na.rm = T))
+}
+
+create_context_var <- function(df) {
   df %>%
     # = 1 if selecting the younger candidate
     # = 0 if selecting the older candidate
@@ -49,87 +64,115 @@ clean_job_data <- function(df) {
              rowSums(na.rm = T))
 }
 
-select_batch <- function(df) {
-  df %>%
-    arrange(desc(StartDate)) %>%
-    head(100)
-}
-
 # should be missing if participants do not consent
 check_consent <- function(df) {
-  df %>%
-    filter(Status == "Survey Test", Consent == "I do not consent to participate") %>%
-    mutate(Q2 = as.character(Q2)) %>%
-    distinct(`Q2`) %>%
-    is.na() %>%
-    stopifnot()
+  no_consent_num <- df %>%
+    filter(Consent == "I do not consent to participate") %>% 
+    nrow()
+  
+  if (no_consent_num > 0) {
+    log_warn(str_glue("Dropping {no_consent_num} survey respondents who do not consent"))
+  
+    vars <- str_c("Q", 1:8)
+    no_consent_with_data <- df %>%
+      filter(Consent == "I do not consent to participate") %>% 
+      select(all_of(vars)) %>% 
+      is.na() %>% 
+      rowSums() %>% 
+      equals(0) %>% 
+      sum()
+    
+    if (no_consent_with_data > 0) {
+      log_warn(str_glue("{no_consent_with_data} survey respondents who do not consent with non-missing responses"))
+    }
+    
+    df <- df %>%
+      filter(Consent != "I do not consent to participate")
+    
+    log_info(str_glue("{nrow(df)} respondents in the data"))
+  }
+  return(df)
 }
 
 # should be missing if they are not in the US
 check_location_screen <- function(df) {
-  df %>%
-    filter(
-      Status == "Survey Test", PreScreen_Q1 != "Yes",
-    ) %>%
-    mutate(Q1 = as.character(Q1)) %>%
-    distinct(Q1) %>%
-    is.na() %>%
-    stopifnot()
+  no_prescreen_num <- df %>%
+    filter(PreScreen_Q1 != "Yes") %>% 
+    nrow()
+  
+  if (no_prescreen_num > 0) {
+    log_warn(str_glue("Dropping {no_prescreen_num} survey respondents who are not in the US"))
+  
+    vars <- str_c("Q", 1:8)
+    no_prescreen_with_data <- df %>%
+      filter(PreScreen_Q1 != "Yes") %>% 
+      select(all_of(vars)) %>% 
+      is.na() %>% 
+      rowSums() %>% 
+      equals(0) %>% 
+      sum()
+  
+    if (no_prescreen_with_data > 0) {
+      log_warn(str_glue("{no_prescreen_with_data} survey respondents who are not in the US with non-missing responses"))
+    }
+    
+    df <- df %>%
+      filter(PreScreen_Q1 == "Yes")
+    
+    log_info(str_glue("{nrow(df)} respondents in the data"))
+  }
+  return(df)
 }
 
 check_completion <- function(df) {
-  df %>%
+  completion_outcome <- df %>%
     select("Finished") %>%
     equals(TRUE) %>%
-    all() %>%
-    stopifnot()
-}
-
-create_profile_var_jobs <- function(df, pi) {
-  df %>%
-    mutate(profile = case_when(
-      rnum <= pi1 ~ 1,
-      rnum > pi1 & rnum <= pi2 ~ 2,
-      rnum > pi2 & rnum <= pi3 ~ 3
-    ))
-}
-
-create_fake_data <- function(pi, profile_prob, batch_size, num_profiles = 8, cdf = T) {
-  # initialize empty dataframe
-  df_fake <- tibble("candidate_response" = rep(NA, batch_size))
-  df_fake["profile"] <- NA
-  # randomly generate profile based on pi cdf
-  for (i in 1:batch_size) {
-    if (cdf == T) {
-      rnum <- runif(1)
-      profile <- case_when(
-        rnum < pi[1] ~ 1,
-        rnum >= pi[1] & rnum < pi[2] ~ 2,
-        rnum >= pi[2] & rnum < pi[3] ~ 3,
-        rnum >= pi[3] & rnum < pi[4] ~ 4,
-        rnum >= pi[4] & rnum < pi[5] ~ 5,
-        rnum >= pi[5] & rnum < pi[6] ~ 6,
-        rnum >= pi[6] & rnum < pi[7] ~ 7,
-        rnum >= pi[7] ~ 8
-      )
-    } else {
-      rnum <- runif(1)
-      profile <- case_when(
-        rnum < pi[1] ~ 1,
-        rnum >= sum(pi[1]) & rnum < sum(pi[1:2]) ~ 2,
-        rnum >= sum(pi[1:2]) & rnum < sum(pi[1:3]) ~ 3,
-        rnum >= sum(pi[1:3]) & rnum < sum(pi[1:4]) ~ 4,
-        rnum >= sum(pi[1:4]) & rnum < sum(pi[1:5]) ~ 5,
-        rnum >= sum(pi[1:5]) & rnum < sum(pi[1:6]) ~ 6,
-        rnum >= sum(pi[1:6]) & rnum < sum(pi[1:7]) ~ 7,
-        rnum >= sum(pi[1:7]) ~ 8
-      )
-      # profile <- match(1, rmultinom(1, size = 1, prob = pi))
-    }
+    all()
+  
+  if (completion_outcome != TRUE) {
+    num_respondents <- df %>% 
+      filter(Finished != TRUE) %>% 
+      nrow()
     
-    # assign based on probability of choosing a younger profile
-    df_fake[i, "candidate_response"] <- rbinom(1, 1, profile_prob[profile])
-    df_fake[i, "profile"] <- profile
+    # dropping respondents who did not finish
+    df <- df %>% 
+      filter(Finished == TRUE)
+    
+    log_warn(str_glue("Dropping {num_respondents} survey respondents who did not finish"))
+    log_info(str_glue("{nrow(df)} respondents in the data"))
   }
-  return(df_fake)
+  return(df)
+}
+
+check_commitment <- function(df) {
+  commitment_check1 <- df %>% 
+    distinct(Commitment_Q1) %>% 
+    equals('Yes, I will') %>% 
+    all()
+  
+  if (commitment_check1 != TRUE | is.na(commitment_check1)) {
+    num_respondents <- df %>% 
+      filter(Commitment_Q1 != 'Yes, I will') %>% 
+      nrow()
+    
+    log_warn(str_glue("{num_respondents} survey respondents did not pass commitment check 1; not dropping"))
+    log_info(str_glue("{nrow(df)} respondents in the data"))
+  }
+  
+  commitment_check2 <- df %>% 
+    mutate(Commitment_Q2 = str_to_lower(Commitment_Q2)) %>% 
+    select(Commitment_Q2) %>% 
+    equals("purple") %>%
+    all()
+  
+  if (commitment_check2 != TRUE | is.na(commitment_check2)) {
+    num_respondents <- df %>% 
+      mutate(Commitment_Q2 = str_to_lower(Commitment_Q2)) %>% 
+      filter(Commitment_Q2 != 'purple') %>% 
+      nrow()
+    
+    log_warn(str_glue("{num_respondents} survey respondents did not pass commitment check 2; not dropping"))
+    log_info(str_glue("{nrow(df)} respondents in the data"))
+  }
 }

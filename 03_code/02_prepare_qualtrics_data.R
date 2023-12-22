@@ -1,24 +1,46 @@
-df_clean <- clean_political_data(df_survey)
+# R script to clean and process survey data from Qualtrics saved locally
+library(tidyverse)
+library(qualtRics)
+library(magrittr)
+library(assertr)
+library(logger)
 
+set.seed(2023)
+config <- config::get()
+
+source("./03_code/_data_cleaning.R")
+
+###############################################
+# Load Qualtrics data
+###############################################
+survey_lab <- "political_candidates"
+df_clean <- readRDS(str_glue('00_data/qualtrics_data_{survey_lab}.RDS'))
+
+# check attention, percent who pass the attention check
+df_clean %>%
+  mutate(older_candidate = if_else(rnum_age <= 0.5, "Candidate 2", "Candidate 1")) %>%
+  mutate(pass_attention_check = if_else(Manipulation_Q1 == older_candidate, 1, 0)) %>%
+  summarize(per_pass_attention_check = mean(pass_attention_check))
+
+###############################################
+# Process Qualtrics data
+###############################################
+
+# create outcome variable
+df_clean <- clean_political_data(df_clean)
+
+# validation of outcome variable
 # each question number is the random ordering of the context attributes
 df_clean %>%
   select(chose_younger, str_c("Q", 1:8)) %>%
   verify(!is.na(chose_younger))
 
 # create cleaned demographic variables
-df_clean %>%
-  mutate(older_candidate = if_else(rnum_age <= 0.5, "Candidate 2", "Candidate 1")) %>%
-  mutate(pass_attention_check = if_else(Manipulation_Q1 == older_candidate, 1, 0)) %>%
-  summarize(per_pass_attention_check = mean(pass_attention_check))
-
-df_clean %>%
-  group_by(QD5) %>%
-  summarize(count = n())
-
 df_demo <- df_clean %>%
-  mutate(hispanic_latino = if_else(QD4 == "Yes", 1, 0)) %>%
-  mutate(female = if_else(QD5 == 'Female', 1, 0)) %>% 
+  mutate(hispanic_latino = if_else(QD4 == "Yes", TRUE, FALSE),
+         female = if_else(QD5 == 'Female', TRUE, FALSE)) %>% 
   mutate(age = QD2_1_TEXT) %>%
+  verify(is.numeric(age)) %>% 
   mutate(across(starts_with("QD3_"), .fns = lst(race_num = ~ if_else(!is.na(.), 1, 0)))) %>%
   mutate(
     race_count = rowSums(select(., ends_with("race_num"))),
@@ -35,24 +57,21 @@ df_demo <- df_clean %>%
     race = factor(race, levels = c("Black or African American",
                                    "White", "American Indian or Alaska Native",
                                    "Asian", "Native Hawaiian or Other Pacific Islander",
-                                   "Other", "Two or More Races", "Prefer not to disclose"))
+                                   "Other", "Two or More Races", "Prefer not to disclose")),
+    drop_demo_flag = if_else(race == 'Prefer not to disclose' |
+                               QD4 == 'Prefer not to disclose' |
+                               QD5 == 'Prefer not to disclose' |
+                               QD2 == 'Prefer not to disclose', TRUE, FALSE)
   ) %>% 
-  verify(!is.na(race)) %>% 
-  mutate(race_white = if_else(race == 'White', 1, 0),
-         race_black = if_else(race == 'Black or African American', 1, 0),
-         race_aian = if_else(race == 'American Indian or Alaska Native', 1, 0),
-         race_asian = if_else(race == 'Asian', 1, 0),
-         race_nhpi = if_else(race == 'Native Hawaiian or Other Pacific Islander',1, 0),
-         race_other = if_else(race == 'Other', 1, 0),
-         race_multi = if_else(race == 'Two or More Races', 1, 0))
+  verify(!is.na(race))
+
+# filter to only the variables we need
+df_demo <- df_demo %>% 
+  select(id, chose_younger, race, female, age, hispanic_latino, drop_demo_flag)
+
+# saving locally
+df_demo %>% 
+  saveRDS(str_glue('01_intermediate/qualtrics_data_{survey_lab}_clean.RDS'))
 
 df_demo %>% 
-  summarize(
-    count_hispanic_latino = sum(hispanic_latino),
-    per_hispanic_latino = mean(hispanic_latino)
-  )
-
-df_demo %>%
-  ggplot(aes(age)) +
-  geom_histogram()
-
+  write_csv(str_glue('01_intermediate/qualtrics_data_{survey_lab}_clean.csv'), na = "")
