@@ -143,4 +143,4 @@ df_wgt %>%
   coord_flip() +
   labs(x = "Race", y = "Weight") +
   ylim(c(0, 1))
-ggsave("_figures/ipums_weights_by_race.png", width = 7)
+ggsave("02_output/_figures/ipums_weights_by_race.png", width = 7)
