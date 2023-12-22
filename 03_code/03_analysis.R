@@ -18,13 +18,13 @@ survey_lab <- "political_candidates"
 df_analysis <- readRDS(str_glue("01_intermediate/qualtrics_data_{survey_lab}_clean.RDS"))
 
 # identify the distinct contexts in the data
-distinct_contexts <- df_analysis %>% 
-  distinct(context, context_label) %>% 
+distinct_contexts <- df_analysis %>%
+  distinct(context, context_label) %>%
   arrange(context)
 c_val <- pull(distinct_contexts, context)
 c_desc <- pull(distinct_contexts, context_label)
 
-log_info(str_c("Distinct contexts: ", str_c(c_val, collapse=", ")))
+log_info(str_c("Distinct contexts: ", str_c(c_val, collapse = ", ")))
 
 # load poststratification weights from ipums acs survey
 wgts <- readRDS("00_data/ipums_strata_sizes.RDS")
@@ -40,9 +40,11 @@ df_simple_mean <- df_analysis %>%
     mean = mean(chose_younger),
     se = sqrt((mean * (1 - mean)) / length(chose_younger))
   ) %>%
-  mutate(Mean = as.character(round(mean, 2)),
-         `Confidence Interval (95%)` = str_glue("({round(mean - (qnorm(.975) * se), 2)}, {round(mean + (qnorm(.975) * se), 2)})")) %>% 
-  select(context, context_label, Mean, `Confidence Interval (95%)`) %>% 
+  mutate(
+    Mean = as.character(round(mean, 2)),
+    `Confidence Interval (95%)` = str_glue("({round(mean - (qnorm(.975) * se), 2)}, {round(mean + (qnorm(.975) * se), 2)})")
+  ) %>%
+  select(context, context_label, Mean, `Confidence Interval (95%)`) %>%
   pivot_longer(-c(context, context_label),
     names_to = "type", values_to = "Simple Mean"
   )
@@ -76,7 +78,7 @@ glm_drop_cons_factors <- function(df, vars) {
 }
 
 df_models <- df_filter %>%
-  arrange(context) %>% 
+  arrange(context) %>%
   group_by(context, context_label) %>%
   nest() %>%
   mutate(glm = map(
@@ -92,9 +94,11 @@ w_mean <- map2(df_models$data, df_models$glm, ~ compute_weighted_prob(.x, wgts, 
   unlist()
 
 # compute weighted mean
-df_post <- tibble(context=c_val,
-                  context_label=c_desc,
-                  `Poststratified Estimate (probabilty chose younger)` = w_mean)
+df_post <- tibble(
+  context = c_val,
+  context_label = c_desc,
+  `Poststratified Estimate (probabilty chose younger)` = w_mean
+)
 df_post
 
 ###############################################
@@ -136,9 +140,11 @@ produce_bootstrap_estimates <- function(df, context, iter = 1000) {
     se = sd(bootstrap_est),
     context = context,
   ) %>%
-    mutate(Mean = as.character(round(mean, 2)),
-           `Confidence Interval (95%)` = str_glue("({round(mean - (qnorm(.975) * se), 2)}, {round(mean + (qnorm(.975) * se), 2)})")) %>% 
-    select(context, Mean, `Confidence Interval (95%)`) %>% 
+    mutate(
+      Mean = as.character(round(mean, 2)),
+      `Confidence Interval (95%)` = str_glue("({round(mean - (qnorm(.975) * se), 2)}, {round(mean + (qnorm(.975) * se), 2)})")
+    ) %>%
+    select(context, Mean, `Confidence Interval (95%)`) %>%
     pivot_longer(-context,
       names_to = "type",
       values_to = "PostStratification Estimate (Bootstrapped)"
