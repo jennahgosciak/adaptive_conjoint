@@ -22,10 +22,10 @@ source("../04_update_prob/_functions/data_cleaning.R")
 ```{r, load survey data}
 # load poststratification weights from ipums acs survey
 wgts <- read_csv("../02_output/ipums_strata_sizes.csv")
-wgts %>% 
+wgts %>%
   head()
 
-wgts %>% 
+wgts %>%
   distinct(race_acs)
 
 # load survey data
@@ -76,7 +76,7 @@ df_survey %>%
 df_survey %>%
   check_location_screen()
 
-df_survey %>% 
+df_survey %>%
   check_commitment()
 ```
 
@@ -102,7 +102,7 @@ df_clean %>%
 
 df_demo <- df_clean %>%
   mutate(hispanic_latino = if_else(QD4 == "Yes", 1, 0)) %>%
-  mutate(female = if_else(QD5 == 'Female', 1, 0)) %>% 
+  mutate(female = if_else(QD5 == "Female", 1, 0)) %>%
   mutate(age = QD2_1_TEXT) %>%
   mutate(across(starts_with("QD3_"), .fns = lst(race_num = ~ if_else(!is.na(.), 1, 0)))) %>%
   mutate(
@@ -117,21 +117,25 @@ df_demo <- df_clean %>%
       !is.na(QD3_6) ~ "Other",
       !is.na(QD3_7) ~ "Prefer not to disclose"
     ),
-    race = factor(race, levels = c("Black or African American",
-                                   "White", "American Indian or Alaska Native",
-                                   "Asian", "Native Hawaiian or Other Pacific Islander",
-                                   "Other", "Two or More Races", "Prefer not to disclose"))
-  ) %>% 
-  verify(!is.na(race)) %>% 
-  mutate(race_white = if_else(race == 'White', 1, 0),
-         race_black = if_else(race == 'Black or African American', 1, 0),
-         race_aian = if_else(race == 'American Indian or Alaska Native', 1, 0),
-         race_asian = if_else(race == 'Asian', 1, 0),
-         race_nhpi = if_else(race == 'Native Hawaiian or Other Pacific Islander',1, 0),
-         race_other = if_else(race == 'Other', 1, 0),
-         race_multi = if_else(race == 'Two or More Races', 1, 0))
+    race = factor(race, levels = c(
+      "Black or African American",
+      "White", "American Indian or Alaska Native",
+      "Asian", "Native Hawaiian or Other Pacific Islander",
+      "Other", "Two or More Races", "Prefer not to disclose"
+    ))
+  ) %>%
+  verify(!is.na(race)) %>%
+  mutate(
+    race_white = if_else(race == "White", 1, 0),
+    race_black = if_else(race == "Black or African American", 1, 0),
+    race_aian = if_else(race == "American Indian or Alaska Native", 1, 0),
+    race_asian = if_else(race == "Asian", 1, 0),
+    race_nhpi = if_else(race == "Native Hawaiian or Other Pacific Islander", 1, 0),
+    race_other = if_else(race == "Other", 1, 0),
+    race_multi = if_else(race == "Two or More Races", 1, 0)
+  )
 
-df_demo %>% 
+df_demo %>%
   summarize(
     count_hispanic_latino = sum(hispanic_latino),
     per_hispanic_latino = mean(hispanic_latino)
@@ -154,15 +158,15 @@ df_demo %>%
 ## Simple Mean Estimate
 
 ```{r}
-df_demo %>% 
+df_demo %>%
   summarize(mean_chose_younger_candidate = mean(chose_younger_candidate))
 ```
 
 ## Poststratified Estimate
 ```{r}
 # first, drop people who choose not to disclose for any of the demographic features
-df_demo_drop <- df_demo %>% 
-  filter(race != 'Prefer not to disclose')
+df_demo_drop <- df_demo %>%
+  filter(race != "Prefer not to disclose")
 
 # there should be 1 less category after we drop
 stopifnot(length(unique(df_demo_drop$race)) == (length(unique(df_demo$race)) - 1))
@@ -172,8 +176,10 @@ stopifnot(length(unique(df_demo_drop$race)) == (length(unique(df_demo$race)) - 1
 # running logistic regression
 # dropping 'two or more race' category for multicollinearity
 # other categories that don't change will be dropped as well
-lm <- glm(formula = chose_younger_candidate ~ female + hispanic_latino + age + race, family = "binomial",
-          data = df_demo_drop)
+lm <- glm(
+  formula = chose_younger_candidate ~ female + hispanic_latino + age + race, family = "binomial",
+  data = df_demo_drop
+)
 
 summary(lm)
 ```
@@ -181,54 +187,70 @@ summary(lm)
 ```{r}
 # data for generating predictions for each cell
 # need indicator variables for each of the factor levels
-pred_df <- expand.grid(race = factor(c("Black or African American",
-                                   "White", "American Indian or Alaska Native",
-                                   "Asian", "Native Hawaiian or Other Pacific Islander",
-                                   "Other", "Two or More Races"), 
-                                   levels = c("Black or African American",
-                                   "White", "American Indian or Alaska Native",
-                                   "Asian", "Native Hawaiian or Other Pacific Islander",
-                                   "Other", "Two or More Races")),
-       female = c(1,0),
-       hispanic_latino = c(1,0),
-       age = c(18:100))  %>% 
-  mutate(race_white = if_else(race == 'White', 1, 0),
-         race_black = if_else(race == 'Black or African American', 1, 0),
-         race_aian = if_else(race == 'American Indian or Alaska Native', 1, 0),
-         race_asian = if_else(race == 'Asian', 1, 0),
-         race_nhpi = if_else(race == 'Native Hawaiian or Other Pacific Islander',1, 0),
-         race_other = if_else(race == 'Other', 1, 0),
-         race_multi = if_else(race == 'Two or More Races', 1, 0))
+pred_df <- expand.grid(
+  race = factor(
+    c(
+      "Black or African American",
+      "White", "American Indian or Alaska Native",
+      "Asian", "Native Hawaiian or Other Pacific Islander",
+      "Other", "Two or More Races"
+    ),
+    levels = c(
+      "Black or African American",
+      "White", "American Indian or Alaska Native",
+      "Asian", "Native Hawaiian or Other Pacific Islander",
+      "Other", "Two or More Races"
+    )
+  ),
+  female = c(1, 0),
+  hispanic_latino = c(1, 0),
+  age = c(18:100)
+) %>%
+  mutate(
+    race_white = if_else(race == "White", 1, 0),
+    race_black = if_else(race == "Black or African American", 1, 0),
+    race_aian = if_else(race == "American Indian or Alaska Native", 1, 0),
+    race_asian = if_else(race == "Asian", 1, 0),
+    race_nhpi = if_else(race == "Native Hawaiian or Other Pacific Islander", 1, 0),
+    race_other = if_else(race == "Other", 1, 0),
+    race_multi = if_else(race == "Two or More Races", 1, 0)
+  )
 
 pred_prob_df <- cbind(pred_df,
-      pred_prob = predict(lm, newdata=pred_df, type='response'))
+  pred_prob = predict(lm, newdata = pred_df, type = "response")
+)
 
-pred_prob_df %>% 
+pred_prob_df %>%
   head()
 ```
 
 ```{r, clean wgts}
 # clean weight data for merging
-wgts_clean <- wgts %>% 
-  mutate(hispanic_latino = if_else(hispanic == TRUE, 1, 0),
-         female = if_else(sex == 'Female', 1, 0),
-         race = factor(race_acs, levels = c("Black or African American",
-                                   "White", "American Indian or Alaska Native",
-                                   "Asian", "Native Hawaiian or Other Pacific Islander",
-                                   "Other", "Two or More Races", "Prefer not to disclose"))
-  ) %>% 
-  verify(!is.na(race)) %>% 
+wgts_clean <- wgts %>%
+  mutate(
+    hispanic_latino = if_else(hispanic == TRUE, 1, 0),
+    female = if_else(sex == "Female", 1, 0),
+    race = factor(race_acs, levels = c(
+      "Black or African American",
+      "White", "American Indian or Alaska Native",
+      "Asian", "Native Hawaiian or Other Pacific Islander",
+      "Other", "Two or More Races", "Prefer not to disclose"
+    ))
+  ) %>%
+  verify(!is.na(race)) %>%
   select(race, female, hispanic_latino, age, weight)
 
 # merge weight data onto predicted probabilties
-pred_prob_df %>% 
-  select(race, female, hispanic_latino, age, pred_prob) %>% 
+pred_prob_df %>%
+  select(race, female, hispanic_latino, age, pred_prob) %>%
   # left join bc we only want demographic groups that are truely in the population
-  left_join(wgts_clean, ., by = c("race", "female", "hispanic_latino", "age")) %>% 
-  verify(!is.na(weight)) %>% 
+  left_join(wgts_clean, ., by = c("race", "female", "hispanic_latino", "age")) %>%
+  verify(!is.na(weight)) %>%
   # mean and weighted mean
-  summarize(mean_pred_prob = mean(pred_prob),
-            wmean_pred_prob = weighted.mean(pred_prob, weight))
+  summarize(
+    mean_pred_prob = mean(pred_prob),
+    wmean_pred_prob = weighted.mean(pred_prob, weight)
+  )
 ```
 
 

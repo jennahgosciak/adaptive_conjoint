@@ -1,12 +1,12 @@
 load_qualtrics <- function(survey_name) {
   # load api key permissions
   readRenviron("~/.Renviron")
-  
+
   # load survey data
   surveys <- all_surveys()
   # select survey ID
   pc_id <- surveys[surveys["name"] == survey_name, ][["id"]]
-  
+
   return(fetch_survey(
     surveyID = pc_id,
     verbose = TRUE,
@@ -31,7 +31,7 @@ create_outcome_var <- function(df) {
       TRUE ~ NA_real_
     ))) %>%
     mutate(chose_younger = select(., str_c("Q", 1:8)) %>%
-             rowSums(na.rm = T))
+      rowSums(na.rm = T))
 }
 
 create_context_var <- function(df) {
@@ -46,7 +46,7 @@ create_context_var <- function(df) {
       TRUE ~ NA_real_
     ))) %>%
     mutate(chose_younger = select(., str_c("Q", 1:8)) %>%
-             rowSums(na.rm = T))
+      rowSums(na.rm = T))
 }
 
 clean_job_data <- function(df) {
@@ -61,34 +61,34 @@ clean_job_data <- function(df) {
       TRUE ~ NA_real_
     ))) %>%
     mutate(candidate_response = select(., str_c("Q", 1:8)) %>%
-             rowSums(na.rm = T))
+      rowSums(na.rm = T))
 }
 
 # should be missing if participants do not consent
 check_consent <- function(df) {
   no_consent_num <- df %>%
-    filter(Consent == "I do not consent to participate") %>% 
+    filter(Consent == "I do not consent to participate") %>%
     nrow()
-  
+
   if (no_consent_num > 0) {
     log_warn(str_glue("Dropping {no_consent_num} survey respondents who do not consent"))
-  
+
     vars <- str_c("Q", 1:8)
     no_consent_with_data <- df %>%
-      filter(Consent == "I do not consent to participate") %>% 
-      select(all_of(vars)) %>% 
-      is.na() %>% 
-      rowSums() %>% 
-      equals(0) %>% 
+      filter(Consent == "I do not consent to participate") %>%
+      select(all_of(vars)) %>%
+      is.na() %>%
+      rowSums() %>%
+      equals(0) %>%
       sum()
-    
+
     if (no_consent_with_data > 0) {
       log_warn(str_glue("{no_consent_with_data} survey respondents who do not consent with non-missing responses"))
     }
-    
+
     df <- df %>%
       filter(Consent != "I do not consent to participate")
-    
+
     log_info(str_glue("{nrow(df)} respondents in the data"))
   }
   return(df)
@@ -97,28 +97,28 @@ check_consent <- function(df) {
 # should be missing if they are not in the US
 check_location_screen <- function(df) {
   no_prescreen_num <- df %>%
-    filter(PreScreen_Q1 != "Yes") %>% 
+    filter(PreScreen_Q1 != "Yes") %>%
     nrow()
-  
+
   if (no_prescreen_num > 0) {
     log_warn(str_glue("Dropping {no_prescreen_num} survey respondents who are not in the US"))
-  
+
     vars <- str_c("Q", 1:8)
     no_prescreen_with_data <- df %>%
-      filter(PreScreen_Q1 != "Yes") %>% 
-      select(all_of(vars)) %>% 
-      is.na() %>% 
-      rowSums() %>% 
-      equals(0) %>% 
+      filter(PreScreen_Q1 != "Yes") %>%
+      select(all_of(vars)) %>%
+      is.na() %>%
+      rowSums() %>%
+      equals(0) %>%
       sum()
-  
+
     if (no_prescreen_with_data > 0) {
       log_warn(str_glue("{no_prescreen_with_data} survey respondents who are not in the US with non-missing responses"))
     }
-    
+
     df <- df %>%
       filter(PreScreen_Q1 == "Yes")
-    
+
     log_info(str_glue("{nrow(df)} respondents in the data"))
   }
   return(df)
@@ -129,16 +129,16 @@ check_completion <- function(df) {
     select("Finished") %>%
     equals(TRUE) %>%
     all()
-  
+
   if (completion_outcome != TRUE) {
-    num_respondents <- df %>% 
-      filter(Finished != TRUE) %>% 
+    num_respondents <- df %>%
+      filter(Finished != TRUE) %>%
       nrow()
-    
+
     # dropping respondents who did not finish
-    df <- df %>% 
+    df <- df %>%
       filter(Finished == TRUE)
-    
+
     log_warn(str_glue("Dropping {num_respondents} survey respondents who did not finish"))
     log_info(str_glue("{nrow(df)} respondents in the data"))
   }
@@ -146,32 +146,32 @@ check_completion <- function(df) {
 }
 
 check_commitment <- function(df) {
-  commitment_check1 <- df %>% 
-    distinct(Commitment_Q1) %>% 
-    equals('Yes, I will') %>% 
+  commitment_check1 <- df %>%
+    distinct(Commitment_Q1) %>%
+    equals("Yes, I will") %>%
     all()
-  
+
   if (commitment_check1 != TRUE | is.na(commitment_check1)) {
-    num_respondents <- df %>% 
-      filter(Commitment_Q1 != 'Yes, I will') %>% 
+    num_respondents <- df %>%
+      filter(Commitment_Q1 != "Yes, I will") %>%
       nrow()
-    
+
     log_warn(str_glue("{num_respondents} survey respondents did not pass commitment check 1; not dropping"))
     log_info(str_glue("{nrow(df)} respondents in the data"))
   }
-  
-  commitment_check2 <- df %>% 
-    mutate(Commitment_Q2 = str_to_lower(Commitment_Q2)) %>% 
-    select(Commitment_Q2) %>% 
+
+  commitment_check2 <- df %>%
+    mutate(Commitment_Q2 = str_to_lower(Commitment_Q2)) %>%
+    select(Commitment_Q2) %>%
     equals("purple") %>%
     all()
-  
+
   if (commitment_check2 != TRUE | is.na(commitment_check2)) {
-    num_respondents <- df %>% 
-      mutate(Commitment_Q2 = str_to_lower(Commitment_Q2)) %>% 
-      filter(Commitment_Q2 != 'purple') %>% 
+    num_respondents <- df %>%
+      mutate(Commitment_Q2 = str_to_lower(Commitment_Q2)) %>%
+      filter(Commitment_Q2 != "purple") %>%
       nrow()
-    
+
     log_warn(str_glue("{num_respondents} survey respondents did not pass commitment check 2; not dropping"))
     log_info(str_glue("{nrow(df)} respondents in the data"))
   }

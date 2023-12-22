@@ -44,7 +44,7 @@ if (length(unique(df_survey$`Prolific ID Q`)) != nrow(df_survey)) {
   log_warn("ID is not unique")
 }
 
-if (unique(df_survey$Status) != 'IP Address') {
+if (unique(df_survey$Status) != "IP Address") {
   log_warn("Test data included in the analysis file")
 }
 
@@ -61,7 +61,7 @@ df_survey <- df_survey %>%
   check_location_screen()
 
 # check commitment
-df_survey %>% 
+df_survey %>%
   check_commitment()
 
 ###############################################
@@ -69,17 +69,17 @@ df_survey %>%
 ###############################################
 
 # create cleaned version for saving locally
-df_clean <- df_survey %>% 
-  select(PreScreen_Q1:rnum_age, age1:career2) %>% 
+df_clean <- df_survey %>%
+  select(PreScreen_Q1:rnum_age, age1:career2) %>%
   # create a new unique random ID for linking
-  mutate(id = runif(1,0,1)) %>% 
-  arrange(id) %>% 
-  mutate(id = row_number()) %>% 
+  mutate(id = runif(1, 0, 1)) %>%
+  arrange(id) %>%
+  mutate(id = row_number()) %>%
   select(id, everything())
 
 # saving locally
-df_clean %>% 
-  saveRDS(str_glue('00_data/qualtrics_data_{survey_lab}.RDS'))
+df_clean %>%
+  saveRDS(str_glue("00_data/qualtrics_data_{survey_lab}.RDS"))
 
-df_clean %>% 
-  write_csv(str_glue('00_data/qualtrics_data_{survey_lab}.csv'), na = "")
+df_clean %>%
+  write_csv(str_glue("00_data/qualtrics_data_{survey_lab}.csv"), na = "")

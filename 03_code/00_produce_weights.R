@@ -38,34 +38,38 @@ max(micro_data$AGE)
 # https://usa.ipums.org/usa-action/variables/RACE#codes_section
 df_race_form <- micro_data %>%
   # create race vars in ipums data to match acs
-  mutate(race = case_when(
-    RACE == 1 ~ "White",
-    RACE == 2 ~ "Black or African American",
-    RACE == 3 ~ "American Indian or Alaska Native",
-    RACED %in% c(
-      400, 410, 420, 500, 600, 610, 620,
-      640, 641, 642, 643, 660, 661, 662, 663,
-      664, 665, 666, 667, 668, 669, 670, 671, 672, 673,
-      674, 675, 676, 677, 678, 679
-    ) ~ "Asian",
-    # A person having origins in any of the original peoples of Hawaii,
-    # Guam, Samoa, or other Pacific Islands. It includes people who
-    # indicate their race as “Native Hawaiian,” “Chamorro,”
-    # “Samoan,” and “Other Pacific Islander”
-    # or provide other detailed Pacific Islander responses such as
-    # Palauan, Tahitian, Chuukese, Pohnpeian, Saipanese, Yapese, etc.
-    RACED %in% c(
-      630, 680, 681, 682, 683, 684, 685, 686, 687, 688,
-      689, 690, 691, 692, 698, 699
-    ) ~ "Native Hawaiian or Other Pacific Islander",
-    RACE == 7 ~ "Other",
-    RACE %in% c(8, 9) ~ "Two or More Races",
-    TRUE ~ NA_character_
-  ),
-  race = factor(race, levels = c("Black or African American",
-                                 "White", "American Indian or Alaska Native",
-                                 "Asian", "Native Hawaiian or Other Pacific Islander",
-                                 "Other", "Two or More Races", "Prefer not to disclose"))) %>% 
+  mutate(
+    race = case_when(
+      RACE == 1 ~ "White",
+      RACE == 2 ~ "Black or African American",
+      RACE == 3 ~ "American Indian or Alaska Native",
+      RACED %in% c(
+        400, 410, 420, 500, 600, 610, 620,
+        640, 641, 642, 643, 660, 661, 662, 663,
+        664, 665, 666, 667, 668, 669, 670, 671, 672, 673,
+        674, 675, 676, 677, 678, 679
+      ) ~ "Asian",
+      # A person having origins in any of the original peoples of Hawaii,
+      # Guam, Samoa, or other Pacific Islands. It includes people who
+      # indicate their race as “Native Hawaiian,” “Chamorro,”
+      # “Samoan,” and “Other Pacific Islander”
+      # or provide other detailed Pacific Islander responses such as
+      # Palauan, Tahitian, Chuukese, Pohnpeian, Saipanese, Yapese, etc.
+      RACED %in% c(
+        630, 680, 681, 682, 683, 684, 685, 686, 687, 688,
+        689, 690, 691, 692, 698, 699
+      ) ~ "Native Hawaiian or Other Pacific Islander",
+      RACE == 7 ~ "Other",
+      RACE %in% c(8, 9) ~ "Two or More Races",
+      TRUE ~ NA_character_
+    ),
+    race = factor(race, levels = c(
+      "Black or African American",
+      "White", "American Indian or Alaska Native",
+      "Asian", "Native Hawaiian or Other Pacific Islander",
+      "Other", "Two or More Races", "Prefer not to disclose"
+    ))
+  ) %>%
   verify(!is.na(race))
 
 # check not missing (i.e., enumerated all categories)
@@ -100,8 +104,8 @@ df_wgt <- df_race_form %>%
   )) %>%
   assertr::verify(!is.na(hispanic)) %>%
   # create female variable from sex
-  mutate(female = if_else(SEX == 'Female', TRUE, FALSE)) %>%
-  verify(is.na(female) == is.na(SEX)) %>% 
+  mutate(female = if_else(SEX == "Female", TRUE, FALSE)) %>%
+  verify(is.na(female) == is.na(SEX)) %>%
   group_by(race, female, hispanic, age) %>%
   summarize(
     weight = sum(PERWT),
@@ -139,4 +143,4 @@ df_wgt %>%
   coord_flip() +
   labs(x = "Race", y = "Weight") +
   ylim(c(0, 1))
-ggsave("_figures/ipums_weights_by_race.png", width=7)
+ggsave("_figures/ipums_weights_by_race.png", width = 7)
