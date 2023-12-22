@@ -1,5 +1,5 @@
 # Code to prepare population cell sizes for post-stratification
-# using ACS data
+# using ACS microdata
 
 library(tidyverse)
 library(ipumsr)
