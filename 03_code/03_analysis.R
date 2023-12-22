@@ -4,6 +4,7 @@ library(qualtRics)
 library(magrittr)
 library(assertr)
 library(logger)
+library(modelr)
 
 set.seed(2023)
 config <- config::get()
@@ -27,8 +28,7 @@ df_simple_mean <- df_analysis %>%
             `Standard Error` = sqrt((Mean * (1 - Mean))/length(chose_younger))) %>% 
   pivot_longer(everything(), names_to = "type", values_to = "Simple Mean")
 
-df_simple_mean %>% 
-  View()
+df_simple_mean
 
 # (2) poststratified estimate
 
@@ -55,5 +55,34 @@ df_post <- df_prob %>%
   summarize(`Poststratified Estimate (probabilty chose younger)` = weighted.mean(prob_chose_younger, weight))
 
 ###############################################
-# Confidence Intervals
+# SE with Bootstrapping
 ###############################################
+compute_weighted_prob <- function(df, wgts, lm) {
+  # exclude race categories that aren't in the data we have
+  wgts <- wgts %>% 
+    filter(race %in% unique(as_tibble(df)[["race"]]))
+  
+  # predict probabilities
+  prob <- predict(lm, newdata=wgts, type='response')
+  # return weighted mean
+  return(weighted.mean(prob, w=wgts$weight))
+}
+
+# predict on all resampled datasets
+iter <- 1000
+df_bootstrap <- df_filter %>%
+  bootstrap(iter) %>% 
+  mutate(glm = map(strap, ~glm(chose_younger ~ female + hispanic + age + race, family = "binomial", 
+                             data = .)))
+
+# produce bootstrap estimate
+bootstrap_est <- map2(df_bootstrap$strap, df_bootstrap$glm, ~compute_weighted_prob(.x, wgts, .y)) %>% 
+  unlist() 
+
+# produce mean and sd
+df_post_bootstrap <- tibble(Mean = mean(bootstrap_est),
+                            `Standard Error` = sd(bootstrap_est)) %>% 
+  pivot_longer(everything(), names_to = "type", values_to = "PostStratification Estimate (Bootstrapped)")
+
+# present both simple mean and poststratification results
+left_join(df_simple_mean, df_post_bootstrap, by = "type")
