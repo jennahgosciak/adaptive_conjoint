@@ -3,12 +3,15 @@ library(tidyverse)
 library(qualtRics)
 library(magrittr)
 library(assertr)
-library(logger)
 
 set.seed(2023)
 config <- config::get()
 
 source("./03_code/_data_cleaning.R")
+
+file <- file('./_logs/02_prepare_qualtrics_data.txt', open = "wt")
+sink(file ,type = "output")
+sink(file, type = "message")
 
 ###############################################
 # Load Qualtrics data
@@ -16,7 +19,11 @@ source("./03_code/_data_cleaning.R")
 survey_lab <- "political_candidates"
 df_clean <- readRDS(str_glue("00_data/qualtrics_data_{survey_lab}.RDS"))
 
+cat('\nNumber of rows in data\n')
+nrow(df_clean)
+
 # check attention, percent who pass the attention check
+cat('\nAttention check results\n')
 df_clean %>%
   mutate(older_candidate = if_else(rnum_age <= 0.5, "Candidate 2", "Candidate 1")) %>%
   mutate(pass_attention_check = if_else(Manipulation_Q1 == older_candidate, 1, 0)) %>%
@@ -34,6 +41,7 @@ df_clean <- create_context_var(df_clean)
 
 # validation of outcome variable
 # each question number is the random ordering of the context attributes
+cat('\nValidation of outcome data\n')
 df_clean %>%
   select(chose_younger, str_c("Q", 1:8)) %>%
   verify(!is.na(chose_younger))
@@ -85,3 +93,5 @@ df_demo %>%
 
 df_demo %>%
   write_csv(str_glue("01_intermediate/qualtrics_data_{survey_lab}_clean.csv"), na = "")
+
+sink()

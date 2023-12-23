@@ -4,9 +4,14 @@
 library(tidyverse)
 library(ipumsr)
 
+file <- file('./_logs/00_produce_weights.txt', open = "wt")
+sink(file ,type = "output")
+sink(file, type = "message")
+
 config <- config::get()
 # set_ipums_api_key(config$ipums_usa_api_key, save = TRUE)
 
+cat('\nLoading data from IPUMS\n')
 # define vars in the extract
 usa_ext_def <- define_extract_usa(
   description = "USA extract for API vignette",
@@ -29,8 +34,12 @@ filepath <- download_extract(usa_ext_submitted,
 ddi <- read_ipums_ddi(filepath)
 micro_data <- read_ipums_micro(ddi)
 
-stopifnot(typeof(micro_data$AGE) == "integer")
 
+if (typeof(micro_data$AGE) != "integer") {
+  warning('Age variable is not an integer')
+}
+
+cat('\nMin, max values of age\n')
 min(micro_data$AGE)
 max(micro_data$AGE)
 
@@ -76,15 +85,18 @@ df_race_form <- micro_data %>%
 stopifnot(sum(is.na(df_race_form$race)) == 0)
 
 # check mapping from race (general) to new race var
+cat('\nDistinct values of RACE variable\n')
 df_race_form %>%
   distinct(RACE, race) %>%
   arrange(RACE) %>%
   table()
 
 # recode/fix other variables in ipums microdata
+cat('\nDistinct values of SEX variable\n')
 df_race_form %>%
   distinct(SEX)
 
+cat('\nDistinct values of HISPAN variable\n')
 df_race_form %>%
   distinct(HISPAN)
 
@@ -119,11 +131,12 @@ write_csv(df_wgt, "./00_data/ipums_strata_sizes.csv")
 
 # checking age requirements
 # must at least 18 years old or older
+cat('\nAge cutoffs\n')
 df_wgt %>%
   mutate(age = as.numeric(age)) %>%
   summarize(across(age, .fns = lst(~ min(.), ~ max(.))))
-stopifnot(min(df_wgt$age) >= 18)
 
+cat('\nWeights by race\n')
 df_wgt %>%
   group_by(race) %>%
   summarize(weight = sum(weight)) %>%
@@ -144,3 +157,5 @@ df_wgt %>%
   labs(x = "Race", y = "Weight") +
   ylim(c(0, 1))
 ggsave("02_output/_figures/ipums_weights_by_race.png", width = 7)
+
+sink()

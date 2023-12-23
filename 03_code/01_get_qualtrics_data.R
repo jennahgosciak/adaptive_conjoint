@@ -5,10 +5,13 @@ library(tidyverse)
 library(qualtRics)
 library(magrittr)
 library(assertr)
-library(logger)
 
 set.seed(2023)
 config <- config::get()
+
+file <- file('./_logs/01_get_qualtrics_data.txt', open = "wt")
+sink(file ,type = "output")
+sink(file, type = "message")
 
 source("./03_code/_data_cleaning.R")
 
@@ -22,10 +25,8 @@ survey_id <- config$pol_candidates_survey_id
 
 df_survey <- load_qualtrics(survey_name)
 
+cat('\nNumber of observations in data\n')
 nrow(df_survey)
-
-df_survey %>%
-  head()
 
 # dropping test cases
 df_survey <- df_survey %>%
@@ -33,19 +34,19 @@ df_survey <- df_survey %>%
   verify(is.na(StartDate_clean) == is.na(StartDate)) %>%
   filter(StartDate_clean >= ymd_hms("2023-12-14-17-20-00"))
 
+cat('\nNumber of observations after dropping test cases\n')
 nrow(df_survey)
-
 ###############################################
 # Survey Validation
 ###############################################
 
 # check ID uniquely identifies rows in data
 if (length(unique(df_survey$`Prolific ID Q`)) != nrow(df_survey)) {
-  log_warn("ID is not unique")
+  print("ID is not unique")
 }
 
 if (unique(df_survey$Status) != "IP Address") {
-  log_warn("Test data included in the analysis file")
+  print("Test data included in the analysis file")
 }
 
 # check consent means their responses are missing
@@ -83,3 +84,5 @@ df_clean %>%
 
 df_clean %>%
   write_csv(str_glue("00_data/qualtrics_data_{survey_lab}.csv"), na = "")
+
+sink()
