@@ -9,8 +9,8 @@ set.seed(2023)
 config <- config::get()
 
 source("./03_code/_data_cleaning.R")
-file <- file('./_logs/03_analysis.txt', open = "wt")
-sink(file ,type = "output")
+file <- file("./_logs/03_analysis.txt", open = "wt")
+sink(file, type = "output")
 sink(file, type = "message")
 
 ###############################################
@@ -26,13 +26,15 @@ distinct_contexts <- df_analysis %>%
 c_val <- pull(distinct_contexts, context)
 c_desc <- pull(distinct_contexts, context_label)
 
-cat(str_c("Distinct contexts for the validation phase: ", 
-            str_c(c_val, collapse = ", ")))
+cat(str_c(
+  "Distinct contexts for the validation phase: ",
+  str_c(c_val, collapse = ", ")
+))
 
 # load poststratification weights from ipums acs survey
 wgts <- readRDS("00_data/ipums_strata_sizes.RDS")
 
-cat('\nPopulation weights\n')
+cat("\nPopulation weights\n")
 wgts %>%
   head()
 
@@ -54,7 +56,7 @@ df_simple_mean <- df_analysis %>%
     names_to = "type", values_to = "Simple Mean"
   )
 
-cat('\nSimple mean estimates\n')
+cat("\nSimple mean estimates\n")
 df_simple_mean
 
 ###############################################
@@ -105,7 +107,7 @@ df_post <- tibble(
   context_label = c_desc,
   `Poststratified Estimate (probabilty chose younger)` = w_mean
 )
-cat('\nSingle poststratification estimate\n')
+cat("\nSingle poststratification estimate\n")
 df_post
 
 ###############################################
@@ -158,17 +160,17 @@ produce_bootstrap_estimates <- function(df, context, iter = 1000) {
     )
 }
 
-cat('\nBootstrap estimates\n')
+cat("\nBootstrap estimates\n")
 df_post_bootstrap <- map_dfr(c_val, ~ produce_bootstrap_estimates(df_filter, .))
 df_post_bootstrap
 
 # present both simple mean and poststratification results
 df_final <- left_join(df_simple_mean, df_post_bootstrap, by = c("context", "type"))
 
-cat('\nResults: simple mean and poststratification estimates\n')
+cat("\nResults: simple mean and poststratification estimates\n")
 df_final
 
-df_final %>% 
-  write_csv('02_output/validation_results.csv')
+df_final %>%
+  write_csv("02_output/validation_results.csv")
 
 sink()
