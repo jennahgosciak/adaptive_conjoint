@@ -179,14 +179,14 @@ create_context_var <- function(df) {
       ),
       # create profile context label
       context_label = case_when(
-        context == 1 ~ "white_woman_political_experience",
-        context == 2 ~ "white_woman_no_experience",
-        context == 3 ~ "black_woman_political_experience",
-        context == 4 ~ "black_woman_no_experience",
-        context == 5 ~ "black_man_political_experience",
-        context == 6 ~ "black_man_no_experience",
-        context == 7 ~ "white_man_political_experience",
-        context == 8 ~ "white_man_no_experience"
+        context == 1 ~ "white_female_high",
+        context == 2 ~ "white_woman_low",
+        context == 3 ~ "black_woman_high",
+        context == 4 ~ "black_woman_low",
+        context == 5 ~ "black_man_high",
+        context == 6 ~ "black_man_low",
+        context == 7 ~ "white_man_high",
+        context == 8 ~ "white_man_low"
       ),
       context = factor(context,
         levels = c(1:8),

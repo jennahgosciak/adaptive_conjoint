@@ -5,7 +5,6 @@ library(magrittr)
 library(assertr)
 
 set.seed(2023)
-config <- config::get()
 
 source("./03_code/_data_cleaning.R")
 

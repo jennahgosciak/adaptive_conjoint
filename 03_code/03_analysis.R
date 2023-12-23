@@ -6,7 +6,6 @@ library(assertr)
 library(modelr)
 
 set.seed(2023)
-config <- config::get()
 
 source("./03_code/_data_cleaning.R")
 file <- file("./_logs/03_analysis.txt", open = "wt")
