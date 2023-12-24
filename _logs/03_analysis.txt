@@ -224,3 +224,17 @@ Results: simple mean and poststratification estimates
 14 6       black_man_low     poststratification 0.722 2.47e- 1  0.238   1.21 
 15 7       white_man_high    poststratification 0.601 2.80e- 1  0.0523  1.15 
 16 8       white_man_low     poststratification 0.544 1.49e- 1  0.252   0.836
+Styling  6  files:
+ .Rprofile                           ✔ 
+ 03_code/_data_cleaning.R            ✔ 
+ 03_code/00_produce_weights.R        ✔ 
+ 03_code/01_get_qualtrics_data.R     ✔ 
+ 03_code/02_prepare_qualtrics_data.R ✔ 
+ 03_code/03_analysis.R               ℹ 
+────────────────────────────────────────
+Status	Count	Legend 
+✔ 	5	File unchanged.
+ℹ 	1	File changed.
+✖ 	0	Styling threw an error.
+────────────────────────────────────────
+Please review the changes carefully!

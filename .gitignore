@@ -9,3 +9,4 @@ automate_candidates_files/
 *.pdf
 config.yml
 *.md
+!README.md
