@@ -1,7 +1,7 @@
 update_outcomes <- function(df, num_profiles, num_outcome, outcome_value) {
   profile_cols <- as.character(c(1:num_profiles))
   # vector of num outcomes for either 1 or 0
-  obs_outcome <- table(df[df$candidate_response == outcome_value, "profile"])[profile_cols] %>%
+  obs_outcome <- table(df[df$chose_younger == outcome_value, "profile"])[profile_cols] %>%
     unname()
   obs_outcome[is.na(obs_outcome)] <- 0
 
@@ -19,7 +19,7 @@ update_outcomes_loop <- function(df, num_profiles, num_outcome1, num_outcome0) {
   for (i in 1:num_profiles) {
     obs_responses <- df %>%
       filter(profile == i) %>%
-      pull(candidate_response)
+      pull(chose_younger)
     num_outcome1[i] <- num_outcome1[i] + sum(obs_responses)
     num_outcome0[i] <- num_outcome0[i] + sum(obs_responses == 0)
   }
@@ -84,7 +84,7 @@ run_ts <- function(batch_size, num_profiles, pi_init, num_outcome1 = NULL, num_o
       clean_qualtrics_data() %>%
       select_batch() %>%
       create_profile_var() %>%
-      select(candidate_response, profile)
+      select(chose_younger, profile)
   }
   output <- update_ts(df, num_sim, num_profiles, num_outcome1, num_outcome0, cdf = cdf)
 

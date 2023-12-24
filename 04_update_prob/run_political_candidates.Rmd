@@ -53,7 +53,7 @@ df %>%
 df <- df %>%
   mutate(StartDate_clean = ymd_hms(StartDate)) %>%
   verify(is.na(StartDate_clean) == is.na(StartDate)) %>%
-  filter(StartDate_clean >= ymd_hms("2023-12-14-00-00-00"))
+  filter(StartDate_clean >= ymd_hms("2023-12-14-17-40-00"))
 
 df %>%
   nrow()
@@ -115,15 +115,15 @@ df_clean <- clean_political_data(df)
 
 # each question number is the random ordering of the context attributes
 df_clean %>%
-  select(chose_younger_candidate, str_c("Q", 1:8), profile) %>%
-  verify(!is.na(chose_younger_candidate))
+  select(chose_younger, str_c("Q", 1:8), profile) %>%
+  verify(!is.na(chose_younger))
 
 df_clean %>%
   group_by(profile) %>%
   summarize(
     n = n(),
-    resp1 = sum(chose_younger_candidate),
-    resp0 = sum(chose_younger_candidate == 0)
+    resp1 = sum(chose_younger),
+    resp0 = sum(chose_younger == 0)
   )
 ```
 
@@ -148,8 +148,8 @@ df_clean %>%
   )) %>%
   group_by(profile, profile_desc) %>%
   summarize(
-    select_younger = sum(candidate_response),
-    percent_select_younger = mean(candidate_response)
+    total_chose_younger = sum(chose_younger),
+    percent_select_younger = mean(chose_younger)
   )
 ```
 

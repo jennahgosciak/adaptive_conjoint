@@ -10,3 +10,4 @@ automate_candidates_files/
 *.pdf
 config.yml
 *.md
+_data_private/
