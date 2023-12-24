@@ -1,6 +1,6 @@
-  |                                                                              |                                                                      |   0%  |                                                                              |==============================================================        |  88%  |                                                                              |======================================================================| 100%
-[1mindexing[0m [34mPolitical Candidates.csv[0m [========================] [32m26.85MB/s[0m, eta: [36m 0s[0m                                                                                                                   
-── Column specification ────────────────────────────────────────────────────────
+  |                                                                                                                                             |                                                                                                                                     |   0%  |                                                                                                                                             |======================================================================================================================               |  88%  |                                                                                                                                             |=====================================================================================================================================| 100%
+[1mindexing[0m [34mPolitical Candidates.csv[0m [========================================================================================] [32m2.15GB/s[0m, eta: [36m 0s[0m                                                                                                                                                                                  
+── Column specification ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 cols(
   .default = col_character(),
   StartDate = col_datetime(format = ""),
@@ -25,16 +25,17 @@ cols(
   pi5 = col_double()
   # ... with 14 more columns
 )
-ℹ Use `spec()` for the full column specifications.
-
-'StartDate', 'EndDate', and 'RecordedDate' were converted without a specific timezone
-• To set a timezone, visit https://www.qualtrics.com/support/survey-platform/managing-your-account/
-• Timezone information is under 'User Settings'
-• See https://api.qualtrics.com/instructions/docs/Instructions/dates-and-times.md for more
-
-Number of observations in data
-[1] 113
-
-Number of observations after dropping test cases
-[1] 50
-[1mwrote[0m [32m2.18kB[0m in [36m 0s[0m, [32m53.14MB/s[0m                                                                              [1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                              
+ℹ Use `spec()` for the full cStyling  6  files:
+ .Rprofile                           ✔ 
+ 03_code/_data_cleaning.R            ✔ 
+ 03_code/00_produce_weights.R        ✔ 
+ 03_code/01_get_qualtrics_data.R     ✔ 
+ 03_code/02_prepare_qualtrics_data.R ✔ 
+ 03_code/03_analysis.R               ℹ 
+────────────────────────────────────────
+Status	Count	Legend 
+✔ 	5	File unchanged.
+ℹ 	1	File changed.
+✖ 	0	Styling threw an error.
+────────────────────────────────────────
+Please review the changes carefully!

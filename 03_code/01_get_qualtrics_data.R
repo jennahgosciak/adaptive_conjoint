@@ -49,7 +49,9 @@ if (unique(df_survey$Status) != "IP Address") {
   print("Test data included in the analysis file")
 }
 
-# check consent means their responses are missing
+# check we have consent from all participants
+# if not, make sure we have not collected data
+# drop participants who have not consented
 df_survey <- df_survey %>%
   check_consent()
 
@@ -73,7 +75,7 @@ df_survey %>%
 df_clean <- df_survey %>%
   select(PreScreen_Q1:rnum_age, age1:career2) %>%
   # create a new unique random ID for linking
-  mutate(id = runif(1, 0, 1)) %>%
+  mutate(id = runif(nrow(df_survey), 0, 1)) %>%
   arrange(id) %>%
   mutate(id = row_number()) %>%
   select(id, everything())
