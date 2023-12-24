@@ -14,3 +14,8 @@
 4. Create a new, randomly generated unique ID for the data.
 
 # 02_prepare_qualtrics_data
+
+1. Load survey data
+2. Produce summary of attention check question
+3. Create a binary outcome variable (based on `rnum_age` and whether they select "Candidate 1" or "Candidate 2"; binary outcome denoting whether the respondent selected the younger candidate.
+4. 
