@@ -52,3 +52,4 @@
 - `se = sqrt((mean_estimate * (1 - mean_estimate)) / length(chose_younger))`
 - `ci_min = mean_estimate - (qnorm(.975) * se)`
 - `ci_max = mean_estimate + (qnorm(.975) * se)`
+6. Prior to poststratifying, keep only respondents for whom `drop_demo_flag = FALSE`
