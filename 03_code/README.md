@@ -18,4 +18,12 @@
 1. Load survey data
 2. Produce summary of attention check question
 3. Create a binary outcome variable (based on `rnum_age` and whether they select "Candidate 1" or "Candidate 2"; binary outcome denoting whether the respondent selected the younger candidate.
-4. 
+4. Create the two variables `context` and `context_label` (note, `context` is an ordered factor with values from 1-8):
+- When `rnum <= pi1`, assign `context` = 1 and `context_label` = "white_female_high"
+- When `rnum > pi1 & rnum <= pi2`, assign `context` = 2 and `context_label` = "white_female_low"
+- When `rnum > pi2 & rnum <= pi3`, assign `context` = 3 and `context_label` = "black_female_high"
+- When `rnum > pi3 & rnum <= pi4`, assign `context` = 4 and `context_label` = "black_female_low"
+- When `rnum > pi4 & rnum <= pi5`, assign `context` = 5 and `context_label` = "black_male_high"
+- When `rnum > pi5 & rnum <= pi6`, assign `context` = 6 and `context_label` = "black_male_low"
+- When `rnum > pi6 & rnum <= pi7`, assign `context` = 7 and `context_label` = "white_male_high"
+- When `rnum > pi7`, assign `context` = 8 and `context_label` = "white_male_low"
