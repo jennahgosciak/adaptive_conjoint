@@ -1,4 +1,4 @@
-context,context_label,method,mean,se,ci_min,ci_max
+context,context_label,method,estimate,se,ci_min,ci_max
 1,white_female_high,simple_mean,0.8571428571428571,0.13226001425322165,0.5979179926117886,1.1163677216739256
 2,white_woman_low,simple_mean,1,0,1,1
 3,black_woman_high,simple_mean,0.4166666666666667,0.14231876063832774,0.13772702149116772,0.6956063118421656

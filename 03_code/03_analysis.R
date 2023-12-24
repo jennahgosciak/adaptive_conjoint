@@ -44,7 +44,7 @@ df_simple_mean <- df_analysis %>%
   group_by(context, context_label) %>%
   summarize(
     estimate = mean(chose_younger),
-    se = sqrt((mean * (1 - estimate)) / length(chose_younger)),
+    se = sqrt((estimate * (1 - estimate)) / length(chose_younger)),
     ci_min = estimate - (qnorm(.975) * se),
     ci_max = estimate + (qnorm(.975) * se)
   ) %>%
