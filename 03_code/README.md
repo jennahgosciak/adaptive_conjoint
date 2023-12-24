@@ -42,3 +42,13 @@
 - If `QD4_7` is non-missing, `race` = "Prefer not to disclose"
 - `race` is a factor variable with the following levels: "Black or African American", "White", "American Indian or Alaska Native", "Asian", "Native Hawaiian or Other Pacific Islander", "Other", "Two or More Races", "Prefer not to disclose"
 - Create `drop_demo_flag`: this is an indicator variable that flags any respondent who checked "Prefer not to disclose" for `QD4` (hispanicity), `QD5` (sex), `QD2` (age), or `QD3_7` (race category = "Prefer not to disclose"). We will drop respondents based on this flag prior to doing poststratification.
+
+# 03_analysis.R
+1. Load survey data.
+2. Create two vectors `c_val` and `c_desc` storing the unique profile contexts and profile context labels. This will allow us to flexibly work with data that has any range of profile contexts.
+3. Load population weights from the ACS.
+4. Grouping by `context` and `context_label`, produce mean estimates of the outcome variable `chose_younger`.
+5. Produce the SE and 95% Confidence Interval values based on the following formulas:
+- `se = sqrt((mean_estimate * (1 - mean_estimate)) / length(chose_younger))`
+- `ci_min = mean_estimate - (qnorm(.975) * se)`
+- `ci_max = mean_estimate + (qnorm(.975) * se)`
