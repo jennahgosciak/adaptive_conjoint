@@ -48,7 +48,7 @@ df_simple_mean <- df_analysis %>%
     ci_min = mean - (qnorm(.975) * se),
     ci_max = mean + (qnorm(.975) * se)
   ) %>%
-  mutate(method = 'simple_mean') %>% 
+  mutate(method = "simple_mean") %>%
   select(context, context_label, method, mean, se, ci_min, ci_max)
 
 cat("\nSimple mean estimates\n")
@@ -86,7 +86,7 @@ compute_weighted_prob <- function(df, wgts, lm) {
   # exclude race categories that aren't in the data we have
   wgts <- wgts %>%
     filter(race %in% unique(as_tibble(df)[["race"]]))
-  
+
   # predict probabilities
   prob <- predict(lm, newdata = wgts, type = "response")
   # return weighted mean
@@ -125,7 +125,7 @@ produce_bootstrap_estimates <- function(df, c_val, c_desc, iter = 1000) {
         .x,
         c("female", "hispanic", "age", "race")
       )
-    )) %>% 
+    )) %>%
     print()
 
   # produce bootstrap estimate
@@ -143,8 +143,8 @@ produce_bootstrap_estimates <- function(df, c_val, c_desc, iter = 1000) {
     ci_max = mean + (qnorm(.975) * se),
     context = c_val,
     context_label = c_desc
-  ) %>% 
-    mutate(method = 'poststratification') %>% 
+  ) %>%
+    mutate(method = "poststratification") %>%
     select(context, context_label, method, mean, se, ci_min, ci_max)
 }
 
