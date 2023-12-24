@@ -110,7 +110,10 @@ df_models <- df_filter %>%
 w_mean <- map2(df_models$data, df_models$glm, ~ compute_weighted_prob(.x, wgts, .y)) %>%
   unlist()
 
-w_mean
+df_post <- tibble(context = df_models$context, 
+       context_label = df_models$context_label,
+       mean = w_mean)
+
 ###############################################
 # (3) CI with Bootstrapping
 ###############################################
@@ -137,19 +140,22 @@ produce_bootstrap_estimates <- function(df, c_val, c_desc, iter = 1000) {
 
   # produce mean and sd
   tibble(
-    mean = mean(bootstrap_est),
     se = sd(bootstrap_est),
-    ci_min = mean - (qnorm(.975) * se),
-    ci_max = mean + (qnorm(.975) * se),
     context = c_val,
     context_label = c_desc
   ) %>%
-    mutate(method = "poststratification") %>%
-    select(context, context_label, method, mean, se, ci_min, ci_max)
+    select(context, context_label, se)
 }
 
 cat("\nBootstrap estimates\n")
-df_post_bootstrap <- map2_dfr(c_val, c_desc, ~ produce_bootstrap_estimates(df_filter, .x, .y))
+df_post_bootstrap <- map2_dfr(c_val, c_desc, ~ produce_bootstrap_estimates(df_filter, .x, .y)) %>% 
+  left_join(df_post, ., by = c("context", "context_label")) %>% 
+  # adding bootstrap standard error to calculation of ci with point estimate of the mean
+  mutate(method = "poststratification",
+         ci_min = mean - (qnorm(.975) * se),
+         ci_max = mean + (qnorm(.975) * se)) %>% 
+  select(context, context_label, method, mean, se, ci_min, ci_max)
+
 df_post_bootstrap
 
 # present both simple mean and poststratification results
