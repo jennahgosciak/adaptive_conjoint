@@ -10,4 +10,7 @@
 - Check consent; drop individuals who do not consent.
 - Check completion; drop individuals for whom `Finished` does not equal `TRUE`.
 - Check location screen; drop individuals who say they are not in the US (this should *not* happen).
-- Check commitment questions; do not drop any individuals. 
+- Check commitment questions; do not drop any individuals.
+4. Create a new, randomly generated unique ID for the data.
+
+# 02_prepare_qualtrics_data
