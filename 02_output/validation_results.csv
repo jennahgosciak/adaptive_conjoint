@@ -1,17 +1,17 @@
-context,context_label,type,Simple Mean,PostStratification Estimate (Bootstrapped)
-1,white_woman_political_experience,Mean,0.57,0.62
-1,white_woman_political_experience,Confidence Interval (95%),"(0.2, 0.94)","(0.4, 0.84)"
-2,white_woman_no_experience,Mean,1,0.62
-2,white_woman_no_experience,Confidence Interval (95%),"(1, 1)","(0.4, 0.84)"
-3,black_woman_political_experience,Mean,0.33,0.62
-3,black_woman_political_experience,Confidence Interval (95%),"(0.07, 0.6)","(0.4, 0.84)"
-4,black_woman_no_experience,Mean,0.5,0.62
-4,black_woman_no_experience,Confidence Interval (95%),"(0.1, 0.9)","(0.4, 0.84)"
-5,black_man_political_experience,Mean,1,0.62
-5,black_man_political_experience,Confidence Interval (95%),"(1, 1)","(0.4, 0.84)"
-6,black_man_no_experience,Mean,0.75,0.62
-6,black_man_no_experience,Confidence Interval (95%),"(0.33, 1.17)","(0.4, 0.84)"
-7,white_man_political_experience,Mean,0.8,0.62
-7,white_man_political_experience,Confidence Interval (95%),"(0.45, 1.15)","(0.4, 0.84)"
-8,white_man_no_experience,Mean,0.38,0.62
-8,white_man_no_experience,Confidence Interval (95%),"(0.04, 0.71)","(0.4, 0.84)"
+context,context_label,method,mean,se,ci_min,ci_max
+1,white_female_high,simple_mean,0.5714285714285714,0.1870439059165649,0.20482925230440596,0.9380278905527368
+2,white_woman_low,simple_mean,1,0,1,1
+3,black_woman_high,simple_mean,0.3333333333333333,0.13608276348795434,0.06661601798026062,0.600050648686406
+4,black_woman_low,simple_mean,0.5,0.2041241452319315,0.09992402697039093,0.9000759730296091
+5,black_man_high,simple_mean,1,0,1,1
+6,black_man_low,simple_mean,0.75,0.21650635094610965,0.3256553497214357,1.1743446502785644
+7,white_man_high,simple_mean,0.8,0.17888543819998315,0.44939098376936754,1.1506090162306326
+8,white_man_low,simple_mean,0.375,0.1711632992203644,0.03952609805303314,0.7104739019469668
+1,white_female_high,poststratification,0.4205676617215388,0.20358037533359363,0.021557458108548977,0.8195778653345287
+2,white_woman_low,poststratification,0.9999999999417378,6.322662365348946e-17,0.9999999999417377,0.9999999999417379
+3,black_woman_high,poststratification,0.3355062777175014,0.1772163371484521,-0.011831360565572324,0.6828439160005751
+4,black_woman_low,poststratification,0.7116261502714453,0.19043262768959157,0.33838505851852085,1.0848672420243697
+5,black_man_high,poststratification,0.9999999999417378,1.0508458255586795e-16,0.9999999999417376,0.999999999941738
+6,black_man_low,poststratification,0.7215535927745647,0.2466761565519504,0.2380772100879779,1.2050299754611515
+7,white_man_high,poststratification,0.6010781241350753,0.2800098274855787,0.05226894694606754,1.1498873013240831
+8,white_man_low,poststratification,0.5440773568919967,0.14910559185588404,0.2518357669609352,0.8363189468230581

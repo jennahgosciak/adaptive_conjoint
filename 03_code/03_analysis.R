@@ -44,22 +44,18 @@ df_simple_mean <- df_analysis %>%
   group_by(context, context_label) %>%
   summarize(
     mean = mean(chose_younger),
-    se = sqrt((mean * (1 - mean)) / length(chose_younger))
+    se = sqrt((mean * (1 - mean)) / length(chose_younger)),
+    ci_min = mean - (qnorm(.975) * se),
+    ci_max = mean + (qnorm(.975) * se)
   ) %>%
-  mutate(
-    Mean = as.character(round(mean, 2)),
-    `Confidence Interval (95%)` = str_glue("({round(mean - (qnorm(.975) * se), 2)}, {round(mean + (qnorm(.975) * se), 2)})")
-  ) %>%
-  select(context, context_label, Mean, `Confidence Interval (95%)`) %>%
-  pivot_longer(-c(context, context_label),
-    names_to = "type", values_to = "Simple Mean"
-  )
+  mutate(method = 'simple_mean') %>% 
+  select(context, context_label, method, mean, se, ci_min, ci_max)
 
 cat("\nSimple mean estimates\n")
 df_simple_mean
 
 ###############################################
-# (2) Poststratified Estimate
+# (2) Poststratified Point Estimate
 ###############################################
 
 # first, drop people who choose not to disclose for any of the demographic features
@@ -84,6 +80,19 @@ glm_drop_cons_factors <- function(df, vars) {
   )
 }
 
+# compute weighted probability of choosing the younger candidate
+# exclude race categories that aren't in the data when doing the prediction
+compute_weighted_prob <- function(df, wgts, lm) {
+  # exclude race categories that aren't in the data we have
+  wgts <- wgts %>%
+    filter(race %in% unique(as_tibble(df)[["race"]]))
+  
+  # predict probabilities
+  prob <- predict(lm, newdata = wgts, type = "response")
+  # return weighted mean
+  return(weighted.mean(prob, w = wgts$weight))
+}
+
 df_models <- df_filter %>%
   arrange(context) %>%
   group_by(context, context_label) %>%
@@ -97,35 +106,18 @@ df_models <- df_filter %>%
   ))
 
 # predict based on population weight categories
+# and then compute the weighted mean
 w_mean <- map2(df_models$data, df_models$glm, ~ compute_weighted_prob(.x, wgts, .y)) %>%
   unlist()
 
-# compute weighted mean
-df_post <- tibble(
-  context = c_val,
-  context_label = c_desc,
-  `Poststratified Estimate (probabilty chose younger)` = w_mean
-)
-cat("\nSingle poststratification estimate\n")
-df_post
-
+w_mean
 ###############################################
-# CI with Bootstrapping
+# (3) CI with Bootstrapping
 ###############################################
-compute_weighted_prob <- function(df, wgts, lm) {
-  # exclude race categories that aren't in the data we have
-  wgts <- wgts %>%
-    filter(race %in% unique(as_tibble(df)[["race"]]))
 
-  # predict probabilities
-  prob <- predict(lm, newdata = wgts, type = "response")
-  # return weighted mean
-  return(weighted.mean(prob, w = wgts$weight))
-}
-
-produce_bootstrap_estimates <- function(df, context, iter = 1000) {
-  df %>%
-    filter(context == context) %>%
+produce_bootstrap_estimates <- function(df, c_val, c_desc, iter = 1000) {
+  df_bootstrap <- df %>%
+    filter(context == c_val) %>%
     bootstrap(iter) %>%
     mutate(glm = map(
       strap,
@@ -133,7 +125,8 @@ produce_bootstrap_estimates <- function(df, context, iter = 1000) {
         .x,
         c("female", "hispanic", "age", "race")
       )
-    ))
+    )) %>% 
+    print()
 
   # produce bootstrap estimate
   bootstrap_est <- map2(
@@ -146,25 +139,21 @@ produce_bootstrap_estimates <- function(df, context, iter = 1000) {
   tibble(
     mean = mean(bootstrap_est),
     se = sd(bootstrap_est),
-    context = context,
-  ) %>%
-    mutate(
-      Mean = as.character(round(mean, 2)),
-      `Confidence Interval (95%)` = str_glue("({round(mean - (qnorm(.975) * se), 2)}, {round(mean + (qnorm(.975) * se), 2)})")
-    ) %>%
-    select(context, Mean, `Confidence Interval (95%)`) %>%
-    pivot_longer(-context,
-      names_to = "type",
-      values_to = "PostStratification Estimate (Bootstrapped)"
-    )
+    ci_min = mean - (qnorm(.975) * se),
+    ci_max = mean + (qnorm(.975) * se),
+    context = c_val,
+    context_label = c_desc
+  ) %>% 
+    mutate(method = 'poststratification') %>% 
+    select(context, context_label, method, mean, se, ci_min, ci_max)
 }
 
 cat("\nBootstrap estimates\n")
-df_post_bootstrap <- map_dfr(c_val, ~ produce_bootstrap_estimates(df_filter, .))
+df_post_bootstrap <- map2_dfr(c_val, c_desc, ~ produce_bootstrap_estimates(df_filter, .x, .y))
 df_post_bootstrap
 
 # present both simple mean and poststratification results
-df_final <- left_join(df_simple_mean, df_post_bootstrap, by = c("context", "type"))
+df_final <- bind_rows(df_simple_mean, df_post_bootstrap)
 
 cat("\nResults: simple mean and poststratification estimates\n")
 df_final
