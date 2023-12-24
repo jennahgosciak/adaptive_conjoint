@@ -12,16 +12,15 @@ Validation of outcome data
 # A tibble: 50 × 9
    chose_younger    Q1    Q2    Q3    Q4    Q5    Q6    Q7    Q8
            <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
- 1             1    NA    NA     1    NA    NA    NA    NA    NA
- 2             0     0    NA    NA    NA    NA    NA    NA    NA
+ 1             0    NA    NA     0    NA    NA    NA    NA    NA
+ 2             1     1    NA    NA    NA    NA    NA    NA    NA
  3             1    NA     1    NA    NA    NA    NA    NA    NA
  4             1    NA    NA    NA    NA    NA    NA     1    NA
  5             1    NA    NA     1    NA    NA    NA    NA    NA
  6             1    NA     1    NA    NA    NA    NA    NA    NA
  7             1    NA    NA    NA     1    NA    NA    NA    NA
- 8             0    NA    NA    NA    NA    NA    NA     0    NA
+ 8             1    NA    NA    NA    NA    NA    NA     1    NA
  9             1    NA    NA    NA     1    NA    NA    NA    NA
-10             0    NA    NA    NA    NA    NA    NA     0    NA
+10             1    NA    NA    NA    NA    NA    NA     1    NA
 # ℹ 40 more rows
 # ℹ Use `print(n = ...)` to see more rows
-[1mwrote[0m [32m51.00B[0m in [36m 0s[0m, [32m1.77MB/s[0m[1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                                             

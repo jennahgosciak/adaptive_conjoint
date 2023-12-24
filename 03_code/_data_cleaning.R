@@ -34,21 +34,6 @@ create_outcome_var <- function(df) {
       rowSums(na.rm = T))
 }
 
-create_context_var <- function(df) {
-  df %>%
-    # = 1 if selecting the younger candidate
-    # = 0 if selecting the older candidate
-    mutate(across(str_c("Q", 1:8), ~ case_when(
-      . == "Candidate 1" & rnum_age <= 0.5 ~ 1,
-      . == "Candidate 2" & rnum_age > 0.5 ~ 1,
-      . == "Candidate 1" & rnum_age > 0.5 ~ 0,
-      . == "Candidate 2" & rnum_age <= 0.5 ~ 0,
-      TRUE ~ NA_real_
-    ))) %>%
-    mutate(chose_younger = select(., str_c("Q", 1:8)) %>%
-      rowSums(na.rm = T))
-}
-
 # should be missing if participants do not consent
 check_consent <- function(df) {
   no_consent_num <- df %>%
@@ -179,13 +164,13 @@ create_context_var <- function(df) {
       # create profile context label
       context_label = case_when(
         context == 1 ~ "white_female_high",
-        context == 2 ~ "white_woman_low",
-        context == 3 ~ "black_woman_high",
-        context == 4 ~ "black_woman_low",
-        context == 5 ~ "black_man_high",
-        context == 6 ~ "black_man_low",
-        context == 7 ~ "white_man_high",
-        context == 8 ~ "white_man_low"
+        context == 2 ~ "white_female_low",
+        context == 3 ~ "black_female_high",
+        context == 4 ~ "black_female_low",
+        context == 5 ~ "black_male_high",
+        context == 6 ~ "black_male_low",
+        context == 7 ~ "white_male_high",
+        context == 8 ~ "white_male_low"
       ),
       context = factor(context,
         levels = c(1:8),

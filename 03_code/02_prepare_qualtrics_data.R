@@ -72,7 +72,7 @@ df_demo <- df_clean %>%
       "Asian", "Native Hawaiian or Other Pacific Islander",
       "Other", "Two or More Races", "Prefer not to disclose"
     )),
-    drop_demo_flag = if_else(race == "Prefer not to disclose" |
+    drop_demo_flag = if_else(!is.na(QD3_7) |
       QD4 == "Prefer not to disclose" |
       QD5 == "Prefer not to disclose" |
       QD2 == "Prefer not to disclose", TRUE, FALSE)

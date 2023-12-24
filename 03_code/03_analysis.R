@@ -130,8 +130,7 @@ produce_bootstrap_estimates <- function(df, c_val, c_desc, iter = 1000) {
         .x,
         c("female", "hispanic", "age", "race")
       )
-    )) %>%
-    print()
+    ))
 
   # produce bootstrap estimate
   bootstrap_est <- map2(
@@ -151,7 +150,7 @@ produce_bootstrap_estimates <- function(df, c_val, c_desc, iter = 1000) {
 
 cat("\nBootstrap estimates\n")
 df_post_bootstrap <- map2_dfr(c_val, c_desc, ~ produce_bootstrap_estimates(df_filter, .x, .y)) %>%
-  left_join(df_post, ., by = c("context", "context_label")) %>%
+  full_join(df_post, ., by = c("context", "context_label")) %>%
   # adding bootstrap standard error to calculation of ci with point estimate of the mean
   mutate(
     method = "poststratified",
