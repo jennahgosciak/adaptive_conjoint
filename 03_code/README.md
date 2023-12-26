@@ -82,8 +82,8 @@
 - `compute_weighted_prob` is a function that drops race categories from the population weights if they are not present in a subset of the data for a given `context` and `context_label`. This occurs prior to running predict. It then predicts the probability of choosing the younger candidate and returns a weighted mean.
 - Produce point estimates of the poststratified results.
 7. Bootstrapping:
-- Filter for the correct context (we will iterate through all contexts and labels in the data). Sample the data 1,000 using `bootstrap` from the `modelr` package.
-- Apply `glm_drop_cons_factor` to each bootstrapped dataset. THen apply `compute_weighted_prob` to get the weighted probabilities.
+- Filter for the correct context (we will iterate through all contexts and labels in the data). Sample the data 1,000 times using `bootstrap` from the `modelr` package.
+- Apply `glm_drop_cons_factor` to each bootstrapped dataset. Then apply `compute_weighted_prob` to get the weighted probabilities.
 - Compute the SE as the standard deviation of the weighted probabilities and store in a tibble.
 - With this output, which is a tibble produced by iterating across all `context` and `context_label` values in the data, join to the point estimate data.
 - Compute the 95% Confidence Interval values in the same ways as for the simple mean estimate.
