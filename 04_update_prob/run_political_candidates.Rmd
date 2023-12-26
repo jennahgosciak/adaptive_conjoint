@@ -26,12 +26,18 @@ source("./_functions/data_cleaning.R")
 source("./_functions/experiment_functions.R")
 source("./_functions/plotting_functions.R")
 source("./_functions/populate_probs.R")
+
+# load log of probabilities
+probabilities <- read_csv('../02_output/probabilities.csv')
+probabilities
 ```
 
 ```{r, setup qualtrics}
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
 survey_name <- "Political Candidates"
 survey_id <- config$pol_candidates_survey_id
+batch_size <- 50 # for checking probabilities
+batch_num <- 0 # numeric value for updating the batch number
 
 # can comment out after running once
 # qualtrics_api_credentials(api_key = config$api_key,
@@ -49,7 +55,7 @@ df %>%
 ```
 
 ```{r}
-# drop my test response
+# drop test data
 df <- df %>%
   mutate(StartDate_clean = ymd_hms(StartDate)) %>%
   verify(is.na(StartDate_clean) == is.na(StartDate)) %>%
@@ -76,50 +82,78 @@ df %>%
       median = ~ median(.) / 60
     )
   ))
-
-# check ID uniquely identifies rows in data
-stopifnot(length(unique(df$`Prolific ID Q`)) == nrow(df))
 ```
 
 ## Survey Validation
 
-```{r}
-df %>%
-  distinct(Status)
+```{r, check id}
+# check ID uniquely identifies rows in data
+if (length(unique(df$`Prolific ID Q`)) != nrow(df)) {
+  print("ID is not unique")
+}
 
+if (unique(df$Status) != "IP Address") {
+  print("Test data included in the analysis file")
+}
+```
+
+```{r, check embed data}
+# check embedded data variables for the last iterative batch
+# select probabilities from last run
+probabilities_current <- probabilities %>% 
+  filter(Batch == batch_num)
+  
+df %>% 
+  arrange(StartDate) %>% 
+  tail(batch_size) %>% 
+  check_pi_vars(probabilities_current, 7)
+```
+
+```{r}
 # check consent means their responses are missing
 df %>%
   check_consent()
+```
 
+```{r}
 # check that all completed
 df %>%
   check_completion()
+```
 
+```{r}
 df %>%
   check_location_screen()
 ```
 
 ```{r}
-# create profile variable
+df %>% 
+  check_commitment()
+```
+
+```{r}
+# create context variable
 df <- df %>%
-  create_profile_var_political()
+  create_context_var_political()
 
 df %>%
-  ggplot(aes(profile)) +
-  geom_histogram() +
+  group_by(context) %>% 
+  summarize(n = n()) %>% 
+  ggplot(aes(context, n)) +
+  geom_col() +
   theme_classic()
 ```
 ## Clean Qualtrics Data
 ```{r}
-df_clean <- clean_political_data(df)
+df_clean <- create_outcome_var_political(df)
 
 # each question number is the random ordering of the context attributes
 df_clean %>%
-  select(chose_younger, str_c("Q", 1:8), profile) %>%
+  select(chose_younger, str_c("Q", 1:8), context) %>%
   verify(!is.na(chose_younger))
 
 df_clean %>%
-  group_by(profile) %>%
+  group_by(context) %>%
   summarize(
     n = n(),
     resp1 = sum(chose_younger),
@@ -128,37 +162,21 @@ df_clean %>%
 ```
 
 ```{r, response breakdown}
-# identify profile desc
+# identify context desc
 df %>%
-  select(profile, starts_with("first_name"), starts_with("pol_exp")) %>%
+  select(context, starts_with("first_name"), starts_with("pol_exp")) %>%
   distinct() %>%
-  arrange(profile)
-
-# examine demographcs
-df_clean %>%
-  mutate(profile_desc = case_when(
-    profile == 1 ~ "White woman, political experience",
-    profile == 2 ~ "White woman, no experience",
-    profile == 3 ~ "Black woman, political experience",
-    profile == 4 ~ "Black woman, no experience",
-    profile == 5 ~ "Black man, political experience",
-    profile == 6 ~ "Black man, no experience",
-    profile == 7 ~ "White man, political experience",
-    profile == 8 ~ "White man, no experience"
-  )) %>%
-  group_by(profile, profile_desc) %>%
-  summarize(
-    total_chose_younger = sum(chose_younger),
-    percent_select_younger = mean(chose_younger)
-  )
+  arrange(context)
 ```
 
-```{r, demog}
+```{r, attention check}
 df_clean %>%
   mutate(older_candidate = if_else(rnum_age <= 0.5, "Candidate 2", "Candidate 1")) %>%
   mutate(pass_attention_check = if_else(Manipulation_Q1 == older_candidate, 1, 0)) %>%
   summarize(per_pass_attention_check = mean(pass_attention_check))
+```
 
+```{r, demog}
 df_clean %>%
   mutate(age = QD2_1_TEXT) %>%
   ggplot(aes(age)) +
@@ -201,23 +219,29 @@ df_clean %>%
 
 ```{r}
 # check every respondent has exactly one non-missing value
-df_clean %>%
+check_allmissing <- df_clean %>%
   select(str_c("Q", 1:8)) %>%
   mutate(across(everything(), ~ as.character(.))) %>%
   is.na() %>%
   rowSums(na.rm = T) %>%
-  unique() %>%
-  equals(7) %>%
-  stopifnot()
+  equals(8) %>% 
+  any()
+
+if (check_allmissing == TRUE) {
+  warning("Some rows are missing outcome responses\n")
+}
 
 # check row total is not more than 1
 # 0 if selected the older candidate
-df_clean %>%
+check_rowtotal <- df_clean %>%
   select(str_c("Q", 1:8)) %>%
   rowSums(na.rm = T) %>%
   is_weakly_less_than(1) %>%
-  all() %>%
-  stopifnot()
+  all()
+
+if (check_rowtotal == FALSE) {
+  warning("Total of outcome responses is more than 1\n")
+}
 ```
 
 
@@ -225,19 +249,19 @@ df_clean %>%
 
 ```{r, global params}
 # define with comments
-num_profiles <- 8 # number of profiles
+num_contexts <- 8 # number of contexts
 num_sim <- 1e6 # number of simulations for Monte Carlo simulation
 
 # init to 0 each time since we are using the full data
 # to update the number of outcomes = 1 and = 0
-num_outcome1 <- integer(num_profiles)
-num_outcome0 <- integer(num_profiles)
+num_outcome1 <- integer(num_contexts)
+num_outcome0 <- integer(num_contexts)
 ```
 
 ```{r, message=F, warning=T}
 set.seed(2023)
 # generate pi on real data
-output <- update_ts(df_clean, num_sim, num_profiles, num_outcome1,
+output <- update_ts(df_clean, num_sim, num_contexts, num_outcome1,
   num_outcome0,
   cdf = TRUE
 )
@@ -245,11 +269,13 @@ output
 
 # vector of new probabilities
 # assign names (impt for checking replacement in survey flow)
-pi_ts <- round(output$pi[1:(num_profiles - 1)], 3)
-names(pi_ts) <- str_c("pi", 1:(num_profiles - 1))
+pi_ts <- round(output$pi[1:(num_contexts - 1)], 3)
+names(pi_ts) <- str_c("pi", 1:(num_contexts - 1))
 
-# check total is equal to 50
-stopifnot((sum(output$num_outcome1) + sum(output$num_outcome0)) == 50)
+# check total is equal to number of observations in data
+if ((sum(output$num_outcome1) + sum(output$num_outcome0)) != nrow(df_clean)) {
+  warning("Total of outcome responses does not equal number of rows in data")
+}
 ```
 ```{r}
 # Retrieve current survey flow (full structure)
@@ -276,6 +302,16 @@ update_response <- update_survey_flow(config$api_token, survey_id, current_flow$
 
 # Check the response
 print(update_response)
+```
+```{r, save output probabilities}
+tibble(Batch = rep(batch_num + 1,(num_contexts-1)),
+       "Embedded data variable" = str_c('pi', 1:(num_contexts-1)),
+       "CDF_Threshold" = pi_ts) %>% 
+  bind_rows(probabilities %>% 
+              # drop if previously updated with same batch number
+              filter(Batch != (batch_num + 1))) %>% 
+  arrange(Batch) %>% 
+  write_csv('../02_output/probabilities.csv')
 ```
 
 
