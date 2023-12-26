@@ -12,6 +12,13 @@
 - RACED in the following list of values (630, 680, 682, 685, 689, 690, 698, 699), `race` = "Native Hawaiian or Other Pacific Islander". Note, these categories are: 630=Native Hawaiian, 680=Samoan, 682	Tongan, 685=Chamorro, 689=One or more other Micronesian races (2000,ACS), 690=Fijian, 699=Pacific Islander (PI), n.s.
 - RACE = 7, `race` = "Other"
 - RACE is either 8 or 9, `race` = "Two or More Races"
+4. Filter for `age` greater than 18
+5. Create `hispanic` variable = `FALSE` if HISPAN is "Not Hispanic", = `TRUE` if HISPAN is either ("Mexican", "Other", "Puerto Rican", "Cuban")
+6. Create `female` = `TRUE` if SEX == "Female", else `FALSE`
+7. Grouping by race, female, hispanic, and age, create the following summarized variables:
+- `weight sum(PERWT)`
+- `num = n()`
+- Then recompute `weight`, outside the summarize so that it is a fraction of the total weight =  `weight / sum(weight)`
 
 # 01_get_qualtrics_data.R
 
