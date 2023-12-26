@@ -28,7 +28,7 @@ source("./_functions/plotting_functions.R")
 source("./_functions/populate_probs.R")
 
 # load log of probabilities
-probabilities <- read_csv('../02_output/probabilities.csv')
+probabilities <- read_csv("../02_output/probabilities.csv")
 probabilities
 ```
 
@@ -100,12 +100,12 @@ if (unique(df$Status) != "IP Address") {
 ```{r, check embed data}
 # check embedded data variables for the last iterative batch
 # select probabilities from last run
-probabilities_current <- probabilities %>% 
+probabilities_current <- probabilities %>%
   filter(Batch == batch_num)
-  
-df %>% 
-  arrange(StartDate) %>% 
-  tail(batch_size) %>% 
+
+df %>%
+  arrange(StartDate) %>%
+  tail(batch_size) %>%
   check_pi_vars(probabilities_current, 7)
 ```
 
@@ -127,7 +127,7 @@ df %>%
 ```
 
 ```{r}
-df %>% 
+df %>%
   check_commitment()
 ```
 
@@ -137,8 +137,8 @@ df <- df %>%
   create_context_var_political()
 
 df %>%
-  group_by(context) %>% 
-  summarize(n = n()) %>% 
+  group_by(context) %>%
+  summarize(n = n()) %>%
   ggplot(aes(context, n)) +
   geom_col() +
   theme_classic()
@@ -224,7 +224,7 @@ check_allmissing <- df_clean %>%
   mutate(across(everything(), ~ as.character(.))) %>%
   is.na() %>%
   rowSums(na.rm = T) %>%
-  equals(8) %>% 
+  equals(8) %>%
   any()
 
 if (check_allmissing == TRUE) {
@@ -304,14 +304,16 @@ update_response <- update_survey_flow(config$api_token, survey_id, current_flow$
 print(update_response)
 ```
 ```{r, save output probabilities}
-tibble(Batch = rep(batch_num + 1,(num_contexts-1)),
-       "Embedded data variable" = str_c('pi', 1:(num_contexts-1)),
-       "CDF_Threshold" = pi_ts) %>% 
-  bind_rows(probabilities %>% 
-              # drop if previously updated with same batch number
-              filter(Batch != (batch_num + 1))) %>% 
-  arrange(Batch) %>% 
-  write_csv('../02_output/probabilities.csv')
+tibble(
+  Batch = rep(batch_num + 1, (num_contexts - 1)),
+  "Embedded data variable" = str_c("pi", 1:(num_contexts - 1)),
+  "CDF_Threshold" = pi_ts
+) %>%
+  bind_rows(probabilities %>%
+    # drop if previously updated with same batch number
+    filter(Batch != (batch_num + 1))) %>%
+  arrange(Batch) %>%
+  write_csv("../02_output/probabilities.csv")
 ```
 
 
