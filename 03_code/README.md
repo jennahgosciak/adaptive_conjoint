@@ -7,9 +7,9 @@
 - RACE = 1, `race` = "White"
 - RACE = 2, `race` = "Black or African American"
 - RACE = 3, `race` = "American Indian or Alaska Native"
-- RACED in the following list of values (400, 410, 420, 500, 600, 610, 620, 640, 641, 642, 643, 660, 661, 662, 663, 664, 665, 666, 667, 668, 669, 670, 671, 672, 673, 674, 675, 676, 677, 678, 679), `race` = "Asian". Note: these categories are 400	Chinese, 410 Taiwanese, 420	Chinese and Taiwanese, 500 Japanese, 600 Filipino, 610 Asian Indian (Hindu 1920_1940), 620	Korean, 640	Vietnamese, 641	Bhutanese, 642 Mongolian, 643	Nepalese, 660	Cambodian, 661	Hmong, 662	Laotian, 663	Thai, 
-664	Bangladeshi, 665	Burmese, 666	Indonesian, 667	Malaysian, 668	Okinawan, 669	Pakistani, 670	Sri Lankan,  671	All other Asian, n.e.c., 672 Asian, not specified, 673	Chinese and Japanese, 674	Chinese and Filipino, 675	Chinese and Vietnamese, 676	Chinese and Asian write_in; Chinese and Other Asian
-- RACED in the following list of values (630, 680, 681, 682, 683, 684, 685, 686, 687, 688, 689, 690, 691, 692, 698, 699), `race` = "Native Hawaiian or Other Pacific Islander". Note: these categories are 630 Native Hawaiian, 631 Asiatic Hawaiian, 632	Caucasian Hawaiian, 634	Hawaiian mixed, 
+- RACED in the following list of values (400, 410, 420, 500, 600, 610, 620, 640, 641, 642, 643, 660, 661, 662, 663, 664, 665, 666, 667, 669, 670, 671, 673, 674, 675, 676, 677, 678, 679), `race` = "Asian". Note, these categories are: 400=Chinese, 410=Taiwanese, 420=Chinese and Taiwanese, 500=Japanese, 600=Filipino, 610=Asian Indian (Hindu 1920_1940), 620=Korean, 640=Vietnamese, 641=Bhutanese, 642=Mongolian, 643=Nepalese, 660=Cambodian, 661=Hmong, 662=Laotian, 663=Thai, 
+664=Bangladeshi, 665=Burmese, 666=Indonesian, 667=Malaysian, 669=Pakistani, 670=Sri Lankan, 671=All other Asian, n.e.c., 673=Chinese and Japanese, 674=Chinese and Filipino, 675=Chinese and Vietnamese, 676=Chinese and Asian write_in; Chinese and Other Asian, 677=Japanese and Filipino, 678=Asian Indian and Asian write_in, 679=Other Asian race combinations.
+- RACED in the following list of values (630, 680, 682, 685, 689, 690, 698, 699), `race` = "Native Hawaiian or Other Pacific Islander". Note, these categories are: 630=Native Hawaiian, 680=Samoan, 682	Tongan, 685=Chamorro, 689=One or more other Micronesian races (2000,ACS), 690=Fijian, 699=Pacific Islander (PI), n.s.
 - RACE = 7, `race` = "Other"
 - RACE is either 8 or 9, `race` = "Two or More Races"
 
