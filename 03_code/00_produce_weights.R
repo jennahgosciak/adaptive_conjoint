@@ -14,7 +14,7 @@ config <- config::get()
 cat("\nLoading data from IPUMS\n")
 # define vars in the extract
 usa_ext_def <- define_extract_usa(
-  description = "USA extract for API vignette",
+  description = "Extract for adaptive conjoint experiment",
   samples = c("us2022a"),
   variables = c("AGE", "SEX", "RACE", "STATEFIP", "HISPAN")
 )
@@ -34,7 +34,6 @@ filepath <- download_extract(usa_ext_submitted,
 ddi <- read_ipums_ddi(filepath)
 micro_data <- read_ipums_micro(ddi)
 
-
 if (typeof(micro_data$AGE) != "integer") {
   warning("Age variable is not an integer")
 }
@@ -53,10 +52,10 @@ df_race_form <- micro_data %>%
       RACE == 2 ~ "Black or African American",
       RACE == 3 ~ "American Indian or Alaska Native",
       RACED %in% c(
-        400, 410, 420, 500, 600, 610, 620,
-        640, 641, 642, 643, 660, 661, 662, 663,
-        664, 665, 666, 667, 668, 669, 670, 671, 672, 673,
-        674, 675, 676, 677, 678, 679
+        400, 410, 420, 500, 600, 610, 620, 640, 
+        641, 642, 643, 660, 661, 662, 663, 664, 
+        665, 666, 667, 669, 670, 671, 673, 674, 
+        675, 676, 677, 678, 679
       ) ~ "Asian",
       # A person having origins in any of the original peoples of Hawaii,
       # Guam, Samoa, or other Pacific Islands. It includes people who
@@ -65,8 +64,7 @@ df_race_form <- micro_data %>%
       # or provide other detailed Pacific Islander responses such as
       # Palauan, Tahitian, Chuukese, Pohnpeian, Saipanese, Yapese, etc.
       RACED %in% c(
-        630, 680, 681, 682, 683, 684, 685, 686, 687, 688,
-        689, 690, 691, 692, 698, 699
+        630, 680, 682, 685, 689, 690, 698, 699
       ) ~ "Native Hawaiian or Other Pacific Islander",
       RACE == 7 ~ "Other",
       RACE %in% c(8, 9) ~ "Two or More Races",
@@ -125,6 +123,8 @@ df_wgt <- df_race_form %>%
     .groups = "drop"
   ) %>%
   mutate(weight = weight / sum(weight))
+
+df_wgt
 
 saveRDS(df_wgt, "./00_data/ipums_strata_sizes.RDS")
 write_csv(df_wgt, "./00_data/ipums_strata_sizes.csv")
