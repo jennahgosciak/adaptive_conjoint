@@ -1,41 +1,0 @@
-  |                                                                                                                                             |                                                                                                                                     |   0%  |                                                                                                                                             |======================================================================================================================               |  88%  |                                                                                                                                             |=====================================================================================================================================| 100%
-[1mindexing[0m [34mPolitical Candidates.csv[0m [========================================================================================] [32m2.15GB/s[0m, eta: [36m 0s[0m                                                                                                                                                                                  
-── Column specification ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-cols(
-  .default = col_character(),
-  StartDate = col_datetime(format = ""),
-  EndDate = col_datetime(format = ""),
-  Progress = col_double(),
-  `Duration (in seconds)` = col_double(),
-  Finished = col_logical(),
-  RecordedDate = col_datetime(format = ""),
-  RecipientLastName = col_logical(),
-  RecipientFirstName = col_logical(),
-  RecipientEmail = col_logical(),
-  ExternalReference = col_logical(),
-  LocationLatitude = col_double(),
-  LocationLongitude = col_double(),
-  QD2_1_TEXT = col_double(),
-  QD3_4 = col_logical(),
-  rnum = col_double(),
-  pi1 = col_double(),
-  pi2 = col_double(),
-  pi3 = col_double(),
-  pi4 = col_double(),
-  pi5 = col_double()
-  # ... with 14 more columns
-)
-ℹ Use `spec()` for the full cStyling  6  files:
- .Rprofile                           ✔ 
- 03_code/_data_cleaning.R            ✔ 
- 03_code/00_produce_weights.R        ✔ 
- 03_code/01_get_qualtrics_data.R     ✔ 
- 03_code/02_prepare_qualtrics_data.R ✔ 
- 03_code/03_analysis.R               ℹ 
-────────────────────────────────────────
-Status	Count	Legend 
-✔ 	5	File unchanged.
-ℹ 	1	File changed.
-✖ 	0	Styling threw an error.
-────────────────────────────────────────
-Please review the changes carefully!
