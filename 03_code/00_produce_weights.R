@@ -52,9 +52,9 @@ df_race_form <- micro_data %>%
       RACE == 2 ~ "Black or African American",
       RACE == 3 ~ "American Indian or Alaska Native",
       RACED %in% c(
-        400, 410, 420, 500, 600, 610, 620, 640, 
-        641, 642, 643, 660, 661, 662, 663, 664, 
-        665, 666, 667, 669, 670, 671, 673, 674, 
+        400, 410, 420, 500, 600, 610, 620, 640,
+        641, 642, 643, 660, 661, 662, 663, 664,
+        665, 666, 667, 669, 670, 671, 673, 674,
         675, 676, 677, 678, 679
       ) ~ "Asian",
       # A person having origins in any of the original peoples of Hawaii,
