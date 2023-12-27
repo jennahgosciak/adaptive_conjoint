@@ -1,5 +1,5 @@
-  |                                                                                                                                            |                                                                                                                                    |   0%  |                                                                                                                                            |====================================================================================================================================| 100%
-[1mindexing[0m [34mPolitical Candidates.csv[0m [=======================================================================================] [32m8.28MB/s[0m, eta: [36m 0s[0m                                                                                                                                                                                 
+  |                                                                                                                                            |                                                                                                                                    |   0%  |                                                                                                                                            |==============================                                                                                                      |  23%  |                                                                                                                                            |=======================================================================================================================             |  90%  |                                                                                                                                            |====================================================================================================================================| 100%
+[1mindexing[0m [34mPolitical Candidates.csv[0m [======================================================================================] [32m58.03MB/s[0m, eta: [36m 0s[0m                                                                                                                                                                                 
 ── Column specification ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 cols(
   .default = col_character(),
@@ -16,25 +16,33 @@ cols(
   LocationLatitude = col_double(),
   LocationLongitude = col_double(),
   QD2_1_TEXT = col_double(),
-  QD3_4 = col_logical(),
   rnum = col_double(),
   pi1 = col_double(),
   pi2 = col_double(),
   pi3 = col_double(),
   pi4 = col_double(),
-  pi5 = col_double()
-  # ... with 14 more columns
+  pi5 = col_double(),
+  pi6 = col_double()
+  # ... with 13 more columns
 )
 ℹ Use `spec()` for the full column specifications.
 
-'StartDate', 'EndDate', and 'RecordedDate' were converted without a specific timezone
-• To set a timezone, visit https://www.qualtrics.com/support/survey-platform/managing-your-account/
-• Timezone information is under 'User Settings'
-• See https://api.qualtrics.com/instructions/docs/Instructions/dates-and-times.md for more
 
 Number of observations in data
-[1] 113
+[1] 444
 
 Number of observations after dropping test cases
-[1] 50
-[1mwrote[0m [32m2.19kB[0m in [36m 0s[0m, [32m84.12MB/s[0m                                                                                                                                            [1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                                            
+[1] 381
+Warning messages:
+1: In check_consent(.) : Dropping 1 survey respondents who do not consent
+2: In check_consent(.) :
+  1 survey respondents who do not consent with non-missing responses
+3: In check_consent(.) : 380 respondents in the data
+Warning messages:
+1: In check_commitment(.) :
+  Dropping 1 survey respondents did not pass commitment check 1
+2: In check_commitment(.) : 379 respondents in the data
+3: In check_commitment(.) :
+  Dropping 2 survey respondents who did not pass commitment check 2
+4: In check_commitment(.) : 377 respondents in the data
+[1mwrote[0m [32m2.15kB[0m in [36m 0s[0m, [32m7.11MB/s[0m[1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                                            
