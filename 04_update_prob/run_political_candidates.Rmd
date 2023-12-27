@@ -36,8 +36,8 @@ probabilities
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
 survey_name <- "Political Candidates"
 survey_id <- config$pol_candidates_survey_id
-batch_size <- 320 # for checking probabilities
-batch_num <- 0 # numeric value for updating the batch number
+batch_size <- 100 # for checking probabilities
+batch_num <- 1 # numeric value for updating the batch number
 
 # can comment out after running once
 # qualtrics_api_credentials(api_key = config$api_key,
@@ -59,7 +59,7 @@ df %>%
 df <- df %>%
   mutate(StartDate_clean = ymd_hms(StartDate)) %>%
   verify(is.na(StartDate_clean) == is.na(StartDate)) %>%
-  filter(StartDate_clean >= ymd_hms("2023-12-26-18-00-00"))
+  filter(StartDate_clean >= ymd_hms("2023-12-26-17-56-00"))
 
 df %>%
   nrow()
@@ -127,6 +127,13 @@ df <- df %>%
 ```
 
 ```{r}
+# visually assessing why these respondents failed the commitment check
+df %>% 
+  filter(Commitment_Q1 != "Yes, I will")
+
+df %>% 
+  filter(str_to_lower(Commitment_Q2) != "purple")
+
 df <- df %>%
   check_commitment()
 ```
@@ -163,7 +170,7 @@ df_clean %>%
 
 ```{r, response breakdown}
 # identify context desc
-df %>%
+df_clean %>%
   select(context, starts_with("first_name"), starts_with("pol_exp")) %>%
   distinct() %>%
   arrange(context)
@@ -260,6 +267,7 @@ num_outcome0 <- integer(num_contexts)
 
 ```{r, message=F, warning=T}
 set.seed(2023)
+nrow(df_clean)
 # generate pi on real data
 output <- update_ts(df_clean, num_sim, num_contexts, num_outcome1,
   num_outcome0,
