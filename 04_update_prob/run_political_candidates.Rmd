@@ -37,7 +37,7 @@ url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
 survey_name <- "Political Candidates"
 survey_id <- config$pol_candidates_survey_id
 batch_size <- 100 # for checking probabilities
-batch_num <- 3 # numeric value for updating the batch number
+batch_num <- 4 # numeric value for updating the batch number
 
 # can comment out after running once
 # qualtrics_api_credentials(api_key = config$api_key,
@@ -107,6 +107,12 @@ df %>%
   arrange(StartDate_clean) %>%
   tail(batch_size) %>%
   check_pi_vars(probabilities_current, 7)
+
+df %>%
+  arrange(StartDate_clean) %>%
+  tail(batch_size) %>% 
+  select(str_c("pi", 1:7)) %>% 
+  distinct()
 ```
 
 ```{r}
