@@ -36,7 +36,7 @@ probabilities
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
 survey_name <- "Political Candidates"
 survey_id <- config$pol_candidates_survey_id
-batch_size <- 50 # for checking probabilities
+batch_size <- 320 # for checking probabilities
 batch_num <- 0 # numeric value for updating the batch number
 
 # can comment out after running once
@@ -59,7 +59,7 @@ df %>%
 df <- df %>%
   mutate(StartDate_clean = ymd_hms(StartDate)) %>%
   verify(is.na(StartDate_clean) == is.na(StartDate)) %>%
-  filter(StartDate_clean >= ymd_hms("2023-12-14-17-40-00"))
+  filter(StartDate_clean >= ymd_hms("2023-12-26-18-00-00"))
 
 df %>%
   nrow()
@@ -111,23 +111,23 @@ df %>%
 
 ```{r}
 # check consent means their responses are missing
-df %>%
+df <- df %>%
   check_consent()
 ```
 
 ```{r}
 # check that all completed
-df %>%
+df <- df %>%
   check_completion()
 ```
 
 ```{r}
-df %>%
+df <- df %>%
   check_location_screen()
 ```
 
 ```{r}
-df %>%
+df <- df %>%
   check_commitment()
 ```
 
