@@ -64,7 +64,7 @@ df_survey <- df_survey %>%
   check_location_screen()
 
 # check commitment
-df_survey %>%
+df_survey <- df_survey %>%
   check_commitment()
 
 ###############################################

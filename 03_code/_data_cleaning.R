@@ -120,31 +120,38 @@ check_commitment <- function(df) {
     distinct(Commitment_Q1) %>%
     equals("Yes, I will") %>%
     all()
-
+  
   if (commitment_check1 != TRUE | is.na(commitment_check1)) {
     num_respondents <- df %>%
       filter(Commitment_Q1 != "Yes, I will") %>%
       nrow()
-
-    warning(str_glue("{num_respondents} survey respondents did not pass commitment check 1; not dropping"))
+    
+    df <- df %>%
+      filter(Commitment_Q1 == "Yes, I will")
+    
+    warning(str_glue("Dropping {num_respondents} survey respondents did not pass commitment check 1"))
     warning(str_glue("{nrow(df)} respondents in the data"))
   }
-
+  
   commitment_check2 <- df %>%
     mutate(Commitment_Q2 = str_to_lower(Commitment_Q2)) %>%
     select(Commitment_Q2) %>%
     equals("purple") %>%
     all()
-
+  
   if (commitment_check2 != TRUE | is.na(commitment_check2)) {
     num_respondents <- df %>%
       mutate(Commitment_Q2 = str_to_lower(Commitment_Q2)) %>%
       filter(Commitment_Q2 != "purple") %>%
       nrow()
-
-    warning(str_glue("{num_respondents} survey respondents did not pass commitment check 2; not dropping"))
+    
+    df <- df %>%
+      filter(str_to_lower(Commitment_Q2) == "purple")
+    
+    warning(str_glue("Dropping {num_respondents} survey respondents who did not pass commitment check 2"))
     warning(str_glue("{nrow(df)} respondents in the data"))
   }
+  return(df)
 }
 
 create_context_var <- function(df) {
