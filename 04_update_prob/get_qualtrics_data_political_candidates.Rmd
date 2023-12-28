@@ -177,6 +177,7 @@ df_clean %>%
   )
 ```
 
+
 ```{r, response breakdown}
 # identify context desc
 df_clean %>%
@@ -260,77 +261,14 @@ if (check_rowtotal == FALSE) {
 }
 ```
 
-
-# Update treatment probabilities
-
-```{r, global params}
-# define with comments
-num_contexts <- 8 # number of contexts
-num_sim <- 1e6 # number of simulations for Monte Carlo simulation
-
-# init to 0 each time since we are using the full data
-# to update the number of outcomes = 1 and = 0
-num_outcome1 <- integer(num_contexts)
-num_outcome0 <- integer(num_contexts)
-```
-
-```{r, message=F, warning=T}
-set.seed(2023)
-nrow(df_clean)
-# generate pi on real data
-output <- update_ts(df_clean, num_sim, num_contexts, num_outcome1,
-  num_outcome0,
-  cdf = TRUE
-)
-output
-
-# vector of new probabilities
-# assign names (impt for checking replacement in survey flow)
-pi_ts <- round(output$pi[1:(num_contexts - 1)], 3)
-names(pi_ts) <- str_c("pi", 1:(num_contexts - 1))
-
-# check total is equal to number of observations in data
-if ((sum(output$num_outcome1) + sum(output$num_outcome0)) != nrow(df_clean)) {
-  warning("Total of outcome responses does not equal number of rows in data")
-}
-```
 ```{r}
-# Retrieve current survey flow (full structure)
-current_flow <- get_survey_flow(config$api_token, survey_id, config$datacenter_id)
-# Extract just the flow part for modification
-current_flow_data <- current_flow$result$Flow
+df_clean %>% 
+  select(context, context_label, chose_younger) %>% 
+  saveRDS('../02_output/political_candidates_data_clean.RDS')
 
-# Update the flow data with new probabilities
-modified_flow_data <- update_flow_with_probabilities(
-  current_flow_data,
-  "FL_10",
-  pi_ts,
-  names(pi_ts)
-)
-
-# Reconstruct the full survey configuration with the modified flow part
-current_flow$result$Flow <- modified_flow_data
-
-# Convert the entire modified survey configuration to JSON
-json_payload <- toJSON(current_flow$result, auto_unbox = TRUE)
-
-# Make the PUT request to update the survey flow
-update_response <- update_survey_flow(config$api_token, survey_id, current_flow$result, config$datacenter_id)
-
-# Check the response
-print(update_response)
-```
-```{r, save output probabilities}
-tibble(
-  Batch = rep(batch_num + 1, (num_contexts - 1)),
-  "Embedded data variable" = str_c("pi", 1:(num_contexts - 1)),
-  "CDF_Threshold" = pi_ts
-) %>%
-  bind_rows(probabilities %>%
-    # drop if previously updated with same batch number
-    filter(Batch != (batch_num + 1))) %>%
-  arrange(Batch) %>%
-  write_csv("../02_output/probabilities.csv")
+df_clean %>% 
+  select(context, context_label, chose_younger) %>% 
+  write_csv('../02_output/political_candidates_data_clean.csv')
 ```
 
 
