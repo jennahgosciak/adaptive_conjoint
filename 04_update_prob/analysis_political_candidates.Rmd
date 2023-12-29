@@ -1,0 +1,62 @@
+---
+title: "Process Qualtrics Data and Treatment Assignment Updating for Political Candidates Survey"
+output: rmarkdown::github_document
+date: "2023-11-07"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Setup Data Using Qualtrics API
+
+* Load data directly from Qualtrics
+* Can store API Key and credentials in `.renviron`
+
+```{r, load packages, message=F, warning=F}
+library(tidyverse)
+
+data <- readRDS("../02_output/political_candidates_data_clean.RDS")
+```
+```{r}
+# Create an aggregated dataset with the estimate using all data up to the end
+# of each batch.
+aggregated <- data %>%
+  arrange(context_label, batch_id) %>%
+  group_by(context_label) %>%
+  mutate(index = 1:n(),
+         # Make the estimate using all observations up to this point:
+         # cumulative sum of choosing younger
+         # divided by number of observations
+         estimate = cumsum(chose_younger) / index,
+         se = sqrt(estimate * (1 - estimate) / index),
+         ci.min = estimate - qnorm(.975) * se,
+         ci.max = estimate + qnorm(.975) * se) %>%
+  group_by(context_label, batch_id) %>%
+  filter(index == max(index))
+
+# Visualize the estimates by the end of each batch
+aggregated %>%
+  ggplot(aes(x = batch_id, y = estimate, 
+             ymin = ci.min, ymax = ci.max)) +
+  geom_point() +
+  geom_errorbar() +
+  facet_wrap(~context_label)
+ggsave("../02_output/_figures/all_data_estimates.png",
+       height = 5, width = 5, dpi = 300)
+
+# Visualize estimates using all data
+aggregated %>%
+  ungroup() %>%
+  filter(batch_id == max(batch_id)) %>%
+  mutate(context_label = fct_reorder(context_label, estimate)) %>%
+  ggplot(aes(y = context_label, x = estimate,
+             xmin = ci.min, xmax = ci.max)) +
+  #geom_vline(xintercept = 1, linetype = "dashed") +
+  geom_errorbar(width = .5) +
+  geom_label(aes(label = format(round(estimate,2),nsmall=2))) +
+  xlab("Proportion Choosing Younger") +
+  ylab("Profile Context")
+ggsave("../02_output/_figures/all_data_estimates.png",
+       height = 3, width = 4, dpi = 300)
+```
