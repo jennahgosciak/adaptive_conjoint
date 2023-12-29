@@ -30,7 +30,7 @@ update_outcomes_loop <- function(df, num_contexts, num_outcome1, num_outcome0) {
   return(lst(num_outcome1, num_outcome0))
 }
 
-update_ts <- function(df, num_sim, num_contexts, num_outcome1, num_outcome0, cdf) {
+update_ts <- function(df, num_sim, num_contexts, num_outcome1, num_outcome0, cdf, type) {
   # with the data provided
   # calculated the observed outcomes = 1, and outcomes = 0
 
@@ -45,11 +45,21 @@ update_ts <- function(df, num_sim, num_contexts, num_outcome1, num_outcome0, cdf
 
   # calculate the probability that each arm is the best
   draws <- replicate(num_sim, rbeta(num_contexts, num_outcome1 + 10, num_outcome0 + 10))
-  # calculate argmax across draws
-  argmax <- apply(draws, 2, which.max)
+  if (type == "Iterative Batch Phase: Max") {
+    print("Predicting the most discriminatory context: taking the argmax")
+    # calculate argmax across draws
+    arg <- apply(draws, 2, which.max)
+    
+  } else if (type == "Iterative Batch Phase: Min") {
+    print("Predicting the least discriminatory context: taking the argmin")
+    # calculate argmin across draws
+    arg <- apply(draws, 2, which.min)
+  } else {
+    print("Direction 'type' is unclear") 
+  }
 
   # generate new pi
-  pi <- unname(table(cut(argmax, 0:num_contexts)) / num_sim)
+  pi <- unname(table(cut(arg, 0:num_contexts)) / num_sim)
   print(str_c("PDF: ", str_c(pi, collapse = ",")))
   if (cdf == TRUE) {
     pi <- cumsum(pi)
