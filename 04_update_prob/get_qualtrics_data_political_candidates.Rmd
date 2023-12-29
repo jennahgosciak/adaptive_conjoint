@@ -23,9 +23,7 @@ library(RColorBrewer)
 knitr::opts_chunk$set(cache.extra = 2023)
 
 source("./_functions/data_cleaning.R")
-source("./_functions/experiment_functions.R")
-source("./_functions/plotting_functions.R")
-source("./_functions/populate_probs.R")
+config <- config::get()
 
 # load log of probabilities
 probabilities <- read_csv("../02_output/probabilities.csv")
@@ -35,7 +33,6 @@ probabilities
 ```{r, setup qualtrics}
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
 survey_name <- "Political Candidates"
-survey_id <- config$pol_candidates_survey_id
 batch_size <- 100 # for checking probabilities
 batch_num <- 4 # numeric value for updating the batch number
 
@@ -83,6 +80,22 @@ df %>%
     )
   ))
 ```
+## Create Batch ID variable
+```{r}
+df <- df %>%
+  mutate(batch_id = case_when(
+    StartDate_clean <= ymd_hms("2023-12-26-18-48-00") ~ 0,
+    StartDate_clean <= ymd_hms("2023-12-27-13-59-00") ~ 1,
+    StartDate_clean <= ymd_hms("2023-12-27-14-47-00") ~ 2,
+    StartDate_clean <= ymd_hms("2023-12-27-15-33-00") ~ 3,
+    StartDate_clean <= ymd_hms("2023-12-27-16-54-00") ~ 4
+  )) %>%
+  verify(!is.na(batch_id))
+
+df %>%
+  group_by(batch_id) %>%
+  summarize(n = n())
+```
 
 ## Survey Validation
 
@@ -110,15 +123,15 @@ df %>%
 
 df %>%
   arrange(StartDate_clean) %>%
-  tail(batch_size) %>% 
-  select(str_c("pi", 1:7)) %>% 
+  tail(batch_size) %>%
+  select(str_c("pi", 1:7)) %>%
   distinct()
 ```
 
 ```{r}
 # check consent means their responses are missing
- df %>%
-    filter(Consent == "I do not consent to participate")
+df %>%
+  filter(Consent == "I do not consent to participate")
 
 df <- df %>%
   check_consent()
@@ -137,10 +150,10 @@ df <- df %>%
 
 ```{r}
 # visually assessing why these respondents failed the commitment check
-df %>% 
+df %>%
   filter(Commitment_Q1 != "Yes, I will")
 
-df %>% 
+df %>%
   filter(str_to_lower(Commitment_Q2) != "purple")
 
 df <- df %>%
@@ -194,23 +207,13 @@ df_clean %>%
 ```
 
 ```{r, demog}
-df_clean %>%
-  mutate(age = QD2_1_TEXT) %>%
-  ggplot(aes(age)) +
-  geom_histogram()
-
-df_clean %>%
-  group_by(QD5) %>%
-  summarize(count = n())
-
-df_clean %>%
-  mutate(hispanic_latino = if_else(QD4 == "Yes", 1, 0)) %>%
-  summarize(
-    count_hispanic_latino = sum(hispanic_latino),
-    per_hispanic_latino = mean(hispanic_latino)
-  )
-
-df_clean %>%
+df_clean <- df_clean %>%
+  verify(is.numeric(QD2_1_TEXT)) %>%
+  rename(age = QD2_1_TEXT) %>%
+  mutate(
+    hispanic = if_else(QD4 == "Yes", TRUE, FALSE),
+    female = if_else(QD5 == "Female", TRUE, FALSE)
+  ) %>%
   mutate(across(starts_with("QD3_"), .fns = lst(race_num = ~ if_else(!is.na(.), 1, 0)))) %>%
   mutate(
     race_count = rowSums(select(., ends_with("race_num"))),
@@ -225,11 +228,28 @@ df_clean %>%
       !is.na(QD3_7) ~ "Prefer not to disclose"
     )
   ) %>%
+  verify(!is.na(race))
+
+df_clean %>%
   group_by(race) %>%
   summarize(n = n()) %>%
   ungroup() %>%
   mutate(per = n / sum(n)) %>%
   arrange(desc(per))
+
+df_clean %>%
+  ggplot(aes(age)) +
+  geom_histogram()
+
+df_clean %>%
+  group_by(female) %>%
+  summarize(count = n())
+
+df_clean %>%
+  summarize(
+    count_hispanic = sum(hispanic),
+    per_hispanic = mean(hispanic)
+  )
 ```
 
 ## Clean Data Validation
@@ -262,13 +282,13 @@ if (check_rowtotal == FALSE) {
 ```
 
 ```{r}
-df_clean %>% 
-  select(context, context_label, chose_younger) %>% 
-  saveRDS('../02_output/political_candidates_data_clean.RDS')
+df_clean %>%
+  select(context, context_label, batch_id, chose_younger, race, age, female, hispanic) %>%
+  saveRDS("../02_output/political_candidates_data_clean.RDS")
 
-df_clean %>% 
-  select(context, context_label, chose_younger) %>% 
-  write_csv('../02_output/political_candidates_data_clean.csv')
+df_clean %>%
+  select(context, context_label, batch_id, chose_younger, race, age, female, hispanic) %>%
+  write_csv("../02_output/political_candidates_data_clean.csv")
 ```
 
 

@@ -146,10 +146,10 @@ check_commitment <- function(df) {
     num_respondents <- df %>%
       filter(Commitment_Q1 != "Yes, I will") %>%
       nrow()
-  
+
     df <- df %>%
       filter(Commitment_Q1 == "Yes, I will")
-    
+
     warning(str_glue("Dropping {num_respondents} survey respondents did not pass commitment check 1"))
     warning(str_glue("{nrow(df)} respondents in the data"))
   }
@@ -165,7 +165,7 @@ check_commitment <- function(df) {
       mutate(Commitment_Q2 = str_to_lower(Commitment_Q2)) %>%
       filter(Commitment_Q2 != "purple") %>%
       nrow()
-    
+
     df <- df %>%
       filter(str_to_lower(Commitment_Q2) == "purple")
 

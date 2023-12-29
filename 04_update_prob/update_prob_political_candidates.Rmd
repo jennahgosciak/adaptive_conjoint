@@ -35,7 +35,7 @@ batch_num <- 4 # numeric value for updating the batch number
 probabilities <- read_csv("../02_output/probabilities.csv")
 probabilities
 
-df_clean <- readRDS('../02_output/political_candidates_data_clean.RDS')
+df_clean <- readRDS("../02_output/political_candidates_data_clean.RDS")
 ```
 
 # Update treatment probabilities
