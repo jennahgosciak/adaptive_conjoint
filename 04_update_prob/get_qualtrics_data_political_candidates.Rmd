@@ -85,16 +85,20 @@ df %>%
 # hardcoding this because it should not be changing each time
 # we should only update it as we increase batches
 df <- df %>%
-  mutate(batch_id = case_when(
-    StartDate_clean <= ymd_hms("2023-12-26-18-48-00") ~ 0,
-    StartDate_clean <= ymd_hms("2023-12-27-13-59-00") ~ 1,
-    StartDate_clean <= ymd_hms("2023-12-27-14-47-00") ~ 2,
-    StartDate_clean <= ymd_hms("2023-12-27-15-33-00") ~ 3,
-    StartDate_clean <= ymd_hms("2023-12-27-16-54-00") ~ 4
-  ),
-  batch_type = case_when(batch_id == 0 ~ 'Warmup',
-                        StartDate_clean <= ymd_hms("2023-12-27-16-54-00") ~ 'Iterative Batch Phase: Max',
-                        TRUE ~ NA_character_)) %>%
+  mutate(
+    batch_id = case_when(
+      StartDate_clean <= ymd_hms("2023-12-26-18-48-00") ~ 0,
+      StartDate_clean <= ymd_hms("2023-12-27-13-59-00") ~ 1,
+      StartDate_clean <= ymd_hms("2023-12-27-14-47-00") ~ 2,
+      StartDate_clean <= ymd_hms("2023-12-27-15-33-00") ~ 3,
+      StartDate_clean <= ymd_hms("2023-12-27-16-54-00") ~ 4
+    ),
+    batch_type = case_when(
+      batch_id == 0 ~ "Warmup",
+      StartDate_clean <= ymd_hms("2023-12-27-16-54-00") ~ "Iterative Batch Phase: Max",
+      TRUE ~ NA_character_
+    )
+  ) %>%
   verify(!is.na(batch_id))
 
 df %>%

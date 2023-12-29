@@ -49,13 +49,12 @@ update_ts <- function(df, num_sim, num_contexts, num_outcome1, num_outcome0, cdf
     print("Predicting the most discriminatory context: taking the argmax")
     # calculate argmax across draws
     arg <- apply(draws, 2, which.max)
-    
   } else if (type == "Iterative Batch Phase: Min") {
     print("Predicting the least discriminatory context: taking the argmin")
     # calculate argmin across draws
     arg <- apply(draws, 2, which.min)
   } else {
-    print("Direction 'type' is unclear") 
+    print("Direction 'type' is unclear")
   }
 
   # generate new pi
