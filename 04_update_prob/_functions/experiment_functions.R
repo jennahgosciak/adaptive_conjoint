@@ -44,7 +44,7 @@ update_ts <- function(df, num_sim, num_contexts, num_outcome1, num_outcome0, cdf
   num_outcome0 <- upd_outcomes$num_outcome0
 
   # calculate the probability that each arm is the best
-  draws <- replicate(num_sim, rbeta(num_contexts, num_outcome1 + 1, num_outcome0 + 1))
+  draws <- replicate(num_sim, rbeta(num_contexts, num_outcome1 + 10, num_outcome0 + 10))
   if (type == "Iterative Batch Phase: Max") {
     print("Predicting the most discriminatory context: taking the argmax")
     # calculate argmax across draws
