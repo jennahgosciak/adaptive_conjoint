@@ -33,7 +33,9 @@ probabilities
 ```{r, setup qualtrics}
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
 survey_name <- "Political Candidates"
+
 batch_num <- 5 # numeric value for updating the batch number
+batch_num <- 0 # numeric value for updating the batch number
 batch_type <- "Iterative Batch Phase: Min"
 
 # can comment out after running once
@@ -123,11 +125,17 @@ if (unique(df$Status) != "IP Address") {
 ```{r, check embed data}
 # check embedded data variables for the last iterative batch
 # select probabilities from last run
+if (batch_num == 0) {
+  current_batch_type <- "Warmup"
+} else {
+  current_batch_type <- batch_type
+}
+
 probabilities_current <- probabilities %>%
-  filter(Batch == batch_num, `Batch Type` == batch_type)
+  filter(Batch == batch_num, `Batch Type` == current_batch_type)
 
 df %>%
-  filter(batch_id == batch_num, batch_type == batch_type) %>%
+  filter(batch_id == batch_num, batch_type == current_batch_type) %>%
   check_pi_vars(probabilities_current, 7)
 ```
 
