@@ -18,6 +18,13 @@ library(tidyverse)
 
 data <- readRDS("../02_output/political_candidates_data_clean.RDS")
 ```
+
+```{r}
+data %>% 
+  group_by(context_id, context_label) %>% 
+  summarize(n = n())
+```
+
 ```{r}
 # Create an aggregated dataset with the estimate using all data up to the end
 # of each batch.
@@ -34,6 +41,8 @@ aggregated <- data %>%
          ci.max = estimate + qnorm(.975) * se) %>%
   group_by(context_label, batch_id) %>%
   filter(index == max(index))
+
+aggregated
 
 # Visualize the estimates by the end of each batch
 aggregated %>%
