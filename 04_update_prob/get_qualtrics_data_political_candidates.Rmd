@@ -33,7 +33,7 @@ probabilities
 ```{r, setup qualtrics}
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
 survey_name <- "Political Candidates"
-batch_num <- 0 # numeric value for updating the batch number
+batch_num <- 1 # numeric value for updating the batch number
 batch_type <- "Iterative Batch Phase: Min"
 
 # can comment out after running once
@@ -91,7 +91,8 @@ df <- df %>%
       StartDate_clean <= ymd_hms("2023-12-27-13-59-00") ~ 1,
       StartDate_clean <= ymd_hms("2023-12-27-14-47-00") ~ 2,
       StartDate_clean <= ymd_hms("2023-12-27-15-33-00") ~ 3,
-      StartDate_clean <= ymd_hms("2023-12-27-16-54-00") ~ 4
+      StartDate_clean <= ymd_hms("2023-12-27-16-54-00") ~ 4,
+      StartDate_clean <= 
     ),
     batch_type = case_when(
       batch_id == 0 ~ "Warmup",

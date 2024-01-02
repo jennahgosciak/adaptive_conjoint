@@ -21,7 +21,7 @@ data <- readRDS("../02_output/political_candidates_data_clean.RDS")
 
 ```{r}
 data %>% 
-  group_by(context_id, context_label) %>% 
+  group_by(context, context_label) %>% 
   summarize(n = n())
 ```
 
