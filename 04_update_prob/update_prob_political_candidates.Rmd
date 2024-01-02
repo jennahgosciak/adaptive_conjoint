@@ -30,11 +30,11 @@ probabilities
 df_clean <- readRDS("../02_output/political_candidates_data_clean.RDS")
 
 # current batch type that we want (whether min or max discriminatory context)
-batch_type <- "Iterative Batch Phase: Min"
+current_batch_type <- "Iterative Batch Phase: Min"
 
 # current batch num should just be the last batch number (if we are just updating sequentially)
 current_batch_num <- df_clean %>%
-  filter(batch_type %in% lst("Warmup", batch_type)) %>%
+  filter(batch_type %in% c("Warmup", current_batch_type)) %>% 
   pull(batch_id) %>%
   max()
 ```
@@ -54,7 +54,7 @@ print(str_glue("Number of rows in data: {nrow(df_clean)}"))
 
 # filter for correct batch types (whether max discriminatory or min)
 df_clean <- df_clean %>%
-  filter(batch_type %in% lst("Warmup", batch_type))
+  filter(batch_type %in% c("Warmup", current_batch_type))
 
 # if we want to filter for less data (e.g., just the warmup data)
 if (current_batch_num != max(df_clean$batch_id)) {
@@ -74,7 +74,7 @@ set.seed(2023)
 output <- update_ts(df_clean, num_sim, num_contexts, num_outcome1,
   num_outcome0,
   cdf = TRUE,
-  type = batch_type
+  type = current_batch_type
 )
 output
 
@@ -121,11 +121,11 @@ tibble(
   Batch = rep(current_batch_num + 1, (num_contexts - 1)),
   "Embedded data variable" = str_c("pi", 1:(num_contexts - 1)),
   "CDF_Threshold" = pi_ts,
-  `Batch Type` = batch_type,
+  `Batch Type` = current_batch_type,
 ) %>%
   bind_rows(probabilities %>%
     # drop if previously updated with same batch number
-    filter(!(Batch == (current_batch_num + 1) & `Batch Type` == batch_type))) %>%
+    filter(!(Batch == (current_batch_num + 1) & `Batch Type` == current_batch_type))) %>%
   arrange(Batch, `Batch Type`) %>%
   write_csv("../02_output/probabilities.csv")
 ```

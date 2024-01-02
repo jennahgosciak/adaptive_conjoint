@@ -33,8 +33,8 @@ probabilities
 ```{r, setup qualtrics}
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
 survey_name <- "Political Candidates"
-batch_num <- 1 # numeric value for updating the batch number
-batch_type <- "Iterative Batch Phase: Min"
+current_batch_num <- 1 # numeric value for updating the batch number
+current_batch_type <- "Iterative Batch Phase: Min"
 
 # can comment out after running once
 # qualtrics_api_credentials(api_key = config$api_key,
@@ -92,11 +92,12 @@ df <- df %>%
       StartDate_clean <= ymd_hms("2023-12-27-14-47-00") ~ 2,
       StartDate_clean <= ymd_hms("2023-12-27-15-33-00") ~ 3,
       StartDate_clean <= ymd_hms("2023-12-27-16-54-00") ~ 4,
-      StartDate_clean <= 
+      StartDate_clean <= ymd_hms("2023-12-30-11-03-00") ~ 1
     ),
     batch_type = case_when(
       batch_id == 0 ~ "Warmup",
       StartDate_clean <= ymd_hms("2023-12-27-16-54-00") ~ "Iterative Batch Phase: Max",
+      StartDate_clean <= ymd_hms("2023-12-30-11-03-00") ~ "Iterative Batch Phase: Min",
       TRUE ~ NA_character_
     )
   ) %>%
@@ -123,17 +124,17 @@ if (unique(df$Status) != "IP Address") {
 ```{r, check embed data}
 # check embedded data variables for the last iterative batch
 # select probabilities from last run
-if (batch_num == 0) {
-  current_batch_type <- "Warmup"
+if (current_batch_num == 0) {
+  temp_batch_type <- "Warmup"
 } else {
-  current_batch_type <- batch_type
+  temp_batch_type <- current_batch_type
 }
 
 probabilities_current <- probabilities %>%
-  filter(Batch == batch_num, `Batch Type` == current_batch_type)
+  filter(Batch == current_batch_num, `Batch Type` == temp_batch_type)
 
 df %>%
-  filter(batch_id == batch_num, batch_type == current_batch_type) %>%
+  filter(batch_id == current_batch_num, batch_type == temp_batch_type) %>%
   check_pi_vars(probabilities_current, 7)
 ```
 
@@ -175,12 +176,60 @@ df <- df %>%
   create_context_var_political()
 
 df %>%
-  group_by(context) %>%
+  group_by(batch_type, context) %>%
+  summarize(n = n())
+```
+
+```{r}
+df %>%
+  group_by(context, batch_type, batch_id) %>%
+  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Max")) %>% 
   summarize(n = n()) %>%
   ggplot(aes(context, n)) +
   geom_col() +
-  theme_classic()
+  theme_classic() +
+  facet_grid(cols = vars(batch_id))  +
+  labs(title = "Sample Sizes in Iterative Batch Phase: Max")
+
+df %>%
+  group_by(context, batch_type, batch_id) %>%
+  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>% 
+  summarize(n = n()) %>%
+  ggplot(aes(context, n)) +
+  geom_col() +
+  theme_classic() +
+  facet_grid(cols = vars(batch_id)) +
+  labs(title = "Sample Sizes in Iterative Batch Phase: Min")
 ```
+
+```{r}
+df  %>%
+  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Max")) %>%
+  group_by(batch_id, batch_type) %>%
+  select(str_c("pi", 1:7)) %>% 
+  distinct() %>% 
+  pivot_longer(-c(batch_id, batch_type)) %>% 
+  mutate(context = str_replace_all(name, "pi", "")) %>%
+  ggplot(aes(context, value)) +
+  geom_col() +
+  theme_classic() +
+  facet_grid(cols = vars(batch_id))
+
+df  %>%
+  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>% 
+  group_by(batch_id, batch_type) %>%
+  select(str_c("pi", 1:7)) %>% 
+  distinct() %>% 
+  pivot_longer(-c(batch_id, batch_type)) %>% 
+  mutate(context = str_replace_all(name, "pi", "")) %>%
+  ggplot(aes(context, value)) +
+  geom_col() +
+  theme_classic() +
+  facet_grid(cols = vars(batch_id)) +
+  labs(title = "CDF for Iterative Batch Phase: Min",
+       y = "Cumulative Probability")
+```
+
 ## Clean Qualtrics Data
 ```{r}
 df_clean <- create_outcome_var_political(df)
