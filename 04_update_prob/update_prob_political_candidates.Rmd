@@ -37,8 +37,6 @@ current_batch_num <- df_clean %>%
   filter(batch_type %in% c("Warmup", current_batch_type)) %>%
   pull(batch_id) %>%
   max()
-
-print(str_c("Current batch number:", current_batch_num))
 ```
 
 # Update treatment probabilities
