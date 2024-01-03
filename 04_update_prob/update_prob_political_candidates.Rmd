@@ -33,7 +33,12 @@ df_clean <- readRDS("../02_output/political_candidates_data_clean.RDS")
 current_batch_type <- "Iterative Batch Phase: Min"
 
 # current batch num should just be the last batch number (if we are just updating sequentially)
-current_batch_num <- 0
+current_batch_num <- df_clean %>%
+  filter(batch_type %in% c("Warmup", current_batch_type)) %>%
+  pull(batch_id) %>%
+  max()
+
+print(str_c("Current batch number:", current_batch_num))
 ```
 
 # Update treatment probabilities
@@ -55,7 +60,7 @@ df_clean <- df_clean %>%
 
 # if we want to filter for less data (e.g., just the warmup data)
 if (current_batch_num != max(df_clean$batch_id)) {
-  print(str_glue("\nFiltering data for batch id <= {current_batch_num} and batch types 'Warmup' or '{batch_type}'"))
+  print(str_glue("\nFiltering data for batch id <= {current_batch_num} and batch types 'Warmup' or '{current_batch_type}'"))
   df_clean <- df_clean %>%
     filter(batch_id <= current_batch_num)
 }

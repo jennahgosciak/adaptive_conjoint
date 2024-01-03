@@ -23,7 +23,7 @@ probabilities <- read_csv("../02_output/probabilities.csv")
 probabilities
 ```
 
-    ## # A tibble: 63 × 4
+    ## # A tibble: 42 × 4
     ##    Batch `Embedded data variable` CDF_Threshold `Batch Type`              
     ##    <dbl> <chr>                            <dbl> <chr>                     
     ##  1     0 pi1                              0.125 Warmup                    
@@ -36,20 +36,24 @@ probabilities
     ##  8     1 pi1                              0.071 Iterative Batch Phase: Max
     ##  9     1 pi2                              0.241 Iterative Batch Phase: Max
     ## 10     1 pi3                              0.264 Iterative Batch Phase: Max
-    ## # ℹ 53 more rows
+    ## # ℹ 32 more rows
 
 ``` r
 df_clean <- readRDS("../02_output/political_candidates_data_clean.RDS")
 
 # current batch type that we want (whether min or max discriminatory context)
-current_batch_type <- "Iterative Batch Phase: Max"
+current_batch_type <- "Iterative Batch Phase: Min"
 
 # current batch num should just be the last batch number (if we are just updating sequentially)
 current_batch_num <- df_clean %>%
   filter(batch_type %in% c("Warmup", current_batch_type)) %>%
   pull(batch_id) %>%
   max()
+
+print(str_c("Current batch number:", current_batch_num))
 ```
+
+    ## [1] "Current batch number:0"
 
 # Update treatment probabilities
 
@@ -65,7 +69,7 @@ num_outcome0 <- integer(num_contexts)
 print(str_glue("Number of rows in data: {nrow(df_clean)}"))
 ```
 
-    ## Number of rows in data: 1017
+    ## Number of rows in data: 716
 
 ``` r
 # filter for correct batch types (whether max discriminatory or min)
@@ -82,13 +86,13 @@ if (current_batch_num != max(df_clean$batch_id)) {
 print(str_glue("Current batch ID: {current_batch_num}"))
 ```
 
-    ## Current batch ID: 4
+    ## Current batch ID: 0
 
 ``` r
 print(str_glue("Number of rows left in data: {nrow(df_clean)}"))
 ```
 
-    ## Number of rows left in data: 716
+    ## Number of rows left in data: 317
 
 ``` r
 set.seed(2023)
@@ -102,22 +106,22 @@ output <- update_ts(df_clean, num_sim, num_contexts, num_outcome1,
 ```
 
     ## [1] 1e+06
-    ## [1] "Predicting the most discriminatory context: taking the argmax"
-    ## [1] "PDF: 0.031566,0.027018,0.006979,0.013139,0.82026,0.035434,0.015992,0.049612"
-    ## [1] "CDF: 0.031566,0.058584,0.065563,0.078702,0.898962,0.934396,0.950388,1"
+    ## [1] "Predicting the least discriminatory context: taking the argmin"
+    ## [1] "PDF: 0.110631,0.035259,0.19992,0.392076,0.00981,0.033119,0.200866,0.018319"
+    ## [1] "CDF: 0.110631,0.14589,0.34581,0.737886,0.747696,0.780815,0.981681,1"
 
 ``` r
 output
 ```
 
     ## $pi
-    ## [1] 0.031566 0.058584 0.065563 0.078702 0.898962 0.934396 0.950388 1.000000
+    ## [1] 0.110631 0.145890 0.345810 0.737886 0.747696 0.780815 0.981681 1.000000
     ## 
     ## $num_outcome1
-    ## [1]  33  57  32  26 238  54  34  62
+    ## [1] 24 30 28 18 40 32 25 35
     ## 
     ## $num_outcome0
-    ## [1] 12 22 15 11 64 20 14 22
+    ## [1]  9  9 14 10 11 10 12 10
 
 ``` r
 # check total is equal to number of observations in data
@@ -148,13 +152,13 @@ modified_flow_data <- update_flow_with_probabilities(
 )
 ```
 
-    ## For pi1, replacing old probability 0.071 with new probability 0.032
-    ## For pi2, replacing old probability 0.241 with new probability 0.059
-    ## For pi3, replacing old probability 0.264 with new probability 0.066
-    ## For pi4, replacing old probability 0.277 with new probability 0.079
-    ## For pi5, replacing old probability 0.579 with new probability 0.899
-    ## For pi6, replacing old probability 0.741 with new probability 0.934
-    ## For pi7, replacing old probability 0.768 with new probability 0.95
+    ## For pi1, replacing old probability 0.111 with new probability 0.111
+    ## For pi2, replacing old probability 0.146 with new probability 0.146
+    ## For pi3, replacing old probability 0.346 with new probability 0.346
+    ## For pi4, replacing old probability 0.738 with new probability 0.738
+    ## For pi5, replacing old probability 0.748 with new probability 0.748
+    ## For pi6, replacing old probability 0.781 with new probability 0.781
+    ## For pi7, replacing old probability 0.982 with new probability 0.982
 
 ``` r
 # Reconstruct the full survey configuration with the modified flow part
@@ -179,7 +183,7 @@ print(update_response)
     ## [1] "200 - OK"
     ## 
     ## $meta$requestId
-    ## [1] "f238095a-6657-4a66-897b-a88e958b2712"
+    ## [1] "c5f1f082-c150-430e-ba19-448922187493"
 
 ``` r
 tibble(
