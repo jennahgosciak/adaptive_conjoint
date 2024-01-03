@@ -182,9 +182,10 @@ check_pi_vars <- function(df, probabilities, num_contexts) {
     pivot_longer(-c(batch_id, batch_type),
                  names_to = "Embedded data variable", values_to = "CDF_Data"
     ) %>%
-    full_join(probabilities, by = c("Embedded data variable", "batch_id" = "Batch", "batch_type" = "Batch Type")) %>%
+    left_join(probabilities, by = c("Embedded data variable", "batch_id" = "Batch", "batch_type" = "Batch Type")) %>%
     mutate(Comparison = CDF_Threshold == CDF_Data)
   
+  print(comp_df)
   check_pi <- comp_df %>%
     pull(Comparison) %>%
     equals(TRUE) %>%

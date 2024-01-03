@@ -30,13 +30,10 @@ probabilities
 df_clean <- readRDS("../02_output/political_candidates_data_clean.RDS")
 
 # current batch type that we want (whether min or max discriminatory context)
-current_batch_type <- "Iterative Batch Phase: Max"
+current_batch_type <- "Iterative Batch Phase: Min"
 
 # current batch num should just be the last batch number (if we are just updating sequentially)
-current_batch_num <- df_clean %>%
-  filter(batch_type %in% c("Warmup", current_batch_type)) %>%
-  pull(batch_id) %>%
-  max()
+current_batch_num <- 0
 ```
 
 # Update treatment probabilities

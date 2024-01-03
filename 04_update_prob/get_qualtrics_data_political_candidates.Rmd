@@ -89,18 +89,17 @@ df <- df %>%
       StartDate_clean <= ymd_hms("2023-12-27-14-47-00") ~ 2,
       StartDate_clean <= ymd_hms("2023-12-27-15-33-00") ~ 3,
       StartDate_clean <= ymd_hms("2023-12-27-16-54-00") ~ 4,
-      StartDate_clean <= ymd_hms("2023-12-30-11-03-00") ~ 1,
-      StartDate_clean <= ymd_hms("2024-01-02-14-47-00") ~ 2,
-      StartDate_clean <= ymd_hms("2024-01-02-15-07-00") ~ 3,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
       batch_id == 0 ~ "Warmup",
       StartDate_clean <= ymd_hms("2023-12-27-16-54-00") ~ "Iterative Batch Phase: Max",
-      StartDate_clean <= ymd_hms("2024-01-02-15-07-00") ~ "Iterative Batch Phase: Min",
+      StartDate_clean > ymd_hms("2023-12-27-16-54-00") ~ "Iterative Batch Phase: Min",
       TRUE ~ NA_character_
     )
   ) %>%
+  # drop data collected incorrectly
+  filter(StartDate_clean <= ymd_hms("2023-12-27-16-54-00") | StartDate_clean >= ymd_hms("2024-01-03-00-00-00")) %>% 
   verify(!is.na(batch_id)) 
 
 df %>%
