@@ -44,6 +44,7 @@ update_ts <- function(df, num_sim, num_contexts, num_outcome1, num_outcome0, cdf
   num_outcome0 <- upd_outcomes$num_outcome0
 
   # calculate the probability that each arm is the best
+  print(num_sim)
   draws <- replicate(num_sim, rbeta(num_contexts, num_outcome1 + 10, num_outcome0 + 10))
   if (type == "Iterative Batch Phase: Max") {
     print("Predicting the most discriminatory context: taking the argmax")
@@ -66,40 +67,4 @@ update_ts <- function(df, num_sim, num_contexts, num_outcome1, num_outcome0, cdf
   }
   stopifnot(length(pi) == num_contexts)
   return(lst(pi, num_outcome1, num_outcome0))
-}
-
-run_ts <- function(batch_size, num_contexts, pi_init, num_outcome1 = NULL, num_outcome0 = NULL, fake_data = T, cdf = T) {
-  # if null, init number of outcomes in previous rounds to 0
-  # generate warning message with output
-  warning_message <- NULL
-  if (is.null(num_outcome1)) {
-    warning_message <- "Initializing number of outcomes=1 in previous rounds to 0"
-    num_outcome1 <- integer(num_contexts)
-  }
-  if (is.null(num_outcome0)) {
-    warning_message <- str_c(
-      warning_message,
-      "\nInitializing number of outcomes=0 in previous rounds to 0\n"
-    )
-    num_outcome0 <- integer(num_contexts)
-  }
-
-  if (fake_data == T) {
-    # generate fake data
-    df <- create_fake_data(pi_init, context_prob, batch_size, num_contexts, cdf = cdf)
-  } else {
-    ## function to load qualtrics data
-    df <- load_qualtrics("Political Candidates") %>%
-      clean_qualtrics_data() %>%
-      select_batch() %>%
-      create_context_var() %>%
-      select(chose_younger, context)
-  }
-  output <- update_ts(df, num_sim, num_contexts, num_outcome1, num_outcome0, cdf = cdf)
-
-  # warn if automatically initialized outcome values in previous rounds to 0
-  if (!is.null(warning_message)) {
-    warning(warning_message)
-  }
-  return(output)
 }

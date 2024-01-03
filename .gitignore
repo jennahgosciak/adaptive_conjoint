@@ -9,5 +9,4 @@ automate_candidates_files/
 .Rproj.user
 *.pdf
 config.yml
-*.md
 _data_private/

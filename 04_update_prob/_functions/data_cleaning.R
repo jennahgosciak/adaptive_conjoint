@@ -176,20 +176,24 @@ check_commitment <- function(df) {
 }
 
 check_pi_vars <- function(df, probabilities, num_contexts) {
-  check_pi <- df %>%
-    select(all_of(str_c("pi", 1:num_contexts))) %>%
+  comp_df <- df %>%
+    select(batch_id, batch_type, all_of(str_c("pi", 1:num_contexts))) %>%
     distinct() %>%
-    pivot_longer(everything(),
-      names_to = "Embedded data variable", values_to = "CDF_Data"
+    pivot_longer(-c(batch_id, batch_type),
+                 names_to = "Embedded data variable", values_to = "CDF_Data"
     ) %>%
-    full_join(probabilities, by = "Embedded data variable") %>%
-    mutate(Comparison = CDF_Threshold == CDF_Data) %>%
+    full_join(probabilities, by = c("Embedded data variable", "batch_id" = "Batch", "batch_type" = "Batch Type")) %>%
+    mutate(Comparison = CDF_Threshold == CDF_Data)
+  
+  check_pi <- comp_df %>%
     pull(Comparison) %>%
     equals(TRUE) %>%
     all()
-
+  
   if (check_pi == FALSE) {
-    warning("Embedded data variables do not match updated probability in previous iteration")
+    warning("Embedded data variables do not match probabilities in log")
+    return(comp_df %>% 
+             filter(Comparison == FALSE))
   }
 }
 

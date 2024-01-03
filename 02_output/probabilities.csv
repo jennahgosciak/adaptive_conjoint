@@ -6,13 +6,13 @@ Batch,Embedded data variable,CDF_Threshold,Batch Type
 0,pi5,0.625,Warmup
 0,pi6,0.75,Warmup
 0,pi7,0.875,Warmup
-1,pi1,0.086,Iterative Batch Phase: Max
-1,pi2,0.288,Iterative Batch Phase: Max
-1,pi3,0.3,Iterative Batch Phase: Max
-1,pi4,0.314,Iterative Batch Phase: Max
+1,pi1,0.071,Iterative Batch Phase: Max
+1,pi2,0.241,Iterative Batch Phase: Max
+1,pi3,0.264,Iterative Batch Phase: Max
+1,pi4,0.277,Iterative Batch Phase: Max
 1,pi5,0.579,Iterative Batch Phase: Max
-1,pi6,0.745,Iterative Batch Phase: Max
-1,pi7,0.765,Iterative Batch Phase: Max
+1,pi6,0.741,Iterative Batch Phase: Max
+1,pi7,0.768,Iterative Batch Phase: Max
 1,pi1,0.111,Iterative Batch Phase: Min
 1,pi2,0.146,Iterative Batch Phase: Min
 1,pi3,0.346,Iterative Batch Phase: Min
@@ -41,6 +41,13 @@ Batch,Embedded data variable,CDF_Threshold,Batch Type
 3,pi5,0.813,Iterative Batch Phase: Max
 3,pi6,0.925,Iterative Batch Phase: Max
 3,pi7,0.94,Iterative Batch Phase: Max
+3,pi1,0.124,Iterative Batch Phase: Min
+3,pi2,0.178,Iterative Batch Phase: Min
+3,pi3,0.379,Iterative Batch Phase: Min
+3,pi4,0.614,Iterative Batch Phase: Min
+3,pi5,0.619,Iterative Batch Phase: Min
+3,pi6,0.724,Iterative Batch Phase: Min
+3,pi7,0.997,Iterative Batch Phase: Min
 4,pi1,0.035,Iterative Batch Phase: Max
 4,pi2,0.102,Iterative Batch Phase: Max
 4,pi3,0.108,Iterative Batch Phase: Max
@@ -55,10 +62,3 @@ Batch,Embedded data variable,CDF_Threshold,Batch Type
 5,pi5,0.899,Iterative Batch Phase: Max
 5,pi6,0.934,Iterative Batch Phase: Max
 5,pi7,0.95,Iterative Batch Phase: Max
-5,pi1,0.111,Iterative Batch Phase: Min
-5,pi2,0.146,Iterative Batch Phase: Min
-5,pi3,0.346,Iterative Batch Phase: Min
-5,pi4,0.738,Iterative Batch Phase: Min
-5,pi5,0.748,Iterative Batch Phase: Min
-5,pi6,0.781,Iterative Batch Phase: Min
-5,pi7,0.982,Iterative Batch Phase: Min
