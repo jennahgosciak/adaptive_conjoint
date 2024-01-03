@@ -23,7 +23,7 @@ probabilities <- read_csv("../02_output/probabilities.csv")
 probabilities
 ```
 
-    ## # A tibble: 56 × 4
+    ## # A tibble: 63 × 4
     ##    Batch `Embedded data variable` CDF_Threshold `Batch Type`              
     ##    <dbl> <chr>                            <dbl> <chr>                     
     ##  1     0 pi1                              0.125 Warmup                    
@@ -36,7 +36,7 @@ probabilities
     ##  8     1 pi1                              0.071 Iterative Batch Phase: Max
     ##  9     1 pi2                              0.241 Iterative Batch Phase: Max
     ## 10     1 pi3                              0.264 Iterative Batch Phase: Max
-    ## # ℹ 46 more rows
+    ## # ℹ 53 more rows
 
 ``` r
 df_clean <- readRDS("../02_output/political_candidates_data_clean.RDS")
@@ -49,11 +49,7 @@ current_batch_num <- df_clean %>%
   filter(batch_type %in% c("Warmup", current_batch_type)) %>%
   pull(batch_id) %>%
   max()
-
-print(str_c("Current batch number:", current_batch_num))
 ```
-
-    ## [1] "Current batch number:2"
 
 # Update treatment probabilities
 
@@ -69,7 +65,7 @@ num_outcome0 <- integer(num_contexts)
 print(str_glue("Number of rows in data: {nrow(df_clean)}"))
 ```
 
-    ## Number of rows in data: 917
+    ## Number of rows in data: 1017
 
 ``` r
 # filter for correct batch types (whether max discriminatory or min)
@@ -86,20 +82,20 @@ if (current_batch_num != max(df_clean$batch_id)) {
 print(str_glue("Current batch ID: {current_batch_num}"))
 ```
 
-    ## Current batch ID: 2
+    ## Current batch ID: 3
 
 ``` r
 print(str_glue("Number of rows left in data: {nrow(df_clean)}"))
 ```
 
-    ## Number of rows left in data: 518
+    ## Number of rows left in data: 618
 
 ``` r
 set.seed(2023)
 nrow(df_clean)
 ```
 
-    ## [1] 518
+    ## [1] 618
 
 ``` r
 # generate prob of most (or least) discriminatory context
@@ -112,21 +108,21 @@ output <- update_ts(df_clean, num_sim, num_contexts, num_outcome1,
 
     ## [1] 1e+06
     ## [1] "Predicting the least discriminatory context: taking the argmin"
-    ## [1] "PDF: 0.041964,0.101508,0.225217,0.047542,0.191146,0.225172,0.081012,0.086439"
-    ## [1] "CDF: 0.041964,0.143472,0.368689,0.416231,0.607377,0.832549,0.913561,1"
+    ## [1] "PDF: 0.041428,0.313481,0.120766,0.048902,0.054919,0.200989,0.115458,0.104057"
+    ## [1] "CDF: 0.041428,0.354909,0.475675,0.524577,0.579496,0.780485,0.895943,1"
 
 ``` r
 output
 ```
 
     ## $pi
-    ## [1] 0.041964 0.143472 0.368689 0.416231 0.607377 0.832549 0.913561 1.000000
+    ## [1] 0.041428 0.354909 0.475675 0.524577 0.579496 0.780485 0.895943 1.000000
     ## 
     ## $num_outcome1
-    ## [1] 60 41 54 59 46 37 55 38
+    ## [1] 63 46 71 64 63 58 59 41
     ## 
     ## $num_outcome0
-    ## [1] 18 12 22 18 17 13 18 10
+    ## [1] 18 18 26 19 19 22 20 11
 
 ``` r
 # check total is equal to number of observations in data
@@ -157,13 +153,13 @@ modified_flow_data <- update_flow_with_probabilities(
 )
 ```
 
-    ## For pi1, replacing old probability 0.355 with new probability 0.042
-    ## For pi2, replacing old probability 0.471 with new probability 0.143
-    ## For pi3, replacing old probability 0.612 with new probability 0.369
-    ## For pi4, replacing old probability 0.642 with new probability 0.416
-    ## For pi5, replacing old probability 0.708 with new probability 0.607
-    ## For pi6, replacing old probability 0.821 with new probability 0.833
-    ## For pi7, replacing old probability 0.949 with new probability 0.914
+    ## For pi1, replacing old probability 0.042 with new probability 0.041
+    ## For pi2, replacing old probability 0.143 with new probability 0.355
+    ## For pi3, replacing old probability 0.369 with new probability 0.476
+    ## For pi4, replacing old probability 0.416 with new probability 0.525
+    ## For pi5, replacing old probability 0.607 with new probability 0.579
+    ## For pi6, replacing old probability 0.833 with new probability 0.78
+    ## For pi7, replacing old probability 0.914 with new probability 0.896
 
 ``` r
 # Reconstruct the full survey configuration with the modified flow part
@@ -188,7 +184,7 @@ print(update_response)
     ## [1] "200 - OK"
     ## 
     ## $meta$requestId
-    ## [1] "d87d3621-85e9-4dac-a432-5897a4459312"
+    ## [1] "2a76d351-d5d9-494e-94c7-ceb4a11de807"
 
 ``` r
 tibble(
