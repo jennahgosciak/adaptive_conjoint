@@ -53,7 +53,7 @@ survey_name <- "Political Candidates"
 df <- load_qualtrics(survey_name)
 ```
 
-    ##   |                                                                              |                                                                      |   0%  |                                                                              |======                                                                |   8%  |                                                                              |===========                                                           |  16%  |                                                                              |=================                                                     |  24%  |                                                                              |==============================================================        |  88%  |                                                                              |===================================================================   |  96%  |                                                                              |======================================================================| 100%
+    ##   |                                                                              |                                                                      |   0%  |                                                                              |=================                                                     |  24%  |                                                                              |===================================================================   |  96%  |                                                                              |======================================================================| 100%
 
     ## 
     ## ── Column specification ────────────────────────────────────────────────────────
@@ -143,6 +143,24 @@ df %>%
 ``` r
 # hardcoding this because it should not be changing each time
 # we should only update it as we increase batches
+
+# check max date times on each day
+df %>% 
+  mutate(date = date(StartDate_clean)) %>% 
+  group_by(date) %>% 
+  summarize(max_date_time = max(StartDate_clean))
+```
+
+    ## # A tibble: 5 × 2
+    ##   date       max_date_time      
+    ##   <date>     <dttm>             
+    ## 1 2023-12-26 2023-12-26 18:45:16
+    ## 2 2023-12-27 2023-12-27 16:49:41
+    ## 3 2023-12-30 2023-12-30 11:00:19
+    ## 4 2024-01-02 2024-01-02 15:04:43
+    ## 5 2024-01-03 2024-01-03 12:36:24
+
+``` r
 df <- df %>%
   # drop data collected incorrectly
   filter(StartDate_clean <= ymd_hms("2023-12-27-16-54-00") | StartDate_clean >= ymd_hms("2024-01-03-00-00-00")) %>%
@@ -163,7 +181,8 @@ df <- df %>%
       TRUE ~ NA_character_
     )
   ) %>% 
-  verify(!is.na(batch_id)) 
+  verify(!is.na(batch_id)) %>% 
+  verify(!is.na(batch_type))
 
 df %>%
   group_by(batch_id, batch_type) %>%

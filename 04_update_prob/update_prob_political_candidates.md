@@ -53,7 +53,7 @@ current_batch_num <- df_clean %>%
 print(str_c("Current batch number:", current_batch_num))
 ```
 
-    ## [1] "Current batch number:0"
+    ## [1] "Current batch number:1"
 
 # Update treatment probabilities
 
@@ -69,7 +69,7 @@ num_outcome0 <- integer(num_contexts)
 print(str_glue("Number of rows in data: {nrow(df_clean)}"))
 ```
 
-    ## Number of rows in data: 716
+    ## Number of rows in data: 816
 
 ``` r
 # filter for correct batch types (whether max discriminatory or min)
@@ -86,20 +86,20 @@ if (current_batch_num != max(df_clean$batch_id)) {
 print(str_glue("Current batch ID: {current_batch_num}"))
 ```
 
-    ## Current batch ID: 0
+    ## Current batch ID: 1
 
 ``` r
 print(str_glue("Number of rows left in data: {nrow(df_clean)}"))
 ```
 
-    ## Number of rows left in data: 317
+    ## Number of rows left in data: 417
 
 ``` r
 set.seed(2023)
 nrow(df_clean)
 ```
 
-    ## [1] 317
+    ## [1] 417
 
 ``` r
 # generate prob of most (or least) discriminatory context
@@ -112,21 +112,21 @@ output <- update_ts(df_clean, num_sim, num_contexts, num_outcome1,
 
     ## [1] 1e+06
     ## [1] "Predicting the least discriminatory context: taking the argmin"
-    ## [1] "PDF: 0.110631,0.035259,0.19992,0.392076,0.00981,0.033119,0.200866,0.018319"
-    ## [1] "CDF: 0.110631,0.14589,0.34581,0.737886,0.747696,0.780815,0.981681,1"
+    ## [1] "PDF: 0.355132,0.115703,0.141419,0.029393,0.066625,0.112698,0.128137,0.050893"
+    ## [1] "CDF: 0.355132,0.470835,0.612254,0.641647,0.708272,0.82097,0.949107,1"
 
 ``` r
 output
 ```
 
     ## $pi
-    ## [1] 0.110631 0.145890 0.345810 0.737886 0.747696 0.780815 0.981681 1.000000
+    ## [1] 0.355132 0.470835 0.612254 0.641647 0.708272 0.820970 0.949107 1.000000
     ## 
     ## $num_outcome1
-    ## [1] 24 30 28 18 40 32 25 35
+    ## [1] 30 31 42 55 40 33 41 36
     ## 
     ## $num_outcome0
-    ## [1]  9  9 14 10 11 10 12 10
+    ## [1] 14 10 17 18 13 11 16 10
 
 ``` r
 # check total is equal to number of observations in data
@@ -157,13 +157,13 @@ modified_flow_data <- update_flow_with_probabilities(
 )
 ```
 
-    ## For pi1, replacing old probability 0.071 with new probability 0.111
-    ## For pi2, replacing old probability 0.241 with new probability 0.146
-    ## For pi3, replacing old probability 0.264 with new probability 0.346
-    ## For pi4, replacing old probability 0.277 with new probability 0.738
-    ## For pi5, replacing old probability 0.579 with new probability 0.748
-    ## For pi6, replacing old probability 0.741 with new probability 0.781
-    ## For pi7, replacing old probability 0.768 with new probability 0.982
+    ## For pi1, replacing old probability 0.111 with new probability 0.355
+    ## For pi2, replacing old probability 0.146 with new probability 0.471
+    ## For pi3, replacing old probability 0.346 with new probability 0.612
+    ## For pi4, replacing old probability 0.738 with new probability 0.642
+    ## For pi5, replacing old probability 0.748 with new probability 0.708
+    ## For pi6, replacing old probability 0.781 with new probability 0.821
+    ## For pi7, replacing old probability 0.982 with new probability 0.949
 
 ``` r
 # Reconstruct the full survey configuration with the modified flow part
@@ -188,7 +188,7 @@ print(update_response)
     ## [1] "200 - OK"
     ## 
     ## $meta$requestId
-    ## [1] "582389be-cef7-4d6c-a489-792ec1f8d2e7"
+    ## [1] "2a988fc5-44d1-4a5f-9b72-6fdd73cc8afa"
 
 ``` r
 tibble(
