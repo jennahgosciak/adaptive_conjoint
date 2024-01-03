@@ -71,7 +71,7 @@ print(str_glue("Number of rows left in data: {nrow(df_clean)}"))
 
 ```{r, message=F, warning=T}
 set.seed(2023)
-
+nrow(df_clean)
 # generate prob of most (or least) discriminatory context
 output <- update_ts(df_clean, num_sim, num_contexts, num_outcome1,
   num_outcome0,

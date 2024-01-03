@@ -25,7 +25,7 @@ probabilities <- read_csv("../02_output/probabilities.csv")
 probabilities
 ```
 
-    ## # A tibble: 42 × 4
+    ## # A tibble: 49 × 4
     ##    Batch `Embedded data variable` CDF_Threshold `Batch Type`              
     ##    <dbl> <chr>                            <dbl> <chr>                     
     ##  1     0 pi1                              0.125 Warmup                    
@@ -38,7 +38,7 @@ probabilities
     ##  8     1 pi1                              0.071 Iterative Batch Phase: Max
     ##  9     1 pi2                              0.241 Iterative Batch Phase: Max
     ## 10     1 pi3                              0.264 Iterative Batch Phase: Max
-    ## # ℹ 32 more rows
+    ## # ℹ 39 more rows
 
 ``` r
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
@@ -55,7 +55,7 @@ current_batch_type <- "Iterative Batch Phase: Min"
 df <- load_qualtrics(survey_name)
 ```
 
-    ##   |                                                                              |                                                                      |   0%  |                                                                              |===================================================================   |  96%  |                                                                              |======================================================================| 100%
+    ##   |                                                                              |                                                                      |   0%  |                                                                              |============                                                          |  17%  |                                                                              |===========================================                           |  61%  |                                                                              |=============================================================         |  87%  |                                                                              |===================================================================   |  96%  |                                                                              |======================================================================| 100%
 
     ## 
     ## ── Column specification ────────────────────────────────────────────────────────
@@ -207,21 +207,21 @@ df %>%
   check_pi_vars(probabilities, 7)
 ```
 
-    ## # A tibble: 35 × 6
-    ##    batch_id batch_type  Embedded data variab…¹ CDF_Data CDF_Threshold Comparison
-    ##       <dbl> <chr>       <chr>                     <dbl>         <dbl> <lgl>     
-    ##  1        0 Warmup      pi1                       0.125         0.125 TRUE      
-    ##  2        0 Warmup      pi2                       0.25          0.25  TRUE      
-    ##  3        0 Warmup      pi3                       0.375         0.375 TRUE      
-    ##  4        0 Warmup      pi4                       0.5           0.5   TRUE      
-    ##  5        0 Warmup      pi5                       0.625         0.625 TRUE      
-    ##  6        0 Warmup      pi6                       0.75          0.75  TRUE      
-    ##  7        0 Warmup      pi7                       0.875         0.875 TRUE      
-    ##  8        1 Iterative … pi1                       0.071         0.071 TRUE      
-    ##  9        1 Iterative … pi2                       0.241         0.241 TRUE      
-    ## 10        1 Iterative … pi3                       0.264         0.264 TRUE      
-    ## # ℹ 25 more rows
-    ## # ℹ abbreviated name: ¹​`Embedded data variable`
+``` r
+# check distinct probabilities based on embedded data
+df %>% 
+  select(batch_id, str_c("pi", 1:7)) %>% 
+  distinct()
+```
+
+    ## # A tibble: 5 × 8
+    ##   batch_id   pi1   pi2   pi3   pi4   pi5   pi6   pi7
+    ##      <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+    ## 1        0 0.125 0.25  0.375 0.5   0.625 0.75  0.875
+    ## 2        1 0.071 0.241 0.264 0.277 0.579 0.741 0.768
+    ## 3        2 0.023 0.176 0.186 0.199 0.845 0.94  0.955
+    ## 4        3 0.028 0.073 0.078 0.094 0.813 0.925 0.94 
+    ## 5        4 0.035 0.102 0.108 0.12  0.856 0.901 0.916
 
 ``` r
 # check consent means their responses are missing
@@ -355,7 +355,7 @@ df %>%
     ## `summarise()` has grouped output by 'context', 'batch_type'. You can override
     ## using the `.groups` argument.
 
-![](get_qualtrics_data_political_candidates_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](get_qualtrics_data_political_candidates_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 df %>%
@@ -375,7 +375,7 @@ df %>%
     ## `summarise()` has grouped output by 'context', 'batch_type'. You can override
     ## using the `.groups` argument.
 
-![](get_qualtrics_data_political_candidates_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->
+![](get_qualtrics_data_political_candidates_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->
 
 ``` r
 df %>%
@@ -395,7 +395,7 @@ df %>%
     ## `summarise()` has grouped output by 'context', 'batch_type'. You can override
     ## using the `.groups` argument.
 
-![](get_qualtrics_data_political_candidates_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](get_qualtrics_data_political_candidates_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 ``` r
 df %>%
@@ -415,7 +415,7 @@ df %>%
     ## `summarise()` has grouped output by 'context', 'batch_type'. You can override
     ## using the `.groups` argument.
 
-![](get_qualtrics_data_political_candidates_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
+![](get_qualtrics_data_political_candidates_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
 
 ``` r
 df  %>%
@@ -433,7 +433,7 @@ df  %>%
 
     ## Adding missing grouping variables: `batch_id`, `batch_type`
 
-![](get_qualtrics_data_political_candidates_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](get_qualtrics_data_political_candidates_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ``` r
 df  %>%
@@ -453,7 +453,7 @@ df  %>%
 
     ## Adding missing grouping variables: `batch_id`, `batch_type`
 
-![](get_qualtrics_data_political_candidates_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->
+![](get_qualtrics_data_political_candidates_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
 
 ## Clean Qualtrics Data
 

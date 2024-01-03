@@ -127,6 +127,13 @@ df %>%
 ```
 
 ```{r}
+# check distinct probabilities based on embedded data
+df %>% 
+  select(batch_id, str_c("pi", 1:7)) %>% 
+  distinct()
+```
+
+```{r}
 # check consent means their responses are missing
 # df %>%
 #   filter(Consent == "I do not consent to participate")
@@ -170,7 +177,9 @@ df %>%
 df %>%
   group_by(batch_id, batch_type) %>%
   summarize(n = n())
+```
 
+```{r}
 # check ID is unique again
 if (length(unique(df$`Prolific ID Q`)) != nrow(df)) {
   print("ID is not unique")

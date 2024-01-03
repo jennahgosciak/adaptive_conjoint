@@ -23,7 +23,7 @@ probabilities <- read_csv("../02_output/probabilities.csv")
 probabilities
 ```
 
-    ## # A tibble: 42 × 4
+    ## # A tibble: 49 × 4
     ##    Batch `Embedded data variable` CDF_Threshold `Batch Type`              
     ##    <dbl> <chr>                            <dbl> <chr>                     
     ##  1     0 pi1                              0.125 Warmup                    
@@ -36,7 +36,7 @@ probabilities
     ##  8     1 pi1                              0.071 Iterative Batch Phase: Max
     ##  9     1 pi2                              0.241 Iterative Batch Phase: Max
     ## 10     1 pi3                              0.264 Iterative Batch Phase: Max
-    ## # ℹ 32 more rows
+    ## # ℹ 39 more rows
 
 ``` r
 df_clean <- readRDS("../02_output/political_candidates_data_clean.RDS")
@@ -78,7 +78,7 @@ df_clean <- df_clean %>%
 
 # if we want to filter for less data (e.g., just the warmup data)
 if (current_batch_num != max(df_clean$batch_id)) {
-  print(str_glue("\nFiltering data for batch id <= {current_batch_num} and batch types 'Warmup' or '{batch_type}'"))
+  print(str_glue("\nFiltering data for batch id <= {current_batch_num} and batch types 'Warmup' or '{current_batch_type}'"))
   df_clean <- df_clean %>%
     filter(batch_id <= current_batch_num)
 }
@@ -96,7 +96,12 @@ print(str_glue("Number of rows left in data: {nrow(df_clean)}"))
 
 ``` r
 set.seed(2023)
+nrow(df_clean)
+```
 
+    ## [1] 317
+
+``` r
 # generate prob of most (or least) discriminatory context
 output <- update_ts(df_clean, num_sim, num_contexts, num_outcome1,
   num_outcome0,
@@ -152,13 +157,13 @@ modified_flow_data <- update_flow_with_probabilities(
 )
 ```
 
-    ## For pi1, replacing old probability 0.111 with new probability 0.111
-    ## For pi2, replacing old probability 0.146 with new probability 0.146
-    ## For pi3, replacing old probability 0.346 with new probability 0.346
-    ## For pi4, replacing old probability 0.738 with new probability 0.738
-    ## For pi5, replacing old probability 0.748 with new probability 0.748
-    ## For pi6, replacing old probability 0.781 with new probability 0.781
-    ## For pi7, replacing old probability 0.982 with new probability 0.982
+    ## For pi1, replacing old probability 0.071 with new probability 0.111
+    ## For pi2, replacing old probability 0.241 with new probability 0.146
+    ## For pi3, replacing old probability 0.264 with new probability 0.346
+    ## For pi4, replacing old probability 0.277 with new probability 0.738
+    ## For pi5, replacing old probability 0.579 with new probability 0.748
+    ## For pi6, replacing old probability 0.741 with new probability 0.781
+    ## For pi7, replacing old probability 0.768 with new probability 0.982
 
 ``` r
 # Reconstruct the full survey configuration with the modified flow part
@@ -183,7 +188,7 @@ print(update_response)
     ## [1] "200 - OK"
     ## 
     ## $meta$requestId
-    ## [1] "c5f1f082-c150-430e-ba19-448922187493"
+    ## [1] "582389be-cef7-4d6c-a489-792ec1f8d2e7"
 
 ``` r
 tibble(
