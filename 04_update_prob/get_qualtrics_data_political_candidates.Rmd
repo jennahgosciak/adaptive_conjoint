@@ -99,6 +99,7 @@ df <- df %>%
       StartDate_clean <= ymd_hms("2024-01-03-12-43-00") ~ 1,
       StartDate_clean <= ymd_hms("2024-01-03-16-32-00") ~ 2,
       StartDate_clean <= ymd_hms("2024-01-03-17-02-00") ~ 3,
+      StartDate_clean <= ymd_hms("2024-01-03-17-21-00") ~ 4,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
