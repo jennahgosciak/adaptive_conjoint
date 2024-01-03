@@ -43,8 +43,6 @@ probabilities
 ``` r
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
 survey_name <- "Political Candidates"
-current_batch_num <- 1 # numeric value for updating the batch number
-current_batch_type <- "Iterative Batch Phase: Min"
 
 # can comment out after running once
 # qualtrics_api_credentials(api_key = config$api_key,
@@ -55,7 +53,7 @@ current_batch_type <- "Iterative Batch Phase: Min"
 df <- load_qualtrics(survey_name)
 ```
 
-    ##   |                                                                              |                                                                      |   0%  |                                                                              |===========                                                           |  16%  |                                                                              |=======================================                               |  56%  |                                                                              |===================================================================   |  96%  |                                                                              |======================================================================| 100%
+    ##   |                                                                              |                                                                      |   0%  |                                                                              |======                                                                |   8%  |                                                                              |===========                                                           |  16%  |                                                                              |=================                                                     |  24%  |                                                                              |==============================================================        |  88%  |                                                                              |===================================================================   |  96%  |                                                                              |======================================================================| 100%
 
     ## 
     ## ── Column specification ────────────────────────────────────────────────────────
@@ -90,7 +88,7 @@ df %>%
   nrow()
 ```
 
-    ## [1] 1247
+    ## [1] 1252
 
 ``` r
 # drop test data
@@ -103,21 +101,21 @@ df %>%
   nrow()
 ```
 
-    ## [1] 1124
+    ## [1] 1129
 
 ``` r
 # average finished rate
 mean(df$Finished)
 ```
 
-    ## [1] 0.9982206
+    ## [1] 0.9937998
 
 ``` r
 # average time to complete
 mean(df$`Duration (in seconds)`)
 ```
 
-    ## [1] 96.61655
+    ## [1] 96.74668
 
 ``` r
 # compare amount of time spent
@@ -180,10 +178,10 @@ df %>%
     ##   batch_id batch_type                     n
     ##      <dbl> <chr>                      <int>
     ## 1        0 Warmup                       323
-    ## 2        1 Iterative Batch Phase: Max    99
+    ## 2        1 Iterative Batch Phase: Max   102
     ## 3        1 Iterative Batch Phase: Min   101
     ## 4        2 Iterative Batch Phase: Max   100
-    ## 5        3 Iterative Batch Phase: Max   100
+    ## 5        3 Iterative Batch Phase: Max   102
     ## 6        4 Iterative Batch Phase: Max   100
 
 ## Survey Validation
@@ -228,9 +226,18 @@ df %>%
 
 ``` r
 # check consent means their responses are missing
-# df %>%
-#   filter(Consent == "I do not consent to participate")
+df %>%
+  filter(Consent == "I do not consent to participate") %>% 
+    select(Consent, `Duration (in seconds)`, Finished, batch_id, batch_type)
+```
 
+    ## # A tibble: 1 × 5
+    ##   Consent                    Duration (in seconds…¹ Finished batch_id batch_type
+    ##   <ord>                                       <dbl> <lgl>       <dbl> <chr>     
+    ## 1 I do not consent to parti…                     65 TRUE            0 Warmup    
+    ## # ℹ abbreviated name: ¹​`Duration (in seconds)`
+
+``` r
 df <- df %>%
   check_consent()
 ```
@@ -240,7 +247,7 @@ df <- df %>%
     ## Warning in check_consent(.): 1 survey respondents who do not consent with
     ## non-missing responses
 
-    ## Warning in check_consent(.): 822 respondents in the data
+    ## Warning in check_consent(.): 827 respondents in the data
 
 ``` r
 # check that all completed
@@ -248,7 +255,7 @@ df <- df %>%
   check_completion()
 ```
 
-    ## Warning in check_completion(.): Dropping 2 survey respondents who did not
+    ## Warning in check_completion(.): Dropping 7 survey respondents who did not
     ## finish
 
     ## Warning in check_completion(.): 820 respondents in the data
@@ -260,12 +267,33 @@ df <- df %>%
 
 ``` r
 # visually assessing why these respondents failed the commitment check
-# df %>%
-#   filter(Commitment_Q1 != "Yes, I will")
-# 
-# df %>%
-#   filter(str_to_lower(Commitment_Q2) != "purple")
+df %>%
+  filter(Commitment_Q1 != "Yes, I will") %>% 
+    select(Commitment_Q1, Commitment_Q2, `Duration (in seconds)`, Finished, batch_id, batch_type)
+```
 
+    ## # A tibble: 1 × 6
+    ##   Commitment_Q1           Commitment_Q2 Duration (in seconds…¹ Finished batch_id
+    ##   <ord>                   <chr>                          <dbl> <lgl>       <dbl>
+    ## 1 I can't promise either… purple                            88 TRUE            0
+    ## # ℹ abbreviated name: ¹​`Duration (in seconds)`
+    ## # ℹ 1 more variable: batch_type <chr>
+
+``` r
+df %>%
+  filter(str_to_lower(Commitment_Q2) != "purple") %>% 
+    select(Commitment_Q1, Commitment_Q2, `Duration (in seconds)`, Finished, batch_id, batch_type)
+```
+
+    ## # A tibble: 2 × 6
+    ##   Commitment_Q1 Commitment_Q2           Duration (in seconds…¹ Finished batch_id
+    ##   <ord>         <chr>                                    <dbl> <lgl>       <dbl>
+    ## 1 Yes, I will   6459b8128544c7f22edba1…                     99 TRUE            0
+    ## 2 Yes, I will   pur                                         63 TRUE            0
+    ## # ℹ abbreviated name: ¹​`Duration (in seconds)`
+    ## # ℹ 1 more variable: batch_type <chr>
+
+``` r
 df <- df %>%
   check_commitment()
 ```
@@ -279,6 +307,38 @@ df <- df %>%
     ## commitment check 2
 
     ## Warning in check_commitment(.): 817 respondents in the data
+
+``` r
+# check ID is unique again
+if (length(unique(df$`Prolific ID Q`)) != nrow(df)) {
+  warning("ID is not unique")
+  print(str_glue("Number of rows in data: {nrow(df)}"))
+  df <- df %>% 
+    group_by(`Prolific ID Q`) %>% 
+    arrange(`Prolific ID Q`, StartDate_clean) %>% 
+    mutate(flag_first_obs = if_else(row_number() == 1, 1, 0)) %>% 
+    ungroup()
+  
+  df %>% 
+    group_by(`Prolific ID Q`) %>% 
+    mutate(n = n()) %>% 
+    arrange(desc(n), StartDate_clean) %>% 
+    ungroup() %>% 
+    select(n, StartDate_clean, EndDate, flag_first_obs, `Duration (in seconds)`, Finished, batch_id, batch_type)
+  
+  df <- df %>% 
+    filter(flag_first_obs == 1)
+  
+  print(str_glue("Number of rows in data after dropping duplicate ID: {nrow(df)}"))
+}
+```
+
+    ## Warning: ID is not unique
+
+    ## Number of rows in data: 817
+    ## Number of rows in data after dropping duplicate ID: 816
+
+## Create Context and Context Label Variables
 
 ``` r
 # create context variable
@@ -324,19 +384,10 @@ df %>%
     ##      <dbl> <chr>                      <int>
     ## 1        0 Warmup                       317
     ## 2        1 Iterative Batch Phase: Max    99
-    ## 3        1 Iterative Batch Phase: Min   101
+    ## 3        1 Iterative Batch Phase: Min   100
     ## 4        2 Iterative Batch Phase: Max   100
     ## 5        3 Iterative Batch Phase: Max   100
     ## 6        4 Iterative Batch Phase: Max   100
-
-``` r
-# check ID is unique again
-if (length(unique(df$`Prolific ID Q`)) != nrow(df)) {
-  print("ID is not unique")
-}
-```
-
-    ## [1] "ID is not unique"
 
 ``` r
 df %>%
@@ -467,20 +518,20 @@ df_clean %>%
   verify(!is.na(chose_younger))
 ```
 
-    ## # A tibble: 817 × 10
+    ## # A tibble: 816 × 10
     ##    chose_younger    Q1    Q2    Q3    Q4    Q5    Q6    Q7    Q8 context
     ##            <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <ord>  
-    ##  1             1    NA    NA    NA     1    NA    NA    NA    NA 6      
-    ##  2             1     1    NA    NA    NA    NA    NA    NA    NA 2      
-    ##  3             1    NA    NA    NA    NA    NA    NA     1    NA 3      
-    ##  4             1    NA    NA    NA    NA    NA    NA    NA     1 2      
-    ##  5             0    NA    NA    NA    NA    NA     0    NA    NA 1      
-    ##  6             1    NA    NA     1    NA    NA    NA    NA    NA 2      
-    ##  7             1    NA    NA    NA    NA    NA    NA     1    NA 5      
-    ##  8             1    NA    NA    NA     1    NA    NA    NA    NA 5      
-    ##  9             0    NA     0    NA    NA    NA    NA    NA    NA 6      
-    ## 10             1    NA     1    NA    NA    NA    NA    NA    NA 5      
-    ## # ℹ 807 more rows
+    ##  1             1    NA    NA    NA    NA     1    NA    NA    NA 5      
+    ##  2             1    NA    NA    NA    NA    NA    NA    NA     1 2      
+    ##  3             1    NA    NA    NA    NA    NA     1    NA    NA 8      
+    ##  4             0    NA    NA    NA    NA    NA    NA    NA     0 6      
+    ##  5             1    NA    NA    NA    NA    NA    NA    NA     1 2      
+    ##  6             1    NA    NA    NA    NA     1    NA    NA    NA 6      
+    ##  7             1    NA     1    NA    NA    NA    NA    NA    NA 7      
+    ##  8             1    NA    NA    NA    NA    NA     1    NA    NA 2      
+    ##  9             1    NA     1    NA    NA    NA    NA    NA    NA 4      
+    ## 10             0    NA    NA    NA    NA    NA    NA     0    NA 5      
+    ## # ℹ 806 more rows
 
 ``` r
 df_clean %>%
@@ -497,7 +548,7 @@ df_clean %>%
     ##   <ord>   <int> <dbl> <int>
     ## 1 1          56    39    17
     ## 2 2          81    58    23
-    ## 3 3          65    46    19
+    ## 3 3          64    46    18
     ## 4 4          82    63    19
     ## 5 5         304   238    66
     ## 6 6          76    55    21
@@ -534,7 +585,7 @@ df_clean %>%
     ## # A tibble: 1 × 1
     ##   per_pass_attention_check
     ##                      <dbl>
-    ## 1                    0.965
+    ## 1                    0.964
 
 ``` r
 df_clean <- df_clean %>%
@@ -571,13 +622,13 @@ df_clean %>%
     ## # A tibble: 8 × 3
     ##   race                                  n     per
     ##   <chr>                             <int>   <dbl>
-    ## 1 White                               583 0.714  
+    ## 1 White                               582 0.713  
     ## 2 Asian                                82 0.100  
-    ## 3 Black or African American            79 0.0967 
+    ## 3 Black or African American            79 0.0968 
     ## 4 Multiracial                          44 0.0539 
     ## 5 Other                                17 0.0208 
-    ## 6 American Indian or Alaskan Native     5 0.00612
-    ## 7 Prefer not to disclose                5 0.00612
+    ## 6 American Indian or Alaskan Native     5 0.00613
+    ## 7 Prefer not to disclose                5 0.00613
     ## 8 Native Hawaiian                       2 0.00245
 
 ``` r
@@ -588,7 +639,7 @@ df_clean %>%
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-    ## Warning: Removed 7 rows containing non-finite values (`stat_bin()`).
+    ## Warning: Removed 6 rows containing non-finite values (`stat_bin()`).
 
 ![](get_qualtrics_data_political_candidates_files/figure-gfm/demog-1.png)<!-- -->
 
@@ -602,7 +653,7 @@ df_clean %>%
     ##   female count
     ##   <lgl>  <int>
     ## 1 FALSE    443
-    ## 2 TRUE     374
+    ## 2 TRUE     373
 
 ``` r
 df_clean %>%
@@ -615,7 +666,7 @@ df_clean %>%
     ## # A tibble: 1 × 2
     ##   count_hispanic per_hispanic
     ##            <int>        <dbl>
-    ## 1             79       0.0967
+    ## 1             79       0.0968
 
 ## Clean Data Validation
 

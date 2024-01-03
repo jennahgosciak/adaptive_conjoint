@@ -33,8 +33,6 @@ probabilities
 ```{r, setup qualtrics}
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
 survey_name <- "Political Candidates"
-current_batch_num <- 1 # numeric value for updating the batch number
-current_batch_type <- "Iterative Batch Phase: Min"
 
 # can comment out after running once
 # qualtrics_api_credentials(api_key = config$api_key,
@@ -81,6 +79,13 @@ df %>%
 ```{r}
 # hardcoding this because it should not be changing each time
 # we should only update it as we increase batches
+
+# check max date times on each day
+df %>% 
+  mutate(date = date(StartDate_clean)) %>% 
+  group_by(date) %>% 
+  summarize(max_date_time = max(StartDate_clean))
+
 df <- df %>%
   # drop data collected incorrectly
   filter(StartDate_clean <= ymd_hms("2023-12-27-16-54-00") | StartDate_clean >= ymd_hms("2024-01-03-00-00-00")) %>%
@@ -101,7 +106,8 @@ df <- df %>%
       TRUE ~ NA_character_
     )
   ) %>% 
-  verify(!is.na(batch_id)) 
+  verify(!is.na(batch_id)) %>% 
+  verify(!is.na(batch_type))
 
 df %>%
   group_by(batch_id, batch_type) %>%
@@ -136,8 +142,9 @@ df %>%
 
 ```{r}
 # check consent means their responses are missing
-# df %>%
-#   filter(Consent == "I do not consent to participate")
+df %>%
+  filter(Consent == "I do not consent to participate") %>% 
+    select(Consent, `Duration (in seconds)`, Finished, batch_id, batch_type)
 
 df <- df %>%
   check_consent()
@@ -156,15 +163,44 @@ df <- df %>%
 
 ```{r}
 # visually assessing why these respondents failed the commitment check
-# df %>%
-#   filter(Commitment_Q1 != "Yes, I will")
-# 
-# df %>%
-#   filter(str_to_lower(Commitment_Q2) != "purple")
+df %>%
+  filter(Commitment_Q1 != "Yes, I will") %>% 
+    select(Commitment_Q1, Commitment_Q2, `Duration (in seconds)`, Finished, batch_id, batch_type)
+  
+
+df %>%
+  filter(str_to_lower(Commitment_Q2) != "purple") %>% 
+    select(Commitment_Q1, Commitment_Q2, `Duration (in seconds)`, Finished, batch_id, batch_type)
 
 df <- df %>%
   check_commitment()
 ```
+
+```{r}
+# check ID is unique again
+if (length(unique(df$`Prolific ID Q`)) != nrow(df)) {
+  warning("ID is not unique")
+  print(str_glue("Number of rows in data: {nrow(df)}"))
+  df <- df %>% 
+    group_by(`Prolific ID Q`) %>% 
+    arrange(`Prolific ID Q`, StartDate_clean) %>% 
+    mutate(flag_first_obs = if_else(row_number() == 1, 1, 0)) %>% 
+    ungroup()
+  
+  df %>% 
+    group_by(`Prolific ID Q`) %>% 
+    mutate(n = n()) %>% 
+    arrange(desc(n), StartDate_clean) %>% 
+    ungroup() %>% 
+    select(n, StartDate_clean, EndDate, flag_first_obs, `Duration (in seconds)`, Finished, batch_id, batch_type)
+  
+  df <- df %>% 
+    filter(flag_first_obs == 1)
+  
+  print(str_glue("Number of rows in data after dropping duplicate ID: {nrow(df)}"))
+}
+```
+## Create Context and Context Label Variables
 
 ```{r}
 # create context variable
@@ -178,13 +214,6 @@ df %>%
 df %>%
   group_by(batch_id, batch_type) %>%
   summarize(n = n())
-```
-
-```{r}
-# check ID is unique again
-if (length(unique(df$`Prolific ID Q`)) != nrow(df)) {
-  print("ID is not unique")
-}
 ```
 
 ```{r}
