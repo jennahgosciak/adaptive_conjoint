@@ -23,7 +23,7 @@ probabilities <- read_csv("../02_output/probabilities.csv")
 probabilities
 ```
 
-    ## # A tibble: 49 × 4
+    ## # A tibble: 56 × 4
     ##    Batch `Embedded data variable` CDF_Threshold `Batch Type`              
     ##    <dbl> <chr>                            <dbl> <chr>                     
     ##  1     0 pi1                              0.125 Warmup                    
@@ -36,7 +36,7 @@ probabilities
     ##  8     1 pi1                              0.071 Iterative Batch Phase: Max
     ##  9     1 pi2                              0.241 Iterative Batch Phase: Max
     ## 10     1 pi3                              0.264 Iterative Batch Phase: Max
-    ## # ℹ 39 more rows
+    ## # ℹ 46 more rows
 
 ``` r
 df_clean <- readRDS("../02_output/political_candidates_data_clean.RDS")
@@ -157,13 +157,13 @@ modified_flow_data <- update_flow_with_probabilities(
 )
 ```
 
-    ## For pi1, replacing old probability 0.111 with new probability 0.355
-    ## For pi2, replacing old probability 0.146 with new probability 0.471
-    ## For pi3, replacing old probability 0.346 with new probability 0.612
-    ## For pi4, replacing old probability 0.738 with new probability 0.642
-    ## For pi5, replacing old probability 0.748 with new probability 0.708
-    ## For pi6, replacing old probability 0.781 with new probability 0.821
-    ## For pi7, replacing old probability 0.982 with new probability 0.949
+    ## For pi1, replacing old probability 0.355 with new probability 0.355
+    ## For pi2, replacing old probability 0.471 with new probability 0.471
+    ## For pi3, replacing old probability 0.612 with new probability 0.612
+    ## For pi4, replacing old probability 0.642 with new probability 0.642
+    ## For pi5, replacing old probability 0.708 with new probability 0.708
+    ## For pi6, replacing old probability 0.821 with new probability 0.821
+    ## For pi7, replacing old probability 0.949 with new probability 0.949
 
 ``` r
 # Reconstruct the full survey configuration with the modified flow part
@@ -188,7 +188,7 @@ print(update_response)
     ## [1] "200 - OK"
     ## 
     ## $meta$requestId
-    ## [1] "2a988fc5-44d1-4a5f-9b72-6fdd73cc8afa"
+    ## [1] "d96278ba-2272-4747-b20e-c56e53506e08"
 
 ``` r
 tibble(
@@ -200,6 +200,8 @@ tibble(
   bind_rows(probabilities %>%
     # drop if previously updated with same batch number
     filter(!(Batch == (current_batch_num + 1) & `Batch Type` == current_batch_type))) %>%
-  arrange(Batch, `Batch Type`) %>%
+  mutate(`Batch Type` = factor(`Batch Type`, levels = c("Warmup", "Iterative Batch Phase: Max", "Iterative Batch Phase: Min"),
+                               ordered = TRUE)) %>% 
+  arrange(`Batch Type`, Batch) %>%
   write_csv("../02_output/probabilities.csv")
 ```
