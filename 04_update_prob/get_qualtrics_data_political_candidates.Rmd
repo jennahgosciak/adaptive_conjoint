@@ -82,6 +82,8 @@ df %>%
 # hardcoding this because it should not be changing each time
 # we should only update it as we increase batches
 df <- df %>%
+  # drop data collected incorrectly
+  filter(StartDate_clean <= ymd_hms("2023-12-27-16-54-00") | StartDate_clean >= ymd_hms("2024-01-03-00-00-00")) %>%
   mutate(
     batch_id = case_when(
       StartDate_clean <= ymd_hms("2023-12-26-18-48-00") ~ 0,
@@ -89,6 +91,7 @@ df <- df %>%
       StartDate_clean <= ymd_hms("2023-12-27-14-47-00") ~ 2,
       StartDate_clean <= ymd_hms("2023-12-27-15-33-00") ~ 3,
       StartDate_clean <= ymd_hms("2023-12-27-16-54-00") ~ 4,
+      StartDate_clean <= ymd_hms("2024-01-03-12-43-00") ~ 1,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
@@ -97,9 +100,7 @@ df <- df %>%
       StartDate_clean > ymd_hms("2023-12-27-16-54-00") ~ "Iterative Batch Phase: Min",
       TRUE ~ NA_character_
     )
-  ) %>%
-  # drop data collected incorrectly
-  filter(StartDate_clean <= ymd_hms("2023-12-27-16-54-00") | StartDate_clean >= ymd_hms("2024-01-03-00-00-00")) %>% 
+  ) %>% 
   verify(!is.na(batch_id)) 
 
 df %>%

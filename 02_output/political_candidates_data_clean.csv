@@ -715,3 +715,104 @@ context,context_label,batch_id,batch_type,chose_younger,race,age,female,hispanic
 5,black_male_high,4,Iterative Batch Phase: Max,1,Multiracial,27,FALSE,FALSE
 5,black_male_high,4,Iterative Batch Phase: Max,0,Black or African American,28,FALSE,FALSE
 8,white_male_low,4,Iterative Batch Phase: Max,0,Black or African American,20,FALSE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,1,White,45,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,Asian,21,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,30,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,39,FALSE,FALSE
+6,black_male_low,1,Iterative Batch Phase: Min,0,White,44,TRUE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,1,White,34,TRUE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,0,Asian,35,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,0,White,32,FALSE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,1,White,30,TRUE,FALSE
+1,white_female_high,1,Iterative Batch Phase: Min,0,White,31,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,0,White,28,FALSE,TRUE
+7,white_male_high,1,Iterative Batch Phase: Min,1,White,27,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,32,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,0,White,28,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,Black or African American,26,TRUE,FALSE
+1,white_female_high,1,Iterative Batch Phase: Min,0,White,37,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,27,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,40,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,37,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,Black or African American,33,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,0,White,55,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,56,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,43,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,25,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,30,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,29,TRUE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,1,White,24,TRUE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,1,White,57,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,42,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,47,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,34,FALSE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,1,Asian,44,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,30,FALSE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,1,White,22,FALSE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,0,White,25,TRUE,TRUE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,33,TRUE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,0,White,71,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,Asian,31,FALSE,FALSE
+1,white_female_high,1,Iterative Batch Phase: Min,1,White,22,FALSE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,1,Asian,46,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,39,TRUE,TRUE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,38,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,45,FALSE,FALSE
+1,white_female_high,1,Iterative Batch Phase: Min,0,White,26,FALSE,TRUE
+1,white_female_high,1,Iterative Batch Phase: Min,1,White,35,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,51,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,0,White,57,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,52,FALSE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,1,White,36,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,47,FALSE,FALSE
+8,white_male_low,1,Iterative Batch Phase: Min,1,White,61,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,48,FALSE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,1,Black or African American,25,FALSE,FALSE
+5,black_male_high,1,Iterative Batch Phase: Min,0,White,43,TRUE,FALSE
+6,black_male_low,1,Iterative Batch Phase: Min,1,White,42,FALSE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,0,White,36,FALSE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,1,White,46,TRUE,FALSE
+1,white_female_high,1,Iterative Batch Phase: Min,0,Asian,27,TRUE,FALSE
+1,white_female_high,1,Iterative Batch Phase: Min,0,White,68,FALSE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,1,White,36,FALSE,FALSE
+1,white_female_high,1,Iterative Batch Phase: Min,1,White,68,TRUE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,1,White,39,TRUE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,1,Multiracial,40,FALSE,FALSE
+2,white_female_low,1,Iterative Batch Phase: Min,0,White,48,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,42,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,0,White,66,TRUE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,1,White,38,TRUE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,1,White,31,FALSE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,1,White,39,TRUE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,1,White,55,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,0,White,NA,FALSE,FALSE
+2,white_female_low,1,Iterative Batch Phase: Min,1,Black or African American,32,TRUE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,0,White,70,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,26,FALSE,FALSE
+5,black_male_high,1,Iterative Batch Phase: Min,0,White,65,TRUE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,1,Multiracial,22,TRUE,FALSE
+1,white_female_high,1,Iterative Batch Phase: Min,1,Black or African American,42,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,Asian,57,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,33,TRUE,TRUE
+7,white_male_high,1,Iterative Batch Phase: Min,1,White,34,FALSE,TRUE
+3,black_female_high,1,Iterative Batch Phase: Min,0,White,42,FALSE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,1,White,45,FALSE,FALSE
+1,white_female_high,1,Iterative Batch Phase: Min,1,White,33,FALSE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,1,Multiracial,35,TRUE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,1,White,29,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,0,White,41,TRUE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,1,White,40,TRUE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,1,Black or African American,43,FALSE,FALSE
+1,white_female_high,1,Iterative Batch Phase: Min,1,Multiracial,26,TRUE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,0,Black or African American,23,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,Asian,28,FALSE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,1,Other,55,FALSE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,1,White,30,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,Black or African American,48,FALSE,FALSE
+7,white_male_high,1,Iterative Batch Phase: Min,1,Asian,32,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,45,TRUE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,0,White,NA,TRUE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,Black or African American,37,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,40,FALSE,FALSE
+3,black_female_high,1,Iterative Batch Phase: Min,1,Black or African American,53,FALSE,FALSE
+4,black_female_low,1,Iterative Batch Phase: Min,1,White,39,FALSE,TRUE
