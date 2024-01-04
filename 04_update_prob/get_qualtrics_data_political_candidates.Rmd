@@ -56,7 +56,6 @@ df <- df %>%
 df %>%
   nrow()
 ```
-
 ```{r}
 # average finished rate
 mean(df$Finished)
@@ -102,6 +101,7 @@ df <- df %>%
       StartDate_clean <= ymd_hms("2024-01-03-17-21-00") ~ 4,
       StartDate_clean <= ymd_hms("2024-01-03-18-05-00") ~ 5,
       StartDate_clean <= ymd_hms("2024-01-04-10-05-00") ~ 6,
+      StartDate_clean <= ymd_hms("2024-01-04-10-55-00") ~ 7,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
@@ -201,7 +201,8 @@ if (length(unique(df$`Prolific ID Q`)) != nrow(df)) {
     mutate(n = n()) %>% 
     arrange(desc(n), StartDate_clean) %>% 
     ungroup() %>% 
-    select(n, StartDate_clean, EndDate, flag_first_obs, `Duration (in seconds)`, Finished, batch_id, batch_type)
+    select(n, StartDate_clean, EndDate, flag_first_obs, `Duration (in seconds)`, Finished, batch_id, batch_type) %>% 
+    print()
   
   df <- df %>% 
     filter(flag_first_obs == 1)
@@ -315,10 +316,6 @@ df  %>%
 ```
 
 ## Clean Qualtrics Data
-```{r}
-df %>% 
-  filter(PROLIFIC_PID == '63fcfd81a075a45d1a821308')
-```
 
 ```{r}
 df_clean <- create_outcome_var_political(df)
