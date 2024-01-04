@@ -23,7 +23,7 @@ probabilities <- read_csv("../02_output/probabilities.csv")
 probabilities
 ```
 
-    ## # A tibble: 84 × 4
+    ## # A tibble: 91 × 4
     ##    Batch `Embedded data variable` CDF_Threshold `Batch Type`              
     ##    <dbl> <chr>                            <dbl> <chr>                     
     ##  1     0 pi1                              0.125 Warmup                    
@@ -36,7 +36,7 @@ probabilities
     ##  8     1 pi1                              0.071 Iterative Batch Phase: Max
     ##  9     1 pi2                              0.241 Iterative Batch Phase: Max
     ## 10     1 pi3                              0.264 Iterative Batch Phase: Max
-    ## # ℹ 74 more rows
+    ## # ℹ 81 more rows
 
 ``` r
 df_clean <- readRDS("../02_output/political_candidates_data_clean.RDS")
@@ -89,6 +89,12 @@ print(str_glue("Number of rows left in data: {nrow(df_clean)}"))
 ```
 
     ## Number of rows left in data: 918
+
+``` r
+print(str_glue("Only batch type in data: {str_c(unique(df_clean$batch_type), collapse=', ')}"))
+```
+
+    ## Only batch type in data: Warmup, Iterative Batch Phase: Min
 
 ``` r
 set.seed(2023)
@@ -153,13 +159,13 @@ modified_flow_data <- update_flow_with_probabilities(
 )
 ```
 
-    ## For pi1, replacing old probability 0.045 with new probability 0.022
-    ## For pi2, replacing old probability 0.123 with new probability 0.112
-    ## For pi3, replacing old probability 0.288 with new probability 0.218
-    ## For pi4, replacing old probability 0.392 with new probability 0.572
-    ## For pi5, replacing old probability 0.474 with new probability 0.637
-    ## For pi6, replacing old probability 0.891 with new probability 0.878
-    ## For pi7, replacing old probability 0.965 with new probability 0.963
+    ## For pi1, replacing old probability 0.022 with new probability 0.022
+    ## For pi2, replacing old probability 0.112 with new probability 0.112
+    ## For pi3, replacing old probability 0.218 with new probability 0.218
+    ## For pi4, replacing old probability 0.572 with new probability 0.572
+    ## For pi5, replacing old probability 0.637 with new probability 0.637
+    ## For pi6, replacing old probability 0.878 with new probability 0.878
+    ## For pi7, replacing old probability 0.963 with new probability 0.963
 
 ``` r
 # Reconstruct the full survey configuration with the modified flow part
@@ -184,7 +190,7 @@ print(update_response)
     ## [1] "200 - OK"
     ## 
     ## $meta$requestId
-    ## [1] "fd69dd09-6397-48b9-828e-f76d591c3cc9"
+    ## [1] "ad943829-8fe3-43e8-b2d1-f411283779d7"
 
 ``` r
 tibble(

@@ -216,7 +216,9 @@ stopifnot(length(unique(df$`Prolific ID Q`)) == nrow(df))
 ```{r}
 # create context variable
 df <- df %>%
-  create_context_var_political()
+  create_context_var_political() %>% 
+  verify(!is.na(context)) %>% 
+  verify(!is.na(context_label))
 
 df %>%
   group_by(batch_type, context) %>%
@@ -313,6 +315,11 @@ df  %>%
 ```
 
 ## Clean Qualtrics Data
+```{r}
+df %>% 
+  filter(PROLIFIC_PID == '63fcfd81a075a45d1a821308')
+```
+
 ```{r}
 df_clean <- create_outcome_var_political(df)
 

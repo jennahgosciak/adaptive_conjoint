@@ -209,7 +209,8 @@ create_context_var_political <- function(df) {
         rnum > pi4 & rnum <= pi5 ~ 5,
         rnum > pi5 & rnum <= pi6 ~ 6,
         rnum > pi6 & rnum <= pi7 ~ 7,
-        rnum > pi7 ~ 8
+        rnum > pi7 ~ 8,
+        TRUE ~ NA_integer_
       ),
       # create profile context label
       context_label = case_when(
@@ -220,7 +221,8 @@ create_context_var_political <- function(df) {
         context == 5 ~ "black_male_high",
         context == 6 ~ "black_male_low",
         context == 7 ~ "white_male_high",
-        context == 8 ~ "white_male_low"
+        context == 8 ~ "white_male_low",
+        TRUE ~ NA_character_
       ),
       context = factor(context,
         levels = c(1:8),
