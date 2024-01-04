@@ -101,6 +101,7 @@ df <- df %>%
       StartDate_clean <= ymd_hms("2024-01-03-17-02-00") ~ 3,
       StartDate_clean <= ymd_hms("2024-01-03-17-21-00") ~ 4,
       StartDate_clean <= ymd_hms("2024-01-03-18-05-00") ~ 5,
+      StartDate_clean <= ymd_hms("2024-01-04-10-05-00") ~ 6,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
@@ -156,6 +157,10 @@ df <- df %>%
 
 ```{r}
 # check that all completed
+df %>%
+  filter(Finished != TRUE) %>% 
+  select(StartDate_clean, EndDate, `Duration (in seconds)`, Finished, Consent, PreScreen_Q1:QD5)
+
 df <- df %>%
   check_completion()
 ```
