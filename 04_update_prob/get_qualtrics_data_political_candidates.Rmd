@@ -55,6 +55,7 @@ df <- df %>%
 
 df %>%
   nrow()
+
 ```
 
 ```{r}
@@ -112,6 +113,7 @@ df <- df %>%
       StartDate_clean <= ymd_hms("2024-01-05-10-52-00") ~ 14,
       StartDate_clean <= ymd_hms("2024-01-05-11-50-00") ~ 15,
       StartDate_clean <= ymd_hms("2024-01-05-13-33-00") ~ 16,
+      StartDate_clean <= ymd_hms("2024-01-05-14-10-00") ~ 17,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
@@ -126,8 +128,7 @@ df <- df %>%
 
 df %>%
   group_by(batch_type, batch_id) %>%
-  summarize(n = n()) %>% 
-  print(n = 1e3)
+  summarize(n = n())
 ```
 
 ## Survey Validation
@@ -239,13 +240,11 @@ df <- df %>%
 
 df %>%
   group_by(batch_type, context) %>%
-  summarize(n = n()) %>%
-  print(n = 1e3)
+  summarize(n = n())
 
 df %>%
   group_by(batch_type, batch_id) %>%
-  summarize(n = n()) %>% 
-  print(n = 1e3)
+  summarize(n = n())
 ```
 
 ```{r}
@@ -271,7 +270,7 @@ df %>%
   ggplot(aes(context, n)) +
   geom_col() +
   theme_classic() +
-  facet_wrap(~batch_id) +
+  facet_grid(cols = vars(batch_id)) +
   labs(title = "Sample Sizes in Iterative Batch Phase: Min",
        y = "Share of total")
 ```
