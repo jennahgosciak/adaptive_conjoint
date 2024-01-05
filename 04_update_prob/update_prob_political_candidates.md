@@ -23,7 +23,7 @@ probabilities <- read_csv("../02_output/probabilities.csv")
 probabilities
 ```
 
-    ## # A tibble: 140 × 4
+    ## # A tibble: 147 × 4
     ##    Batch `Embedded data variable` CDF_Threshold `Batch Type`              
     ##    <dbl> <chr>                            <dbl> <chr>                     
     ##  1     0 pi1                              0.125 Warmup                    
@@ -36,7 +36,7 @@ probabilities
     ##  8     1 pi1                              0.071 Iterative Batch Phase: Max
     ##  9     1 pi2                              0.241 Iterative Batch Phase: Max
     ## 10     1 pi3                              0.264 Iterative Batch Phase: Max
-    ## # ℹ 130 more rows
+    ## # ℹ 137 more rows
 
 ``` r
 df_clean <- readRDS("../02_output/political_candidates_data_clean.RDS")
@@ -159,13 +159,13 @@ modified_flow_data <- update_flow_with_probabilities(
 )
 ```
 
-    ## For pi1, replacing old probability 0.046 with new probability 0.042
-    ## For pi2, replacing old probability 0.098 with new probability 0.09
-    ## For pi3, replacing old probability 0.158 with new probability 0.157
-    ## For pi4, replacing old probability 0.614 with new probability 0.552
-    ## For pi5, replacing old probability 0.753 with new probability 0.683
-    ## For pi6, replacing old probability 0.946 with new probability 0.896
-    ## For pi7, replacing old probability 0.973 with new probability 0.924
+    ## For pi1, replacing old probability 0.042 with new probability 0.042
+    ## For pi2, replacing old probability 0.09 with new probability 0.09
+    ## For pi3, replacing old probability 0.157 with new probability 0.157
+    ## For pi4, replacing old probability 0.552 with new probability 0.552
+    ## For pi5, replacing old probability 0.683 with new probability 0.683
+    ## For pi6, replacing old probability 0.896 with new probability 0.896
+    ## For pi7, replacing old probability 0.924 with new probability 0.924
 
 ``` r
 # Reconstruct the full survey configuration with the modified flow part
@@ -190,7 +190,7 @@ print(update_response)
     ## [1] "200 - OK"
     ## 
     ## $meta$requestId
-    ## [1] "ae5cd184-b459-411a-a856-4a03854656c5"
+    ## [1] "d822f385-2fbc-4683-8352-14af12c5aab8"
 
 ``` r
 tibble(
