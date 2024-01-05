@@ -55,7 +55,6 @@ df <- df %>%
 
 df %>%
   nrow()
-
 ```
 
 ```{r}
@@ -127,7 +126,8 @@ df <- df %>%
 
 df %>%
   group_by(batch_type, batch_id) %>%
-  summarize(n = n())
+  summarize(n = n()) %>% 
+  print(n = 1e3)
 ```
 
 ## Survey Validation
@@ -239,11 +239,13 @@ df <- df %>%
 
 df %>%
   group_by(batch_type, context) %>%
-  summarize(n = n())
+  summarize(n = n()) %>%
+  print(n = 1e3)
 
 df %>%
   group_by(batch_type, batch_id) %>%
-  summarize(n = n())
+  summarize(n = n()) %>% 
+  print(n = 1e3)
 ```
 
 ```{r}
@@ -269,7 +271,7 @@ df %>%
   ggplot(aes(context, n)) +
   geom_col() +
   theme_classic() +
-  facet_grid(cols = vars(batch_id)) +
+  facet_wrap(~batch_id) +
   labs(title = "Sample Sizes in Iterative Batch Phase: Min",
        y = "Share of total")
 ```

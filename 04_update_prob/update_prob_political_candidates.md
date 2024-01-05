@@ -23,7 +23,7 @@ probabilities <- read_csv("../02_output/probabilities.csv")
 probabilities
 ```
 
-    ## # A tibble: 147 × 4
+    ## # A tibble: 154 × 4
     ##    Batch `Embedded data variable` CDF_Threshold `Batch Type`              
     ##    <dbl> <chr>                            <dbl> <chr>                     
     ##  1     0 pi1                              0.125 Warmup                    
@@ -36,7 +36,7 @@ probabilities
     ##  8     1 pi1                              0.071 Iterative Batch Phase: Max
     ##  9     1 pi2                              0.241 Iterative Batch Phase: Max
     ## 10     1 pi3                              0.264 Iterative Batch Phase: Max
-    ## # ℹ 137 more rows
+    ## # ℹ 144 more rows
 
 ``` r
 df_clean <- readRDS("../02_output/political_candidates_data_clean.RDS")
@@ -65,7 +65,7 @@ num_outcome0 <- integer(num_contexts)
 print(str_glue("Number of rows in data: {nrow(df_clean)}"))
 ```
 
-    ## Number of rows in data: 2219
+    ## Number of rows in data: 2318
 
 ``` r
 # filter for correct batch types (whether max discriminatory or min)
@@ -82,13 +82,13 @@ if (current_batch_num != max(df_clean$batch_id)) {
 print(str_glue("Current batch ID: {current_batch_num}"))
 ```
 
-    ## Current batch ID: 15
+    ## Current batch ID: 16
 
 ``` r
 print(str_glue("Number of rows left in data: {nrow(df_clean)}"))
 ```
 
-    ## Number of rows left in data: 1820
+    ## Number of rows left in data: 1919
 
 ``` r
 print(str_glue("Only batch type in data: {str_c(unique(df_clean$batch_type), collapse=', ')}"))
@@ -101,7 +101,7 @@ set.seed(2023)
 nrow(df_clean)
 ```
 
-    ## [1] 1820
+    ## [1] 1919
 
 ``` r
 # generate prob of most (or least) discriminatory context
@@ -114,21 +114,21 @@ output <- update_ts(df_clean, num_sim, num_contexts, num_outcome1,
 
     ## [1] 1e+06
     ## [1] "Predicting the least discriminatory context: taking the argmin"
-    ## [1] "PDF: 0.025914,0.038997,0.041927,0.303112,0.084062,0.415836,0.039268,0.050884"
-    ## [1] "CDF: 0.025914,0.064911,0.106838,0.40995,0.494012,0.909848,0.949116,1"
+    ## [1] "PDF: 0.0301,0.035695,0.030337,0.246062,0.14385,0.43333,0.039376,0.04125"
+    ## [1] "CDF: 0.0301,0.065795,0.096132,0.342194,0.486044,0.919374,0.95875,1"
 
 ``` r
 output
 ```
 
     ## $pi
-    ## [1] 0.025914 0.064911 0.106838 0.409950 0.494012 0.909848 0.949116 1.000000
+    ## [1] 0.030100 0.065795 0.096132 0.342194 0.486044 0.919374 0.958750 1.000000
     ## 
     ## $num_outcome1
-    ## [1] 101 136 159 296 146 284 124  78
+    ## [1] 103 138 164 323 147 313 125  83
     ## 
     ## $num_outcome0
-    ## [1]  28  44  54 130  52 128  39  21
+    ## [1]  29  44  54 139  55 141  39  22
 
 ``` r
 # check total is equal to number of observations in data
@@ -159,13 +159,13 @@ modified_flow_data <- update_flow_with_probabilities(
 )
 ```
 
-    ## For pi1, replacing old probability 0.042 with new probability 0.026
-    ## For pi2, replacing old probability 0.09 with new probability 0.065
-    ## For pi3, replacing old probability 0.157 with new probability 0.107
-    ## For pi4, replacing old probability 0.552 with new probability 0.41
-    ## For pi5, replacing old probability 0.683 with new probability 0.494
-    ## For pi6, replacing old probability 0.896 with new probability 0.91
-    ## For pi7, replacing old probability 0.924 with new probability 0.949
+    ## For pi1, replacing old probability 0.026 with new probability 0.03
+    ## For pi2, replacing old probability 0.065 with new probability 0.066
+    ## For pi3, replacing old probability 0.107 with new probability 0.096
+    ## For pi4, replacing old probability 0.41 with new probability 0.342
+    ## For pi5, replacing old probability 0.494 with new probability 0.486
+    ## For pi6, replacing old probability 0.91 with new probability 0.919
+    ## For pi7, replacing old probability 0.949 with new probability 0.959
 
 ``` r
 # Reconstruct the full survey configuration with the modified flow part
@@ -190,7 +190,7 @@ print(update_response)
     ## [1] "200 - OK"
     ## 
     ## $meta$requestId
-    ## [1] "841fbc18-c374-49fd-b80b-f53c86a2526c"
+    ## [1] "1db7da80-fb69-4cf8-91ae-2c76549002f0"
 
 ``` r
 tibble(
