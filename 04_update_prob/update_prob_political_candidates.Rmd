@@ -128,7 +128,7 @@ tibble(
     # drop if previously updated with same batch number
     filter(!(Batch == (current_batch_num + 1) & `Batch Type` == current_batch_type))) %>%
   mutate(`Batch Type` = factor(`Batch Type`, levels = c("Warmup", "Iterative Batch Phase: Max", "Iterative Batch Phase: Min"),
-                               ordered = TRUE)) %>% 
+                               ordered = TRUE)) %>%
   arrange(`Batch Type`, Batch) %>%
   write_csv("../02_output/probabilities.csv")
 ```
