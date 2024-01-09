@@ -1,8 +1,8 @@
 ---
-title: "Prep_for_validation"
+title: "Prep for validation"
 author: "Ian"
 date: "2024-01-08"
-output: pdf_document
+output: rmarkdown::github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -22,7 +22,8 @@ prob <- read_csv("../02_output/probabilities.csv",
 stopifnot(nrow(distinct(prob, batch, type, quantity)) == nrow(prob))
 
 # Load all of the data
-data <- readRDS("../02_output/political_candidates_data_clean.RDS")
+data <- readRDS("../02_output/political_candidates_data_clean.RDS") %>% 
+  filter(batch_type != "Validation")
 
 # Convert probability data from CDF to PDF
 pdf <- prob %>%
@@ -147,15 +148,21 @@ For the validation study, we would like to have power to detect a difference bet
 
 ```{r, echo = F}
 # Suppose that the true probabilities are the sample probabilities in our data
-true_probs <- data %>%
+estimate_data <- data %>%
   filter(context %in% extreme_contexts) %>%
   group_by(context) %>%
-  summarize(estimate = mean(chose_younger)) %>%
+  summarize(estimate = mean(chose_younger))
+
+true_probs <- estimate_data %>% 
   pull(estimate)
 
-true_probs
 true_sd <- sqrt(true_probs * (1 - true_probs))
 
+true_probs
+true_sd
+```
+
+```{r}
 # Get power at each sample size
 power <- function(n) {
   reps <- foreach(rep = 1:1e4, .combine = "c") %do% {
