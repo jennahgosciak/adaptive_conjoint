@@ -16,7 +16,13 @@ sink(file, type = "message")
 # Load Qualtrics data
 ###############################################
 survey_lab <- "political_candidates"
-df_clean <- readRDS(str_glue("00_data/qualtrics_data_{survey_lab}.RDS"))
+add_all_phases <- TRUE
+if (add_all_phases == TRUE) {
+  fname <- "00_data/qualtrics_data_{survey_lab}_all_phases.RDS"
+} else {
+  fname <- "00_data/qualtrics_data_{survey_lab}.RDS"
+}
+df_clean <- readRDS(str_glue(fname))
 
 cat("\nNumber of rows in data\n")
 nrow(df_clean)
@@ -90,17 +96,27 @@ df_demo <- df_clean %>%
   verify(!is.na(race))
 
 # filter to only the variables we need
-df_demo <- df_demo %>%
-  select(
-    id, chose_younger, race, female, age, hispanic, drop_demo_flag,
-    context, context_label
-  )
+if (add_all_phases == TRUE) {
+  df_demo <- df_demo %>%
+    select(
+      batch_id, batch_type, id, chose_younger, race, female, age, hispanic, drop_demo_flag,
+      context, context_label
+    )
+  output_fname <- "01_intermediate/qualtrics_data_{survey_lab}_clean_all_phases"
+} else {
+  df_demo <- df_demo %>%
+    select(
+      id, chose_younger, race, female, age, hispanic, drop_demo_flag,
+      context, context_label
+    )
+  output_fname <- "01_intermediate/qualtrics_data_{survey_lab}_clean"
+}
 
 # saving locally
 df_demo %>%
-  saveRDS(str_glue("01_intermediate/qualtrics_data_{survey_lab}_clean.RDS"))
+  saveRDS(str_glue("{output_fname}.RDS"))
 
 df_demo %>%
-  write_csv(str_glue("01_intermediate/qualtrics_data_{survey_lab}_clean.csv"), na = "")
+  write_csv(str_glue("{output_fname}.csv"), na = "")
 
 sink()

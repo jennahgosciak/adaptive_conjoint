@@ -1,38 +1,50 @@
 
 Number of rows in data
-[1] 1996
+[1] 4721
 
 Attention check results
 # A tibble: 1 × 1
   per_pass_attention_check
                      <dbl>
-1                    0.970
-# A tibble: 2 × 2
+1                    0.965
+# A tibble: 8 × 2
   context     n
   <ord>   <int>
-1 5         992
-2 6        1004
+1 1         164
+2 2         234
+3 3         236
+4 4         566
+5 5        1486
+6 6        1686
+7 7         191
+8 8         158
 
 Validation of outcome data
-# A tibble: 1,996 × 9
+# A tibble: 4,721 × 9
    chose_younger    Q1    Q2    Q3    Q4    Q5    Q6    Q7    Q8
            <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
- 1             1    NA    NA    NA    NA     1    NA    NA    NA
+ 1             1    NA    NA    NA    NA    NA     1    NA    NA
  2             1    NA    NA     1    NA    NA    NA    NA    NA
- 3             1    NA    NA    NA    NA    NA     1    NA    NA
- 4             1     1    NA    NA    NA    NA    NA    NA    NA
- 5             1    NA    NA    NA    NA     1    NA    NA    NA
- 6             1    NA     1    NA    NA    NA    NA    NA    NA
- 7             0    NA    NA    NA     0    NA    NA    NA    NA
- 8             0    NA    NA    NA    NA    NA     0    NA    NA
- 9             1     1    NA    NA    NA    NA    NA    NA    NA
-10             1    NA    NA    NA    NA    NA    NA    NA     1
-# ℹ 1,986 more rows
+ 3             1    NA    NA     1    NA    NA    NA    NA    NA
+ 4             1    NA    NA     1    NA    NA    NA    NA    NA
+ 5             1    NA    NA    NA    NA    NA     1    NA    NA
+ 6             1    NA    NA     1    NA    NA    NA    NA    NA
+ 7             1    NA     1    NA    NA    NA    NA    NA    NA
+ 8             1    NA    NA    NA    NA    NA    NA     1    NA
+ 9             1    NA     1    NA    NA    NA    NA    NA    NA
+10             0    NA     0    NA    NA    NA    NA    NA    NA
+# ℹ 4,711 more rows
 # ℹ Use `print(n = ...)` to see more rows
 `summarise()` has grouped output by 'context'. You can override using the `.groups` argument.
-# A tibble: 2 × 4
-# Groups:   context [2]
-  context context_label   mean_chose_younger mean_chose_older
-  <ord>   <chr>                        <dbl>            <dbl>
-1 5       black_male_high              0.746            0.254
-2 6       black_male_low               0.725            0.275
+# A tibble: 8 × 4
+# Groups:   context [8]
+  context context_label     mean_chose_younger mean_chose_older
+  <ord>   <chr>                          <dbl>            <dbl>
+1 1       white_female_high              0.756            0.244
+2 2       white_female_low               0.752            0.248
+3 3       black_female_high              0.75             0.25 
+4 4       black_female_low               0.701            0.299
+5 5       black_male_high                0.752            0.248
+6 6       black_male_low                 0.712            0.288
+7 7       white_male_high                0.775            0.225
+8 8       white_male_low                 0.766            0.234
