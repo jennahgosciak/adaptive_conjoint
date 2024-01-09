@@ -1,5 +1,5 @@
 ---
-title: "Process Qualtrics Data and Treatment Assignment Updating for Political Candidates Survey"
+title: "Process Qualtrics Data and Treatment Assignment Updating for Political Candidates Survey: Validation Phase Only"
 output: rmarkdown::github_document
 date: "2023-11-07"
 ---
@@ -24,10 +24,6 @@ knitr::opts_chunk$set(cache.extra = 2023)
 
 source("./_functions/data_cleaning.R")
 config <- config::get()
-
-# load log of probabilities
-probabilities <- read_csv("../02_output/probabilities.csv")
-probabilities
 ```
 
 ```{r, setup qualtrics}
@@ -88,50 +84,11 @@ df %>%
 
 df <- df %>%
   # drop data collected incorrectly
-  filter(StartDate_clean <= ymd_hms("2023-12-27-16-54-00") | StartDate_clean >= ymd_hms("2024-01-03-00-00-00")) %>%
+  filter(StartDate_clean > ymd_hms("2024-01-08-20-00-00")) %>%
   mutate(
-    batch_id = case_when(
-      StartDate_clean <= ymd_hms("2023-12-26-18-48-00") ~ 0,
-      StartDate_clean <= ymd_hms("2023-12-27-13-59-00") ~ 1,
-      StartDate_clean <= ymd_hms("2023-12-27-14-47-00") ~ 2,
-      StartDate_clean <= ymd_hms("2023-12-27-15-33-00") ~ 3,
-      StartDate_clean <= ymd_hms("2023-12-27-16-54-00") ~ 4,
-      StartDate_clean <= ymd_hms("2024-01-03-12-43-00") ~ 1,
-      StartDate_clean <= ymd_hms("2024-01-03-16-32-00") ~ 2,
-      StartDate_clean <= ymd_hms("2024-01-03-17-02-00") ~ 3,
-      StartDate_clean <= ymd_hms("2024-01-03-17-21-00") ~ 4,
-      StartDate_clean <= ymd_hms("2024-01-03-18-05-00") ~ 5,
-      StartDate_clean <= ymd_hms("2024-01-04-10-05-00") ~ 6,
-      StartDate_clean <= ymd_hms("2024-01-04-10-55-00") ~ 7,
-      StartDate_clean <= ymd_hms("2024-01-04-11-58-00") ~ 8,
-      StartDate_clean <= ymd_hms("2024-01-04-12-33-00") ~ 9,
-      StartDate_clean <= ymd_hms("2024-01-04-15-30-00") ~ 10,
-      StartDate_clean <= ymd_hms("2024-01-04-15-55-00") ~ 11,
-      StartDate_clean <= ymd_hms("2024-01-04-16-55-00") ~ 12,
-      StartDate_clean <= ymd_hms("2024-01-04-23-55-00") ~ 13,
-      StartDate_clean <= ymd_hms("2024-01-05-10-52-00") ~ 14,
-      StartDate_clean <= ymd_hms("2024-01-05-11-50-00") ~ 15,
-      StartDate_clean <= ymd_hms("2024-01-05-13-33-00") ~ 16,
-      StartDate_clean <= ymd_hms("2024-01-05-14-10-00") ~ 17,
-      StartDate_clean <= ymd_hms("2024-01-05-14-25-00") ~ 18,
-      StartDate_clean <= ymd_hms("2024-01-05-14-40-00") ~ 19,
-      StartDate_clean <= ymd_hms("2024-01-05-14-53-00") ~ 20,
-      StartDate_clean <= ymd_hms("2024-01-05-15-05-00") ~ 21,
-      StartDate_clean > ymd_hms("2024-01-08-20-00-00") ~ 100,
-      TRUE ~ NA_integer_
-    ),
-    batch_type = case_when(
-      batch_id == 0 ~ "Warmup",
-      StartDate_clean <= ymd_hms("2023-12-27-16-54-00") ~ "Iterative Batch Phase: Max",
-      StartDate_clean > ymd_hms("2023-12-27-16-54-00") & StartDate_clean <= ymd_hms("2024-01-08-20-00-00")~ "Iterative Batch Phase: Min",
-      StartDate_clean > ymd_hms("2023-12-27-16-54-00") ~ "Validation",
-      TRUE ~ NA_character_
-    )
-  ) %>% 
-  verify(!is.na(batch_id)) %>% 
-  verify(!is.na(batch_type)) %>% 
-  # drop the 21st batch
-  filter(batch_id != 21)
+    batch_id = 100,
+    batch_type = "Validation"
+  )
 
 df %>%
   group_by(batch_type, batch_id) %>%
@@ -159,19 +116,7 @@ if (!all(unique(df$Status) == "IP Address")) {
 ```{r, check embed data}
 # check embedded data variables match probabilities for all iterative batches
 df %>%
-  check_pi_vars(probabilities, 7)
-```
-```{r}
-df %>%
-  filter(batch_id == 100) %>% 
-  select(batch_id, batch_type, str_c("pi", 1:7), rnum)
-```
-
-
-```{r}
-# check distinct probabilities based on embedded data
-df %>% 
-  select(batch_type, batch_id, str_c("pi", 1:7)) %>% 
+  select(str_c("pi", 1:7)) %>% 
   distinct()
 ```
 
@@ -260,95 +205,10 @@ df %>%
   summarize(n = n())
 
 df %>% 
-  filter(batch_id == 100) %>% 
-  group_by(context) %>% 
+  group_by(context, context_label) %>% 
   summarize(n = n())
 ```
 
-```{r}
-df %>%
-  group_by(context, batch_type, batch_id) %>%
-  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Max")) %>% 
-  summarize(n = n()) %>%
-  group_by(batch_type, batch_id) %>% 
-  mutate(n = n/sum(n)) %>% 
-  ggplot(aes(context, n)) +
-  geom_col() +
-  theme_classic() +
-  facet_wrap(~batch_id)  +
-  labs(title = "Sample Sizes in Iterative Batch Phase: Max",
-       y = "Share of total")
-
-df %>%
-  group_by(context, batch_type, batch_id) %>%
-  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>% 
-  summarize(n = n()) %>%
-  group_by(batch_type, batch_id) %>% 
-  mutate(n = n/sum(n)) %>%
-  ggplot(aes(context, n)) +
-  geom_col() +
-  theme_classic() +
-  facet_wrap(~batch_id) +
-  labs(title = "Sample Sizes in Iterative Batch Phase: Min",
-       y = "Share of total")
-```
-
-```{r}
-df %>%
-  group_by(context, batch_type, batch_id) %>%
-  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Max")) %>% 
-  summarize(n = n()) %>%
-  group_by(batch_id, batch_type) %>% 
-  arrange(context) %>% 
-  mutate(n = cumsum(n)/sum(n))  %>% 
-  ggplot(aes(context, n)) +
-  geom_col() +
-  theme_classic() +
-  facet_wrap(~batch_id)  +
-  labs(title = "Cumulative Sample Sizes in Iterative Batch Phase: Max")
-
-df %>%
-  group_by(context, batch_type, batch_id) %>%
-  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>% 
-  summarize(n = n()) %>%
-  group_by(batch_id, batch_type) %>% 
-  arrange(context) %>% 
-  mutate(n = cumsum(n)/sum(n))  %>% 
-  ggplot(aes(context, n)) +
-  geom_col() +
-  theme_classic() +
-  facet_wrap(~batch_id)  +
-  labs(title = "Cumulative Sample Sizes in Iterative Batch Phase: Min")
-```
-
-
-```{r}
-df  %>%
-  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Max")) %>%
-  group_by(batch_id, batch_type) %>%
-  select(str_c("pi", 1:7)) %>% 
-  distinct() %>% 
-  pivot_longer(-c(batch_id, batch_type)) %>% 
-  mutate(context = str_replace_all(name, "pi", "")) %>%
-  ggplot(aes(context, value)) +
-  geom_col() +
-  theme_classic() +
-  facet_wrap(~batch_id)
-
-df  %>%
-  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>% 
-  group_by(batch_id, batch_type) %>%
-  select(str_c("pi", 1:7)) %>% 
-  distinct() %>% 
-  pivot_longer(-c(batch_id, batch_type)) %>% 
-  mutate(context = str_replace_all(name, "pi", "")) %>%
-  ggplot(aes(context, value)) +
-  geom_col() +
-  theme_classic() +
-  facet_wrap(~batch_id) +
-  labs(title = "CDF for Iterative Batch Phase: Min",
-       y = "Cumulative Probability")
-```
 
 ## Clean Qualtrics Data
 
@@ -462,11 +322,11 @@ if (check_rowtotal == FALSE) {
 ```{r}
 df_clean %>%
   select(context, context_label, batch_id, batch_type, chose_younger, race, age, female, hispanic) %>%
-  saveRDS("../02_output/political_candidates_data_clean.RDS")
+  saveRDS("../02_output/political_candidates_data_validation.RDS")
 
 df_clean %>%
   select(context, context_label, batch_id, batch_type, chose_younger, race, age, female, hispanic) %>%
-  write_csv("../02_output/political_candidates_data_clean.csv")
+  write_csv("../02_output/political_candidates_data_validation.csv")
 ```
 
 
