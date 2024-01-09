@@ -38,6 +38,10 @@ df_clean <- create_outcome_var(df_clean)
 # create profile context variable
 df_clean <- create_context_var(df_clean)
 
+df_clean %>% 
+  group_by(context) %>% 
+  summarize(n = n())
+
 # validation of outcome variable
 # each question number is the random ordering of the context attributes
 cat("\nValidation of outcome data\n")

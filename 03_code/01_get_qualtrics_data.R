@@ -32,7 +32,7 @@ nrow(df_survey)
 df_survey <- df_survey %>%
   mutate(StartDate_clean = ymd_hms(StartDate)) %>%
   verify(is.na(StartDate_clean) == is.na(StartDate)) %>%
-  filter(StartDate_clean >= ymd_hms("2023-12-14-17-20-00"))
+  filter(StartDate_clean >= ymd_hms("2024-01-08-20-00-00"))
 
 cat("\nNumber of observations after dropping test cases\n")
 nrow(df_survey)
@@ -41,12 +41,17 @@ nrow(df_survey)
 ###############################################
 
 # check ID uniquely identifies rows in data
-if (length(unique(df_survey$`Prolific ID Q`)) != nrow(df_survey)) {
-  print("ID is not unique")
+if (length(unique(df$`Prolific ID Q`)) != nrow(df)) {
+  warning("ID is not unique")
 }
 
-if (unique(df_survey$Status) != "IP Address") {
-  print("Test data included in the analysis file")
+if (!all(unique(df$Status) == "IP Address")) {
+  warning("Test/spam data included in the analysis file")
+  print(str_glue("Number of observations in data: {nrow(df)}"))
+  print(str_glue("Status values in data: {str_c(unique(df$Status), collapse=', ')}"))
+  df <- df %>% 
+    filter(Status == "IP Address")
+  print(str_glue("Number of observations left in data: {nrow(df)}"))
 }
 
 # check we have consent from all participants
