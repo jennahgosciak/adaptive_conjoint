@@ -19,3 +19,17 @@
 # ℹ Use `print(n = ...)` to see more rows
 `stat_bin()` using `bins = 30`. Pick better value with
 `binwidth`.
+Warning message:
+Removed 22 rows containing non-finite values
+(`stat_bin()`). 
+# A tibble: 8 × 3
+  race                                          n      per
+  <fct>                                     <int>    <dbl>
+1 White                                      1424 0.713   
+2 Asian                                       205 0.103   
+3 Black or African American                   193 0.0967  
+4 Two or More Races                            98 0.0491  
+5 Other                                        45 0.0225  
+6 Prefer not to disclose                       18 0.00902 
+7 American Indian or Alaska Native             12 0.00601 
+8 Native Hawaiian or Other Pacific Islander     1 0.000501
