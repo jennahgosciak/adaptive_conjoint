@@ -1,0 +1,73 @@
+# A tibble: 1 × 4
+  female_n female_per hispanic_n hispanic_per
+     <int>      <dbl>      <int>        <dbl>
+1     1146      0.574        191       0.0957
+# A tibble: 65 × 3
+     age     n      per
+   <dbl> <int>    <dbl>
+ 1     5     1 0.000501
+ 2    18     5 0.00251 
+ 3    19    17 0.00852 
+ 4    20    23 0.0115  
+ 5    21    50 0.0251  
+ 6    22    51 0.0256  
+ 7    23    63 0.0316  
+ 8    24    70 0.0351  
+ 9    25    55 0.0276  
+10    26    77 0.0386  
+# ℹ 55 more rows
+# ℹ Use `print(n = ...)` to see more rows
+`stat_bin()` using `bins = 30`. Pick better value with
+`binwidth`.
+Warning message:
+Removed 22 rows containing non-finite values
+(`stat_bin()`). 
+# A tibble: 8 × 3
+  race                                          n      per
+  <fct>                                     <int>    <dbl>
+1 White                                      1424 0.713   
+2 Asian                                       205 0.103   
+3 Black or African American                   193 0.0967  
+4 Two or More Races                            98 0.0491  
+5 Other                                        45 0.0225  
+6 Prefer not to disclose                       18 0.00902 
+7 American Indian or Alaska Native             12 0.00601 
+8 Native Hawaiian or Other Pacific Islander     1 0.000501
+Error in `group_by()`:
+! Must group by variables found in `.data`.
+✖ Column `batch_type` is not found.
+Backtrace:
+ 1. ... %>% mutate(per = n / sum(n))
+ 6. dplyr:::group_by.data.frame(., batch_type, age)
+Error in `summarize()`:
+ℹ In argument: `across(...)`.
+Caused by error in `across()`:
+! `.fns` must be a function, a formula, or a list of functions/formulas.
+Backtrace:
+ 1. df %>% group_by(batch_type) %>% ...
+ 3. dplyr:::summarise.grouped_df(...)
+ 4. dplyr:::summarise_cols(.data, dplyr_quosures(...), by, "summarise")
+ 6. dplyr:::expand_across(dot)
+Error in `geom_histogram()`:
+! `mapping` must be created by `aes()`
+Backtrace:
+ 1. ggplot2::geom_histogram(after_stat(density))
+Error in `combine_vars()`:
+! At least one layer must contain all faceting variables: `batch_type`
+✖ Plot is missing `batch_type`
+✖ Layer 1 is missing `batch_type`
+Backtrace:
+ 1. base (local) `<fn>`(x)
+ 2. ggplot2:::print.ggplot(x)
+ 4. ggplot2:::ggplot_build.ggplot(x)
+ 5. layout$setup(data, plot$data, plot$plot_env)
+ 6. ggplot2 (local) setup(..., self = self)
+ 7. self$facet$compute_layout(data, self$facet_params)
+ 8. ggplot2 (local) compute_layout(..., self = self)
+ 9. ggplot2::combine_vars(data, params$plot_env, vars, drop = params$drop)
+(*) NOTE: I saw chunk options ", fig.length=10in"
+ please go to https://yihui.org/knitr/options
+ (it is likely that you forgot to quote "character" options)
+(*) NOTE: I saw chunk options ", fig.height=10in"
+ please go to https://yihui.org/knitr/options
+ (it is likely that you forgot to quote "character" options)

@@ -1,0 +1,79 @@
+---
+title: "Demographic Breakdowns by Experimental Phase"
+output: rmarkdown::github_document
+date: "2024-01-09"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+```
+
+```{r}
+df <- readRDS("../02_output/political_candidates_data_clean.RDS")
+
+df <- df %>% 
+  mutate(batch_type = factor(batch_type, 
+                             levels = c("Warmup", "Iterative Batch Phase: Max", "Iterative Batch Phase: Min", "Validation"),
+                             ordered = TRUE))
+
+# look at sample counts by batch id and batch type
+df %>% 
+  group_by(batch_type, batch_id) %>% 
+  summarize(n = n())
+
+df %>% 
+  group_by(batch_type) %>% 
+  summarize(n = n())
+```
+```{r}
+## look at female and hispanicity
+df %>% 
+  group_by(batch_type) %>% 
+  summarize(across(c("female", "hispanic"), .fns = lst(n = ~sum(.),
+                                                       per = ~mean(.))))
+```
+
+```{r}
+# age
+df %>% 
+  group_by(batch_type, age) %>% 
+  summarize(n = n()) %>% 
+  group_by(batch_type) %>% 
+  mutate(per = n/sum(n))
+
+df %>% 
+  ggplot(aes(age, after_stat(density), fill = batch_type)) +
+  geom_histogram() +
+  facet_wrap(~batch_type)
+```
+
+```{r}
+# race
+df %>%
+  group_by(batch_type) %>% 
+  group_by(race) %>% 
+  summarize(n = n()) %>% 
+  ungroup() %>% 
+  mutate(per = n/sum(n)) %>% 
+  arrange(desc(per))
+```
+
+```{r, fig.height=7, fig.width=8}
+df %>%
+  group_by(batch_type, race) %>% 
+  summarize(n = n()) %>% 
+  group_by(batch_type) %>% 
+  mutate(per = n/sum(n)) %>% 
+  arrange(desc(per)) %>% 
+  ggplot(aes(reorder(race, desc(per)), per, fill=batch_type)) +
+  geom_col() +
+  facet_wrap(~batch_type) +
+  labs(x = "Race",
+       y = "Percent of total") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+
+
