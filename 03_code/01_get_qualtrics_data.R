@@ -75,7 +75,6 @@ df_survey <- df_survey %>%
 ###############################################
 # Generate new ID
 ###############################################
-
 # create cleaned version for saving locally
 df_clean <- df_survey %>%
   select(PreScreen_Q1:rnum_age, age1:career2) %>%

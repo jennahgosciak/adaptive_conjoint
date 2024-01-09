@@ -35,4 +35,8 @@ Results: simple mean and poststratification estimates
 2 6       black_male_low  simple_mean       0.501 0.0158  0.470  0.532
 3 5       black_male_high poststratified    0.518 0.0206  0.478  0.559
 4 6       black_male_low  poststratified    0.516 0.0206  0.476  0.557
-[1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                                                          
+[1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                                                          Error in `filter()`:
+ℹ In argument: `PROLIFIC_PID == "648cf0659fe8190ecf4c28ed"`.
+Caused by error:
+! object 'PROLIFIC_PID' not found
+Run `rlang::last_trace()` to see where the error occurred.
