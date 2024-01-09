@@ -48,3 +48,5 @@ Simple mean estimates
   method      estimate     se ci.min ci.max    pval
   <chr>          <dbl>  <dbl>  <dbl>  <dbl>   <dbl>
 1 simple_mean   0.0755 0.0255 0.0256  0.125 0.00304
+
+Bootstrap estimates
