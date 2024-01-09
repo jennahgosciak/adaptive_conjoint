@@ -34,7 +34,7 @@ df %>%
 
 ## Examining female and hispanicity
 
-* There are some differences in the percent female between the different phases
+* There are some differences in the percent female between the different phases (around 10 percentage points)
 
 ```{r}
 ## look at female and hispanicity
