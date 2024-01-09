@@ -1,0 +1,217 @@
+---
+title: "Prep_for_validation"
+author: "Ian"
+date: "2024-01-08"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo = F, message = F, warning = F}
+library(tidyverse)
+library(foreach)
+
+# Load the probability estimates for each arm being max or min
+prob <- read_csv("../02_output/probabilities.csv",
+                 col_names = c("batch","quantity","cdf","type"),
+                 skip = 1)
+
+# check there are no duplicates in the dat
+stopifnot(nrow(distinct(prob, batch, type, quantity)) == nrow(prob))
+
+# Load all of the data
+data <- readRDS("../02_output/political_candidates_data_clean.RDS")
+
+# Convert probability data from CDF to PDF
+pdf <- prob %>%
+  # convert CDF to PDF
+  pivot_wider(names_from = "quantity", values_from = "cdf") %>%
+  mutate(p_1 = pi1,
+         p_2 = pi2 - pi1,
+         p_3 = pi3 - pi2,
+         p_4 = pi4 - pi3,
+         p_5 = pi5 - pi4,
+         p_6 = pi6 - pi5,
+         p_7 = pi7 - pi6,
+         p_8 = 1 - pi7) %>%
+  select(-starts_with("pi")) %>%
+  pivot_longer(cols = starts_with("p_"),
+               names_to = "context", values_to = "probability") %>%
+  mutate(context = as.numeric(str_replace(context,"p_",""))) %>%
+  # Import the context labels
+  left_join(data %>%
+              select(context, context_label) %>%
+              distinct() %>%
+              mutate(context = as.numeric(context)),
+            by = "context")
+
+data %>% 
+  filter(batch_id <= 20) %>% 
+  group_by(batch_type, batch_id) %>% 
+  summarize(n = n())
+```
+
+Across batches, the max estimate converged very quickly and the min estimate never converged.
+
+```{r, echo = F}
+# Visualize the PDF
+pdf %>%
+  filter(type != "Warmup") %>%
+  ggplot(aes(x = batch, y = probability, color = context_label)) +
+  geom_line() +
+  facet_wrap(~type, ncol = 1) +
+  ylab("Probability that This Context is Extreme") +
+  xlab("Batch Number")
+```
+
+\clearpage
+
+Below is the estimated probability of choosing the younger candidate, across rounds, with 95% credible interval.
+
+```{r, fig.width=10}
+bayes_result <- foreach(target = c("Min","Max"), .combine = "rbind") %do% {
+  data %>%
+    filter(batch_type %in% c("Warmup",paste0("Iterative Batch Phase: ",target))) %>%
+    group_by(context_label, batch_id) %>%
+    arrange(batch_id) %>%
+    mutate(alpha = cumsum(chose_younger) + 10,
+           beta = cumsum(1 - chose_younger) + 10) %>%
+    group_by(batch_id, context_label) %>%
+    slice_tail(n = 1) %>%
+    mutate(estimate = alpha / (alpha + beta),
+           ci.min = qbeta(.025, shape1 = alpha, shape2 = beta),
+           ci.max = qbeta(.975, shape1 = alpha, shape2 = beta)) %>%
+    mutate(target = target)
+}
+
+bayes_result %>%
+  ggplot(aes(x = batch_id, y = estimate, 
+             ymin = ci.min, ymax = ci.max)) +
+  geom_line() + 
+  geom_ribbon(alpha = .2) +
+  facet_grid(target ~ context_label) +
+  ylab("Estimated P(Chooses Younger)") +
+  xlab("Batch Number")
+```
+
+The two extreme contexts are black male with (high or low experience). This suggests that when presented with a black male candidate, the preference for a younger candidate is much stronger when they are both experienced.
+
+```{r, echo = F}
+# Pool all data for extreme estimates, frequentist
+extreme_contexts <- pdf %>%
+  filter(type != "Warmup") %>%
+  group_by(type) %>%
+  filter(batch == max(batch)) %>%
+  filter(probability == max(probability)) %>%
+  mutate(context = as.numeric(str_replace(context,"p_",""))) %>%
+  pull(context)
+extreme_contexts
+
+pdf %>%
+  filter(type != "Warmup") %>%
+  group_by(type) %>%
+  filter(batch == max(batch)) %>%
+  filter(probability == max(probability)) %>%
+  mutate(context = as.numeric(str_replace(context,"p_","")))
+```
+
+\clearpage
+
+# Pooling all data
+
+Below are the estimates for all contexts, using all the data collected in all phases.
+
+```{r, echo = F}
+all_estimates <- data %>%
+  group_by(context, context_label) %>%
+  summarize(alpha = sum(chose_younger) + 10,
+            beta = sum(1 - chose_younger) + 10) %>%
+  mutate(estimate = alpha / (alpha + beta),
+         ci.min = qbeta(.025, shape1 = alpha, shape2 = beta),
+         ci.max = qbeta(.975, shape1 = alpha, shape2 = beta)) %>%
+  separate(context_label, into = c("race","sex","experience"))
+all_estimates %>%
+  ggplot(aes(x = experience, y = estimate,
+             label = format(round(estimate,2), nsmall = 2),
+             ymin = ci.min, ymax = ci.max)) +
+  geom_errorbar(width = .5) +
+  geom_label() +
+  facet_grid(race ~ sex) +
+  xlab("Political Experience") +
+  ylab("P(Chooses Younger)")
+```
+
+For the validation study, we would like to have power to detect a difference between the two extreme contexts. The point estimates for those are 0.75 and 0.69. Assuming these are the truth, we can calculate the power at various validation sample sizes. Below I do this by simulation and then analytically, with the same result.
+
+```{r, echo = F}
+# Suppose that the true probabilities are the sample probabilities in our data
+true_probs <- data %>%
+  filter(context %in% extreme_contexts) %>%
+  group_by(context) %>%
+  summarize(estimate = mean(chose_younger)) %>%
+  pull(estimate)
+
+true_probs
+true_sd <- sqrt(true_probs * (1 - true_probs))
+
+# Get power at each sample size
+power <- function(n) {
+  reps <- foreach(rep = 1:1e4, .combine = "c") %do% {
+    sim_prob_1 <- mean(rbinom(n, 1, true_probs[1]))
+    sim_prob_2 <- mean(rbinom(n, 1, true_probs[2]))
+    sim_diff <- abs(sim_prob_1 - sim_prob_2)
+    sim_diff_se <- sqrt(
+      sim_prob_1 * (1 - sim_prob_1) / n +
+        sim_prob_2 * (1 - sim_prob_2) / n
+    )
+    sim_test_statistic <- sim_diff / sim_diff_se
+    sim_p <- 2 * pnorm(sim_test_statistic, lower.tail = F)
+    sim_reject <- sim_p < .05
+    return(sim_reject)
+  }
+  return(mean(reps))
+}
+power_curve <- foreach(n_val = seq(100,1000,100), .combine = "rbind") %do% {
+  data.frame(n = n_val,
+             power = power(n_val))
+}
+power_curve %>%
+  ggplot(aes(x = n, y = power)) +
+  geom_line() +
+  geom_point() +
+  geom_text(aes(label = format(round(power,2),nsmall = 2)),
+            vjust = 1.5, hjust = -.5, size = 3) +
+  scale_x_continuous(name = "Validation Sample Size Per Arm",
+                     breaks = seq(100,1e3,100)) +
+  ylab("Power to Reject Null of Equal Probabilities in Arms") +
+  ggtitle("Power analysis by simulation", subtitle = "Estimates assume that the true arm-specific probability of choosing the younger candidate\nequals the sample mean estimate from the warmup + iterative batch phase data")
+```
+
+```{r, echo = F}
+truth_star <- all_estimates %>%
+  filter(context %in% extreme_contexts) %>%
+  mutate(prob = (alpha - 10) / (alpha + beta - 20),
+         sd = sqrt(prob * (1 - prob))) %>%
+  select(context, race, sex, experience, prob, sd)
+
+get_power <- function(n) {
+  estimator_mean <- abs(diff(truth_star$prob)) /
+    sqrt(sum(truth_star$sd ^ 2 / n))
+  data.frame(power = pnorm(q = qnorm(.975),
+                           mean = estimator_mean,
+                           lower.tail = F),
+             n = n)
+}
+
+foreach(n = seq(100,1000,100), .combine = "rbind") %do% {
+  get_power(n)
+} %>%
+  ggplot(aes(x = n, y = power)) +
+  geom_line() +
+  geom_point() +
+  ylab("Validation Power to p < .05 Reject the Null\nThat Min and Max Arms Are Equal") +
+  xlab("Validation Sample Size in Each Arm") +
+  ggtitle("Power analysis by math", subtitle = "Estimates assume that the true arm-specific probability of choosing the younger candidate\nequals the sample mean estimate from the warmup + iterative batch phase data")
+```

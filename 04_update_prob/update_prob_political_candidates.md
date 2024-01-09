@@ -190,11 +190,7 @@ print(update_response)
     ## [1] "200 - OK"
     ## 
     ## $meta$requestId
-<<<<<<< HEAD
-    ## [1] "6cc26b18-b492-46d1-b042-2edb3e3261ae"
-=======
     ## [1] "eda26ab8-6de3-4fab-9ab3-679468b304c8"
->>>>>>> 2d46c475081b756424ffb7f7d90f1675685e874e
 
 ``` r
 tibble(

@@ -16,7 +16,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r, load packages, message=F, warning=F}
 library(tidyverse)
 
-data <- readRDS("../02_output/political_candidates_data_clean.RDS")
+data <- readRDS("../02_output/political_candidates_data_clean.RDS") %>% 
+  filter(batch_type != "Iterative Batch Phase: Max")
 ```
 
 ```{r}

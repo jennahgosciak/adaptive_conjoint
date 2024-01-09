@@ -55,7 +55,6 @@ df <- df %>%
 
 df %>%
   nrow()
-
 ```
 
 ```{r}
@@ -117,6 +116,7 @@ df <- df %>%
       StartDate_clean <= ymd_hms("2024-01-05-14-25-00") ~ 18,
       StartDate_clean <= ymd_hms("2024-01-05-14-40-00") ~ 19,
       StartDate_clean <= ymd_hms("2024-01-05-14-53-00") ~ 20,
+      StartDate_clean <= ymd_hms("2024-01-05-15-05-00") ~ 21,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
@@ -127,7 +127,9 @@ df <- df %>%
     )
   ) %>% 
   verify(!is.na(batch_id)) %>% 
-  verify(!is.na(batch_type))
+  verify(!is.na(batch_type)) %>% 
+  # drop the 21st batch
+  filter(batch_id != 21)
 
 df %>%
   group_by(batch_type, batch_id) %>%
@@ -161,7 +163,7 @@ df %>%
 ```{r}
 # check distinct probabilities based on embedded data
 df %>% 
-  select(batch_id, str_c("pi", 1:7)) %>% 
+  select(batch_type, batch_id, str_c("pi", 1:7)) %>% 
   distinct()
 ```
 
@@ -260,7 +262,7 @@ df %>%
   ggplot(aes(context, n)) +
   geom_col() +
   theme_classic() +
-  facet_grid(cols = vars(batch_id))  +
+  facet_wrap(~batch_id)  +
   labs(title = "Sample Sizes in Iterative Batch Phase: Max",
        y = "Share of total")
 
@@ -273,7 +275,7 @@ df %>%
   ggplot(aes(context, n)) +
   geom_col() +
   theme_classic() +
-  facet_grid(cols = vars(batch_id)) +
+  facet_wrap(~batch_id) +
   labs(title = "Sample Sizes in Iterative Batch Phase: Min",
        y = "Share of total")
 ```
@@ -289,7 +291,7 @@ df %>%
   ggplot(aes(context, n)) +
   geom_col() +
   theme_classic() +
-  facet_grid(cols = vars(batch_id))  +
+  facet_wrap(~batch_id)  +
   labs(title = "Cumulative Sample Sizes in Iterative Batch Phase: Max")
 
 df %>%
@@ -302,7 +304,7 @@ df %>%
   ggplot(aes(context, n)) +
   geom_col() +
   theme_classic() +
-  facet_grid(cols = vars(batch_id))  +
+  facet_wrap(~batch_id)  +
   labs(title = "Cumulative Sample Sizes in Iterative Batch Phase: Min")
 ```
 
@@ -318,7 +320,7 @@ df  %>%
   ggplot(aes(context, value)) +
   geom_col() +
   theme_classic() +
-  facet_grid(cols = vars(batch_id))
+  facet_wrap(~batch_id)
 
 df  %>%
   filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>% 
@@ -330,7 +332,7 @@ df  %>%
   ggplot(aes(context, value)) +
   geom_col() +
   theme_classic() +
-  facet_grid(cols = vars(batch_id)) +
+  facet_wrap(~batch_id) +
   labs(title = "CDF for Iterative Batch Phase: Min",
        y = "Cumulative Probability")
 ```
