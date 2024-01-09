@@ -8,7 +8,7 @@ library(modelr)
 set.seed(2023)
 
 source("./03_code/_data_cleaning.R")
-file <- file("./_logs/03_analysis.txt", open = "wt")
+file <- file("./_logs/04_demographic_breakdowns.txt", open = "wt")
 sink(file, type = "output")
 sink(file, type = "message")
 

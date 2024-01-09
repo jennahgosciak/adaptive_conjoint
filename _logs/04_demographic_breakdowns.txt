@@ -1,0 +1,21 @@
+# A tibble: 1 × 4
+  female_n female_per hispanic_n hispanic_per
+     <int>      <dbl>      <int>        <dbl>
+1     1146      0.574        191       0.0957
+# A tibble: 65 × 3
+     age     n      per
+   <dbl> <int>    <dbl>
+ 1     5     1 0.000501
+ 2    18     5 0.00251 
+ 3    19    17 0.00852 
+ 4    20    23 0.0115  
+ 5    21    50 0.0251  
+ 6    22    51 0.0256  
+ 7    23    63 0.0316  
+ 8    24    70 0.0351  
+ 9    25    55 0.0276  
+10    26    77 0.0386  
+# ℹ 55 more rows
+# ℹ Use `print(n = ...)` to see more rows
+`stat_bin()` using `bins = 30`. Pick better value with
+`binwidth`.
