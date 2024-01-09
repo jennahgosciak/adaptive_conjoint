@@ -37,6 +37,9 @@ cat("\nPopulation weights\n")
 wgts %>%
   head()
 
+cat("\nNumber of rows in data")
+nrow(df_analysis)
+
 ###############################################
 # (1) Simple Mean
 ###############################################
@@ -53,6 +56,30 @@ df_simple_mean <- df_analysis %>%
 
 cat("\nSimple mean estimates\n")
 df_simple_mean
+
+# validation phase, estimate
+estimates_validation_data <- df_analysis %>%
+  group_by(context, context_label) %>%
+  summarize(alpha = sum(chose_younger) + 10,
+            beta = sum(1 - chose_younger) + 10,
+            mean = mean(chose_younger),
+            n = n()) %>%
+  mutate(estimate = alpha / (alpha + beta),
+         ci.min = qbeta(.025, shape1 = alpha, shape2 = beta),
+         ci.max = qbeta(.975, shape1 = alpha, shape2 = beta)) %>%
+  separate(context_label, into = c("race","sex","experience"))
+
+estimates_validation_data
+
+estimates_validation_data %>%
+  ggplot(aes(x = experience, y = estimate,
+             label = format(round(estimate,2), nsmall = 2),
+             ymin = ci.min, ymax = ci.max)) +
+  geom_errorbar(width = .5) +
+  geom_label() +
+  facet_grid(race ~ sex) +
+  xlab("Political Experience") +
+  ylab("P(Chooses Younger)")
 
 ###############################################
 # (2) Poststratified Point Estimate

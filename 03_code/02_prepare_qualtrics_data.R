@@ -49,6 +49,12 @@ df_clean %>%
   select(chose_younger, str_c("Q", 1:8)) %>%
   verify(!is.na(chose_younger))
 
+df_clean %>% 
+  mutate(chose_older = 1 - chose_younger) %>% 
+  group_by(context, context_label) %>% 
+  summarize(mean_chose_younger = mean(chose_younger),
+            mean_chose_older = mean(chose_older))
+
 # create cleaned demographic variables
 df_demo <- df_clean %>%
   mutate(

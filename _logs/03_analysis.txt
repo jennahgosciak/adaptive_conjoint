@@ -9,6 +9,8 @@ Population weights
 4 Black or African American FALSE  FALSE       21 0.00122  2270
 5 Black or African American FALSE  FALSE       22 0.00114  1998
 6 Black or African American FALSE  FALSE       23 0.00111  1934
+
+Number of rows in data[1] 1996
 `summarise()` has grouped output by 'context'. You can override using the `.groups` argument.
 
 Simple mean estimates
@@ -16,27 +18,14 @@ Simple mean estimates
 # Groups:   context [2]
   context context_label   method      estimate     se ci_min ci_max
   <ord>   <chr>           <chr>          <dbl>  <dbl>  <dbl>  <dbl>
-1 5       black_male_high simple_mean    0.513 0.0159  0.482  0.544
-2 6       black_male_low  simple_mean    0.501 0.0158  0.470  0.532
+1 5       black_male_high simple_mean    0.746 0.0138  0.719  0.773
+2 6       black_male_low  simple_mean    0.725 0.0141  0.697  0.753
+`summarise()` has grouped output by 'context'. You can override using the `.groups` argument.
+# A tibble: 2 × 11
+# Groups:   context [2]
+  context race  sex   experience alpha  beta  mean     n estimate ci.min ci.max
+  <ord>   <chr> <chr> <chr>      <dbl> <dbl> <dbl> <int>    <dbl>  <dbl>  <dbl>
+1 5       black male  high         750   262 0.746   992    0.741  0.714  0.768
+2 6       black male  low          738   286 0.725  1004    0.721  0.693  0.748
 
 Bootstrap estimates
-# A tibble: 2 × 7
-  context context_label   method         estimate     se ci_min ci_max
-  <ord>   <chr>           <chr>             <dbl>  <dbl>  <dbl>  <dbl>
-1 5       black_male_high poststratified    0.518 0.0206  0.478  0.559
-2 6       black_male_low  poststratified    0.516 0.0206  0.476  0.557
-
-Results: simple mean and poststratification estimates
-# A tibble: 4 × 7
-# Groups:   context [2]
-  context context_label   method         estimate     se ci_min ci_max
-  <ord>   <chr>           <chr>             <dbl>  <dbl>  <dbl>  <dbl>
-1 5       black_male_high simple_mean       0.513 0.0159  0.482  0.544
-2 6       black_male_low  simple_mean       0.501 0.0158  0.470  0.532
-3 5       black_male_high poststratified    0.518 0.0206  0.478  0.559
-4 6       black_male_low  poststratified    0.516 0.0206  0.476  0.557
-[1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                                                          Error in `filter()`:
-ℹ In argument: `PROLIFIC_PID == "648cf0659fe8190ecf4c28ed"`.
-Caused by error:
-! object 'PROLIFIC_PID' not found
-Run `rlang::last_trace()` to see where the error occurred.

@@ -26,8 +26,8 @@ create_outcome_var <- function(df) {
     mutate(across(str_c("Q", 1:8), ~ case_when(
       . == "Candidate 1" & rnum_age <= 0.5 ~ 1,
       . == "Candidate 2" & rnum_age <= 0.5 ~ 0,
-      . == "Candidate 1" & rnum_age > 0.5 ~ 1,
-      . == "Candidate 2" & rnum_age > 0.5 ~ 0,
+      . == "Candidate 2" & rnum_age > 0.5 ~ 1,
+      . == "Candidate 1" & rnum_age > 0.5 ~ 0,
       TRUE ~ NA_real_
     ))) %>%
     mutate(chose_younger = select(., str_c("Q", 1:8)) %>%
