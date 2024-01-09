@@ -47,7 +47,7 @@ df %>%
 df <- df %>%
   mutate(StartDate_clean = ymd_hms(StartDate)) %>%
   verify(is.na(StartDate_clean) == is.na(StartDate)) %>%
-  filter(StartDate_clean >= ymd_hms("2023-12-26-17-56-00"))
+  filter(StartDate_clean >= ymd_hms("2024-01-08-20-00-00"))
 
 df %>%
   nrow()
@@ -84,7 +84,7 @@ df %>%
 
 df <- df %>%
   # drop data collected incorrectly
-  filter(StartDate_clean > ymd_hms("2024-01-08-20-00-00")) %>%
+  verify(StartDate_clean > ymd_hms("2024-01-08-20-00-00")) %>%
   mutate(
     batch_id = 100,
     batch_type = "Validation"
@@ -122,20 +122,12 @@ df %>%
 
 ```{r}
 # check consent means their responses are missing
-df %>%
-  filter(Consent == "I do not consent to participate") %>% 
-    select(Consent, `Duration (in seconds)`, Finished, batch_id, batch_type)
-
 df <- df %>%
   check_consent()
 ```
 
 ```{r}
 # check that all completed
-df %>%
-  filter(Finished != TRUE) %>% 
-  select(StartDate_clean, EndDate, `Duration (in seconds)`, Finished, Consent, PreScreen_Q1:QD5)
-
 df <- df %>%
   check_completion()
 ```

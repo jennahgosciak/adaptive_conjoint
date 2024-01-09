@@ -18,6 +18,8 @@ library(tidyverse)
 
 data <- readRDS("../02_output/political_candidates_data_clean.RDS") %>% 
   filter(batch_type != "Iterative Batch Phase: Max")
+
+validation_data <- readRDS("../02_output/political_candidates_data_validation.RDS")
 ```
 
 ```{r}
@@ -70,3 +72,29 @@ aggregated %>%
 ggsave("../02_output/_figures/all_data_estimates.png",
        height = 3, width = 4, dpi = 300)
 ```
+```{r}
+# validation phase, estimate
+estimates_validation_data <- validation_data %>%
+  group_by(context, context_label) %>%
+  summarize(alpha = sum(chose_younger) + 10,
+            beta = sum(1 - chose_younger) + 10,
+            mean = mean(chose_younger),
+            n = n()) %>%
+  mutate(estimate = alpha / (alpha + beta),
+         ci.min = qbeta(.025, shape1 = alpha, shape2 = beta),
+         ci.max = qbeta(.975, shape1 = alpha, shape2 = beta)) %>%
+  separate(context_label, into = c("race","sex","experience"))
+
+estimates_validation_data
+
+estimates_validation_data %>%
+  ggplot(aes(x = experience, y = estimate,
+             label = format(round(estimate,2), nsmall = 2),
+             ymin = ci.min, ymax = ci.max)) +
+  geom_errorbar(width = .5) +
+  geom_label() +
+  facet_grid(race ~ sex) +
+  xlab("Political Experience") +
+  ylab("P(Chooses Younger)")
+```
+
