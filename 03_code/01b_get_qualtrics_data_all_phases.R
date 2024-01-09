@@ -82,6 +82,12 @@ df_survey <- df_survey %>%
 
 cat("\nNumber of observations after dropping test cases\n")
 nrow(df_survey)
+
+df_survey %>%
+  group_by(batch_id, batch_type) %>%
+  summarize(n = n()) %>% 
+  print(n=50)
+
 ###############################################
 # Survey Validation
 ###############################################
@@ -129,6 +135,11 @@ df_clean <- df_survey %>%
   arrange(id) %>%
   mutate(id = row_number()) %>%
   select(id, everything())
+
+df_clean %>%
+  group_by(batch_id, batch_type) %>%
+  summarize(n = n()) %>% 
+  print(n=50)
 
 # saving locally
 df_clean %>%

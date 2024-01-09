@@ -1,52 +1,32 @@
-`summarise()` has grouped output by 'batch_type'. You can override using the `.groups` argument.
+`summarise()` has grouped output by 'batch_id'. You can override using the `.groups` argument.
 # A tibble: 25 × 3
-# Groups:   batch_type [3]
-   batch_type                 batch_id     n
-   <ord>                         <dbl> <int>
- 1 Warmup                            0   438
- 2 Iterative Batch Phase: Max        1    99
- 3 Iterative Batch Phase: Max        2   100
- 4 Iterative Batch Phase: Max        3   100
- 5 Iterative Batch Phase: Max        4   100
- 6 Iterative Batch Phase: Min        1   101
- 7 Iterative Batch Phase: Min        2   101
- 8 Iterative Batch Phase: Min        3   100
- 9 Iterative Batch Phase: Min        4    99
-10 Iterative Batch Phase: Min        5   101
-11 Iterative Batch Phase: Min        6   101
-12 Iterative Batch Phase: Min        7   101
-13 Iterative Batch Phase: Min        8   100
-14 Iterative Batch Phase: Min        9   102
-15 Iterative Batch Phase: Min       10   100
-16 Iterative Batch Phase: Min       11   100
-17 Iterative Batch Phase: Min       12   100
-18 Iterative Batch Phase: Min       13   101
-19 Iterative Batch Phase: Min       14   100
-20 Iterative Batch Phase: Min       15   100
-21 Iterative Batch Phase: Min       16    99
-22 Iterative Batch Phase: Min       17   100
-23 Iterative Batch Phase: Min       18   102
-24 Iterative Batch Phase: Min       19   100
-25 Iterative Batch Phase: Min       20   101
+# Groups:   batch_id [21]
+   batch_id batch_type                     n
+      <dbl> <chr>                      <int>
+ 1        0 Warmup                       317
+ 2        1 Iterative Batch Phase: Max    99
+ 3        1 Iterative Batch Phase: Min   101
+ 4        2 Iterative Batch Phase: Max   100
+ 5        2 Iterative Batch Phase: Min   101
+ 6        3 Iterative Batch Phase: Max   100
+ 7        3 Iterative Batch Phase: Min   100
+ 8        4 Iterative Batch Phase: Max   100
+ 9        4 Iterative Batch Phase: Min    99
+10        5 Iterative Batch Phase: Min   101
+11        6 Iterative Batch Phase: Min   101
+12        7 Iterative Batch Phase: Min   101
+13        8 Iterative Batch Phase: Min   100
+14        9 Iterative Batch Phase: Min   102
+15       10 Iterative Batch Phase: Min   100
+16       11 Iterative Batch Phase: Min   100
+17       12 Iterative Batch Phase: Min   100
+18       13 Iterative Batch Phase: Min   101
+19       14 Iterative Batch Phase: Min   100
+20       15 Iterative Batch Phase: Min   100
+21       16 Iterative Batch Phase: Min    99
+22       17 Iterative Batch Phase: Min   100
+23       18 Iterative Batch Phase: Min   102
+24       19 Iterative Batch Phase: Min   100
+25       20 Iterative Batch Phase: Min   101
 Distinct contexts for hypothesis testing: 5, 6
 Population weights
-# A tibble: 6 × 6
-  race                      female hispanic   age  weight   num
-  <fct>                     <lgl>  <lgl>    <dbl>   <dbl> <int>
-1 Black or African American FALSE  FALSE       18 0.00113  2335
-2 Black or African American FALSE  FALSE       19 0.00108  2430
-3 Black or African American FALSE  FALSE       20 0.00118  2319
-4 Black or African American FALSE  FALSE       21 0.00122  2270
-5 Black or African American FALSE  FALSE       22 0.00114  1998
-6 Black or African American FALSE  FALSE       23 0.00111  1934
-
-Number of rows in data[1] 1206
-`summarise()` has grouped output by 'context'. You can override using the `.groups` argument.
-
-Simple mean estimates
-# A tibble: 1 × 6
-  method      estimate     se ci.min ci.max    pval
-  <chr>          <dbl>  <dbl>  <dbl>  <dbl>   <dbl>
-1 simple_mean   0.0755 0.0255 0.0256  0.125 0.00304
-
-Bootstrap estimates

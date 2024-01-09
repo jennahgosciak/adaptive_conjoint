@@ -1,5 +1,5 @@
-  |                                                                                                                                                              |                                                                                                                                                      |   0%  |                                                                                                                                                              |==========================                                                                                                                            |  17%  |                                                                                                                                                              |===================================================                                                                                                   |  34%  |                                                                                                                                                              |=====================================================================================                                                                 |  57%  |                                                                                                                                                              |===========================================================================================================================                           |  82%  |                                                                                                                                                              |======================================================================================================================================================| 100%
-[1mindexing[0m [34mPolitical Candidates.csv[0m [=========================================================================================================] [32m2.15GB/s[0m, eta: [36m 0s[0m                                                                                                                                                                                                   [1mindexing[0m [34mPolitical Candidates.csv[0m [=======================================================================================================] [32m280.12MB/s[0m, eta: [36m 0s[0m                                                                                                                                                                                                   
+  |                                                                                                                                                              |                                                                                                                                                      |   0%  |                                                                                                                                                              |==================================                                                                                                                    |  23%  |                                                                                                                                                              |===================================================                                                                                                   |  34%  |                                                                                                                                                              |=================================================================================================                                                     |  65%  |                                                                                                                                                              |====================================================================================================================================================  |  99%  |                                                                                                                                                              |======================================================================================================================================================| 100%
+[1mindexing[0m [34mPolitical Candidates.csv[0m [=========================================================================================================] [32m2.15GB/s[0m, eta: [36m 0s[0m                                                                                                                                                                                                   [1mindexing[0m [34mPolitical Candidates.csv[0m [=======================================================================================================] [32m223.03MB/s[0m, eta: [36m 0s[0m                                                                                                                                                                                                   
 ── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 cols(
   .default = col_character(),
@@ -33,6 +33,37 @@ Number of observations in data
 
 Number of observations after dropping test cases
 [1] 4738
+`summarise()` has grouped output by 'batch_id'. You can override using the `.groups` argument.
+# A tibble: 26 × 3
+# Groups:   batch_id [22]
+   batch_id batch_type                     n
+      <dbl> <chr>                      <int>
+ 1        0 Warmup                       323
+ 2        1 Iterative Batch Phase: Max   102
+ 3        1 Iterative Batch Phase: Min   101
+ 4        2 Iterative Batch Phase: Max   100
+ 5        2 Iterative Batch Phase: Min   101
+ 6        3 Iterative Batch Phase: Max   102
+ 7        3 Iterative Batch Phase: Min   100
+ 8        4 Iterative Batch Phase: Max   101
+ 9        4 Iterative Batch Phase: Min    99
+10        5 Iterative Batch Phase: Min   101
+11        6 Iterative Batch Phase: Min   101
+12        7 Iterative Batch Phase: Min   101
+13        8 Iterative Batch Phase: Min   100
+14        9 Iterative Batch Phase: Min   102
+15       10 Iterative Batch Phase: Min   100
+16       11 Iterative Batch Phase: Min   100
+17       12 Iterative Batch Phase: Min   100
+18       13 Iterative Batch Phase: Min   101
+19       14 Iterative Batch Phase: Min   100
+20       15 Iterative Batch Phase: Min   100
+21       16 Iterative Batch Phase: Min   100
+22       17 Iterative Batch Phase: Min   100
+23       18 Iterative Batch Phase: Min   102
+24       19 Iterative Batch Phase: Min   100
+25       20 Iterative Batch Phase: Min   101
+26      100 Validation                  2000
 Warning messages:
 1: Unknown or uninitialised column: `Prolific ID Q`. 
 2: ID is not unique 
@@ -54,4 +85,35 @@ Warning messages:
 3: In check_commitment(.) :
   Dropping 4 survey respondents who did not pass commitment check 2
 4: In check_commitment(.) : 4721 respondents in the data
-[1mwrote[0m [32m11.57kB[0m in [36m 0s[0m, [32m822.30MB/s[0m                                                                                                                                                              [1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                                                              
+`summarise()` has grouped output by 'batch_id'. You can override using the `.groups` argument.
+# A tibble: 26 × 3
+# Groups:   batch_id [22]
+   batch_id batch_type                     n
+      <dbl> <chr>                      <int>
+ 1        0 Warmup                       317
+ 2        1 Iterative Batch Phase: Max    99
+ 3        1 Iterative Batch Phase: Min   101
+ 4        2 Iterative Batch Phase: Max   100
+ 5        2 Iterative Batch Phase: Min   101
+ 6        3 Iterative Batch Phase: Max   100
+ 7        3 Iterative Batch Phase: Min   100
+ 8        4 Iterative Batch Phase: Max   100
+ 9        4 Iterative Batch Phase: Min    99
+10        5 Iterative Batch Phase: Min   101
+11        6 Iterative Batch Phase: Min   101
+12        7 Iterative Batch Phase: Min   101
+13        8 Iterative Batch Phase: Min   100
+14        9 Iterative Batch Phase: Min   102
+15       10 Iterative Batch Phase: Min   100
+16       11 Iterative Batch Phase: Min   100
+17       12 Iterative Batch Phase: Min   100
+18       13 Iterative Batch Phase: Min   101
+19       14 Iterative Batch Phase: Min   100
+20       15 Iterative Batch Phase: Min   100
+21       16 Iterative Batch Phase: Min    99
+22       17 Iterative Batch Phase: Min   100
+23       18 Iterative Batch Phase: Min   102
+24       19 Iterative Batch Phase: Min   100
+25       20 Iterative Batch Phase: Min   101
+26      100 Validation                  1996
+[1mwrote[0m [32m11.57kB[0m in [36m 0s[0m, [32m724.11MB/s[0m                                                                                                                                                              [1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                                                              

@@ -102,15 +102,20 @@ if (add_all_phases == TRUE) {
       batch_id, batch_type, id, chose_younger, race, female, age, hispanic, drop_demo_flag,
       context, context_label
     )
-  output_fname <- "01_intermediate/qualtrics_data_{survey_lab}_clean_all_phases"
+  output_fname <- str_glue("01_intermediate/qualtrics_data_{survey_lab}_clean_all_phases")
 } else {
   df_demo <- df_demo %>%
     select(
       id, chose_younger, race, female, age, hispanic, drop_demo_flag,
       context, context_label
     )
-  output_fname <- "01_intermediate/qualtrics_data_{survey_lab}_clean"
+  output_fname <- str_glue("01_intermediate/qualtrics_data_{survey_lab}_clean")
 }
+
+df_demo %>%
+  group_by(batch_id, batch_type) %>%
+  summarize(n = n()) %>% 
+  print(n=50)
 
 # saving locally
 df_demo %>%
