@@ -2,6 +2,10 @@ Demographic Breakdowns by Experimental Phase
 ================
 2024-01-09
 
+# Loading survey data
+
+- Includes warmup, iterative batch phases, and validation
+
 ``` r
 df <- readRDS("../02_output/political_candidates_data_clean.RDS")
 
@@ -49,6 +53,11 @@ df %>%
     ## 3 Iterative Batch Phase: Min  2004
     ## 4 Validation                  1996
 
+## Examining female and hispanicity
+
+- There are some differences in the percent female between the different
+  phases
+
 ``` r
 ## look at female and hispanicity
 df %>% 
@@ -64,6 +73,10 @@ df %>%
     ## 2 Iterative Batch Phase: Max      181      0.454         36       0.0902
     ## 3 Iterative Batch Phase: Min      962      0.480        178       0.0888
     ## 4 Validation                     1146      0.574        191       0.0957
+
+## Examining differences in ages
+
+- Distribution seems similar across phases
 
 ``` r
 # age
@@ -104,7 +117,11 @@ df %>%
 
     ## Warning: Removed 56 rows containing non-finite values (`stat_bin()`).
 
-![](demographic_breakdowns_political_candidates_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](03_demographic_breakdowns_political_candidates_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+## Examining differences in race
+
+- Distribution also is similar across batches
 
 ``` r
 # race
@@ -147,4 +164,4 @@ df %>%
     ## `summarise()` has grouped output by 'batch_type'. You can override using the
     ## `.groups` argument.
 
-![](demographic_breakdowns_political_candidates_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](03_demographic_breakdowns_political_candidates_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->

@@ -10,6 +10,10 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
+# Loading survey data
+
+* Includes warmup, iterative batch phases, and validation
+
 ```{r}
 df <- readRDS("../02_output/political_candidates_data_clean.RDS")
 
@@ -27,6 +31,11 @@ df %>%
   group_by(batch_type) %>% 
   summarize(n = n())
 ```
+
+## Examining female and hispanicity
+
+* There are some differences in the percent female between the different phases
+
 ```{r}
 ## look at female and hispanicity
 df %>% 
@@ -34,6 +43,10 @@ df %>%
   summarize(across(c("female", "hispanic"), .fns = lst(n = ~sum(.),
                                                        per = ~mean(.))))
 ```
+
+## Examining differences in ages
+
+* Distribution seems similar across phases
 
 ```{r}
 # age
@@ -48,6 +61,10 @@ df %>%
   geom_histogram() +
   facet_wrap(~batch_type)
 ```
+
+## Examining differences in race
+
+* Distribution also is similar across batches
 
 ```{r}
 # race
