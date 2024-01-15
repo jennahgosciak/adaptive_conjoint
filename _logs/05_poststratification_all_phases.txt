@@ -30,3 +30,35 @@
 25       20 Iterative Batch Phase: Min   101
 Distinct contexts for hypothesis testing: 5, 6
 Population weights
+# A tibble: 6 × 6
+  race                      female hispanic   age  weight   num
+  <fct>                     <lgl>  <lgl>    <dbl>   <dbl> <int>
+1 Black or African American FALSE  FALSE       18 0.00113  2335
+2 Black or African American FALSE  FALSE       19 0.00108  2430
+3 Black or African American FALSE  FALSE       20 0.00118  2319
+4 Black or African American FALSE  FALSE       21 0.00122  2270
+5 Black or African American FALSE  FALSE       22 0.00114  1998
+6 Black or African American FALSE  FALSE       23 0.00111  1934
+
+Number of rows in data[1] 1176
+`summarise()` has grouped output by 'context'. You can override using the `.groups` argument.
+
+Simple mean estimates
+# A tibble: 1 × 6
+  method      estimate     se ci.min ci.max    pval
+  <chr>          <dbl>  <dbl>  <dbl>  <dbl>   <dbl>
+1 simple_mean   0.0711 0.0260 0.0200  0.122 0.00635
+
+Bootstrap estimates
+# A tibble: 1 × 6
+  method         estimate     se  ci.min ci.max  pval
+  <chr>             <dbl>  <dbl>   <dbl>  <dbl> <dbl>
+1 poststratified   0.0577 0.0355 -0.0118  0.127 0.104
+
+Results: simple mean and poststratification estimates
+# A tibble: 2 × 6
+  method         estimate     se  ci.min ci.max    pval
+  <chr>             <dbl>  <dbl>   <dbl>  <dbl>   <dbl>
+1 simple_mean      0.0711 0.0260  0.0200  0.122 0.00635
+2 poststratified   0.0577 0.0355 -0.0118  0.127 0.104  
+[1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                                                              

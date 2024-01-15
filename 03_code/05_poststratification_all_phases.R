@@ -20,7 +20,7 @@ df_analysis <- readRDS(str_glue("01_intermediate/qualtrics_data_{survey_lab}_cle
   filter(batch_type != 'Validation')
 
 df_analysis %>% 
-  group_by(batch_id, batch_type)
+  group_by(batch_id, batch_type) %>% 
   summarize(n = n()) %>% 
   print(n=50)
 
