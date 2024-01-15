@@ -6,7 +6,8 @@ load_qualtrics <- function(survey_name) {
   surveys <- all_surveys()
   # select survey ID
   pc_id <- surveys[surveys["name"] == survey_name, ][["id"]]
-
+  
+  print(str_glue("Loading survey data for {survey_name}"))
   return(fetch_survey(
     surveyID = pc_id,
     verbose = TRUE,
@@ -231,14 +232,18 @@ create_context_var_political <- function(df) {
     )
 }
 
-create_profile_var_jobs <- function(df, pi) {
+create_context_var_jobs <- function(df, pi) {
   df %>%
-    # create 'profile' variable
-    mutate(profile = case_when(
+    # create 'conext' variable
+    mutate(context = case_when(
       rnum <= pi1 ~ 1,
       rnum > pi1 & rnum <= pi2 ~ 2,
-      rnum > pi2 & rnum <= pi3 ~ 3
-    ))
+      rnum > pi2 & rnum <= pi3 ~ 3,
+      rnum > pi3 ~ 4,
+      TRUE ~ NA_integer_
+      # need to add context label
+    )) %>% 
+    verify(!is.na(context))
 }
 
 create_fake_data <- function(pi, profile_prob, batch_size, num_profiles = 8, cdf = T) {
