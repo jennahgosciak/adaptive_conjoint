@@ -15,7 +15,7 @@ library(tidyverse)
 * Includes warmup, iterative batch phases, and validation
 
 ```{r}
-df <- readRDS("../02_output/political_candidates_data_clean.RDS")
+df <- readRDS("../../02_output/job_applicants_data_clean.RDS")
 
 df <- df %>%
   mutate(batch_type = factor(batch_type,
