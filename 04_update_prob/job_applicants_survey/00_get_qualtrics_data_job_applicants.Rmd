@@ -50,7 +50,7 @@ df %>%
 # drop test data
 df <- df %>%
   mutate(StartDate_clean = ymd_hms(StartDate)) %>%
-  verify(is.na(StartDate_clean) == is.na(StartDate)) %>% 
+  verify(is.na(StartDate_clean) == is.na(StartDate)) %>%
   filter(StartDate_clean >= ymd_hms("2024-01-15-00-00-00"))
 
 df %>%
@@ -81,9 +81,9 @@ df %>%
 # we should only update it as we increase batches
 
 # check max date times on each day
-df %>% 
-  mutate(date = date(StartDate_clean)) %>% 
-  group_by(date) %>% 
+df %>%
+  mutate(date = date(StartDate_clean)) %>%
+  group_by(date) %>%
   summarize(max_date_time = max(StartDate_clean))
 
 df <- df %>%
@@ -98,10 +98,10 @@ df <- df %>%
       batch_id == 0 ~ "Warmup",
       TRUE ~ NA_character_
     )
-  ) %>% 
-  verify(!is.na(batch_id)) %>% 
+  ) %>%
+  verify(!is.na(batch_id)) %>%
   verify(!is.na(batch_type))
-  
+
 df %>%
   group_by(batch_type, batch_id) %>%
   summarize(n = n())
@@ -119,7 +119,7 @@ if (!all(unique(df$Status) == "IP Address")) {
   warning("Test/spam data included in the analysis file")
   print(str_glue("Number of observations in data: {nrow(df)}"))
   print(str_glue("Status values in data: {str_c(unique(df$Status), collapse=', ')}"))
-  df <- df %>% 
+  df <- df %>%
     filter(Status == "IP Address")
   print(str_glue("Number of observations left in data: {nrow(df)}"))
 }
@@ -133,16 +133,16 @@ df %>%
 
 ```{r}
 # check distinct probabilities based on embedded data
-df %>% 
-  select(batch_type, batch_id, str_c("pi", 1:3)) %>% 
+df %>%
+  select(batch_type, batch_id, str_c("pi", 1:3)) %>%
   distinct()
 ```
 
 ```{r}
 # check consent means their responses are missing
 df %>%
-  filter(Consent == "I do not consent to participate") %>% 
-    select(Consent, `Duration (in seconds)`, Finished, batch_id, batch_type)
+  filter(Consent == "I do not consent to participate") %>%
+  select(Consent, `Duration (in seconds)`, Finished, batch_id, batch_type)
 
 df <- df %>%
   check_consent()
@@ -151,7 +151,7 @@ df <- df %>%
 ```{r}
 # check that all completed
 df %>%
-  filter(Finished != TRUE) %>% 
+  filter(Finished != TRUE) %>%
   select(StartDate_clean, EndDate, `Duration (in seconds)`, Finished, Consent, PreScreen_Q1:QD5)
 
 df <- df %>%
@@ -166,13 +166,13 @@ df <- df %>%
 ```{r}
 # visually assessing why these respondents failed the commitment check
 df %>%
-  filter(Commitment_Q1 != "Yes, I will") %>% 
-    select(Commitment_Q1, Commitment_Q2, `Duration (in seconds)`, Finished, batch_id, batch_type)
-  
+  filter(Commitment_Q1 != "Yes, I will") %>%
+  select(Commitment_Q1, Commitment_Q2, `Duration (in seconds)`, Finished, batch_id, batch_type)
+
 
 df %>%
-  filter(str_to_lower(Commitment_Q2) != "purple") %>% 
-    select(Commitment_Q1, Commitment_Q2, `Duration (in seconds)`, Finished, batch_id, batch_type)
+  filter(str_to_lower(Commitment_Q2) != "purple") %>%
+  select(Commitment_Q1, Commitment_Q2, `Duration (in seconds)`, Finished, batch_id, batch_type)
 
 df <- df %>%
   check_commitment()
@@ -183,23 +183,23 @@ df <- df %>%
 if (length(unique(df$`Prolific ID Q`)) != nrow(df)) {
   warning("ID is not unique")
   print(str_glue("Number of rows in data: {nrow(df)}"))
-  df <- df %>% 
-    group_by(`Prolific ID Q`) %>% 
-    arrange(`Prolific ID Q`, StartDate_clean) %>% 
-    mutate(flag_first_obs = if_else(row_number() == 1, 1, 0)) %>% 
+  df <- df %>%
+    group_by(`Prolific ID Q`) %>%
+    arrange(`Prolific ID Q`, StartDate_clean) %>%
+    mutate(flag_first_obs = if_else(row_number() == 1, 1, 0)) %>%
     ungroup()
-  
-  df %>% 
-    group_by(`Prolific ID Q`) %>% 
-    mutate(n = n()) %>% 
-    arrange(desc(n), StartDate_clean) %>% 
-    ungroup() %>% 
-    select(n, StartDate_clean, EndDate, flag_first_obs, `Duration (in seconds)`, Finished, batch_id, batch_type) %>% 
+
+  df %>%
+    group_by(`Prolific ID Q`) %>%
+    mutate(n = n()) %>%
+    arrange(desc(n), StartDate_clean) %>%
+    ungroup() %>%
+    select(n, StartDate_clean, EndDate, flag_first_obs, `Duration (in seconds)`, Finished, batch_id, batch_type) %>%
     print()
-  
-  df <- df %>% 
+
+  df <- df %>%
     filter(flag_first_obs == 1)
-  
+
   print(str_glue("Number of rows in data after dropping duplicate ID: {nrow(df)}"))
 }
 
@@ -210,9 +210,9 @@ stopifnot(length(unique(df$`Prolific ID Q`)) == nrow(df))
 ```{r}
 # create context variable
 df <- df %>%
-  create_context_var_jobs() %>% 
-  verify(!is.na(context)) # %>% 
-  # verify(!is.na(context_label))
+  create_context_var_jobs() %>%
+  verify(!is.na(context)) # %>%
+# verify(!is.na(context_label))
 
 df %>%
   group_by(batch_type, context) %>%
@@ -226,86 +226,92 @@ df %>%
 ```{r}
 df %>%
   group_by(context, batch_type, batch_id) %>%
-  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Max")) %>% 
+  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Max")) %>%
   summarize(n = n()) %>%
-  group_by(batch_type, batch_id) %>% 
-  mutate(n = n/sum(n)) %>% 
-  ggplot(aes(context, n)) +
-  geom_col() +
-  theme_classic() +
-  facet_wrap(~batch_id)  +
-  labs(title = "Sample Sizes in Iterative Batch Phase: Max",
-       y = "Share of total")
-
-df %>%
-  group_by(context, batch_type, batch_id) %>%
-  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>% 
-  summarize(n = n()) %>%
-  group_by(batch_type, batch_id) %>% 
-  mutate(n = n/sum(n)) %>%
+  group_by(batch_type, batch_id) %>%
+  mutate(n = n / sum(n)) %>%
   ggplot(aes(context, n)) +
   geom_col() +
   theme_classic() +
   facet_wrap(~batch_id) +
-  labs(title = "Sample Sizes in Iterative Batch Phase: Min",
-       y = "Share of total")
+  labs(
+    title = "Sample Sizes in Iterative Batch Phase: Max",
+    y = "Share of total"
+  )
+
+df %>%
+  group_by(context, batch_type, batch_id) %>%
+  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>%
+  summarize(n = n()) %>%
+  group_by(batch_type, batch_id) %>%
+  mutate(n = n / sum(n)) %>%
+  ggplot(aes(context, n)) +
+  geom_col() +
+  theme_classic() +
+  facet_wrap(~batch_id) +
+  labs(
+    title = "Sample Sizes in Iterative Batch Phase: Min",
+    y = "Share of total"
+  )
 ```
 
 ```{r}
 df %>%
   group_by(context, batch_type, batch_id) %>%
-  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Max")) %>% 
+  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Max")) %>%
   summarize(n = n()) %>%
-  group_by(batch_id, batch_type) %>% 
-  arrange(context) %>% 
-  mutate(n = cumsum(n)/sum(n))  %>% 
+  group_by(batch_id, batch_type) %>%
+  arrange(context) %>%
+  mutate(n = cumsum(n) / sum(n)) %>%
   ggplot(aes(context, n)) +
   geom_col() +
   theme_classic() +
-  facet_wrap(~batch_id)  +
+  facet_wrap(~batch_id) +
   labs(title = "Cumulative Sample Sizes in Iterative Batch Phase: Max")
 
 df %>%
   group_by(context, batch_type, batch_id) %>%
-  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>% 
+  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>%
   summarize(n = n()) %>%
-  group_by(batch_id, batch_type) %>% 
-  arrange(context) %>% 
-  mutate(n = cumsum(n)/sum(n))  %>% 
+  group_by(batch_id, batch_type) %>%
+  arrange(context) %>%
+  mutate(n = cumsum(n) / sum(n)) %>%
   ggplot(aes(context, n)) +
   geom_col() +
   theme_classic() +
-  facet_wrap(~batch_id)  +
+  facet_wrap(~batch_id) +
   labs(title = "Cumulative Sample Sizes in Iterative Batch Phase: Min")
 ```
 
 
 ```{r}
-df  %>%
+df %>%
   filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Max")) %>%
   group_by(batch_id, batch_type) %>%
-  select(str_c("pi", 1:3)) %>% 
-  distinct() %>% 
-  pivot_longer(-c(batch_id, batch_type)) %>% 
+  select(str_c("pi", 1:3)) %>%
+  distinct() %>%
+  pivot_longer(-c(batch_id, batch_type)) %>%
   mutate(context = str_replace_all(name, "pi", "")) %>%
   ggplot(aes(context, value)) +
   geom_col() +
   theme_classic() +
   facet_wrap(~batch_id)
 
-df  %>%
-  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>% 
+df %>%
+  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>%
   group_by(batch_id, batch_type) %>%
-  select(str_c("pi", 1:3)) %>% 
-  distinct() %>% 
-  pivot_longer(-c(batch_id, batch_type)) %>% 
+  select(str_c("pi", 1:3)) %>%
+  distinct() %>%
+  pivot_longer(-c(batch_id, batch_type)) %>%
   mutate(context = str_replace_all(name, "pi", "")) %>%
   ggplot(aes(context, value)) +
   geom_col() +
   theme_classic() +
   facet_wrap(~batch_id) +
-  labs(title = "CDF for Iterative Batch Phase: Min",
-       y = "Cumulative Probability")
+  labs(
+    title = "CDF for Iterative Batch Phase: Min",
+    y = "Cumulative Probability"
+  )
 ```
 
 ## Clean Qualtrics Data
@@ -416,10 +422,10 @@ if (check_rowtotal == FALSE) {
 
 ```{r}
 # create ID with a random ordering
-df_clean <- df_clean %>% 
-  mutate(rand_sort = runif(nrow(df_clean))) %>% 
-  arrange(batch_id, rand_sort) %>% 
-  mutate(unique_id = row_number()) %>% 
+df_clean <- df_clean %>%
+  mutate(rand_sort = runif(nrow(df_clean))) %>%
+  arrange(batch_id, rand_sort) %>%
+  mutate(unique_id = row_number()) %>%
   select(-rand_sort)
 ```
 

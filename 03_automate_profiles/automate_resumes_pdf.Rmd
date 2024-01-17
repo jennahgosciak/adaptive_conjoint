@@ -50,7 +50,7 @@ treatment <- c(
   "Marketing Coordinator"
 )
 treatment_header <- c(
-  "| Creekside Elementary | Denver, CO 80014 | 2022 – present",
+  "| Creekside Elementary | Denver, CO 80014 | 2022 <U+2013> present",
   "| Goods Delivered | Denver, CO | 2021 to Present"
 )
 treatment_description <- c(

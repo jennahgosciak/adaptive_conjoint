@@ -63,7 +63,7 @@ treatment <- c(
   "Volunteer Treasurer"
 )
 treatment_header <- c(
-  "| Creekside Elementary | 2022 – present",
+  "| Creekside Elementary | 2022 <U+2013> present",
   "| Riverview Neighborhood Association | 2022 - present"
 )
 
@@ -92,7 +92,7 @@ position1 <- c(
 )
 position_desc1 <- c(
   "Report directly to Marketing Manager, assisting in the development of the overall marketing strategy.",
-  "Crafted SEO-friendly website, blog, and social media content, telling the organization’s story across platforms."
+  "Crafted SEO-friendly website, blog, and social media content, telling the organization<U+2019>s story across platforms."
 )
 
 position2 <- c(

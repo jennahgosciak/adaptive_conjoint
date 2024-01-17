@@ -6,7 +6,7 @@ load_qualtrics <- function(survey_name) {
   surveys <- all_surveys()
   # select survey ID
   pc_id <- surveys[surveys["name"] == survey_name, ][["id"]]
-  
+
   print(str_glue("Loading survey data for {survey_name}"))
   return(fetch_survey(
     surveyID = pc_id,
@@ -181,20 +181,20 @@ check_pi_vars <- function(df, probabilities, num_contexts) {
     select(batch_id, batch_type, all_of(str_c("pi", 1:num_contexts))) %>%
     distinct() %>%
     pivot_longer(-c(batch_id, batch_type),
-                 names_to = "Embedded data variable", values_to = "CDF_Data"
+      names_to = "Embedded data variable", values_to = "CDF_Data"
     ) %>%
     left_join(probabilities, by = c("Embedded data variable", "batch_id" = "Batch", "batch_type" = "Batch Type")) %>%
     mutate(Comparison = CDF_Threshold == CDF_Data)
-  
+
   check_pi <- comp_df %>%
     pull(Comparison) %>%
     equals(TRUE) %>%
     all()
-  
+
   if (check_pi == FALSE) {
     warning("Embedded data variables do not match probabilities in log")
-    return(comp_df %>% 
-             filter(Comparison == FALSE))
+    return(comp_df %>%
+      filter(Comparison == FALSE))
   }
 }
 
@@ -235,26 +235,28 @@ create_context_var_political <- function(df) {
 create_context_var_jobs <- function(df, pi) {
   df %>%
     # create 'conext' variable
-    mutate(context = case_when(
-      rnum <= pi1 ~ 1,
-      rnum > pi1 & rnum <= pi2 ~ 2,
-      rnum > pi2 & rnum <= pi3 ~ 3,
-      rnum > pi3 ~ 4,
-      TRUE ~ NA_integer_
-      # need to add context label
-    ),
-    # create profile context label
-    context_label = case_when(
-      context == 1 ~ "black_low",
-      context == 2 ~ "black_high",
-      context == 3 ~ "white_low",
-      context == 4 ~ "white_high",
-      TRUE ~ NA_character_
-    ),
-    context = factor(context,
-                     levels = c(1:4),
-                     ordered = TRUE
-    )) %>% 
+    mutate(
+      context = case_when(
+        rnum <= pi1 ~ 1,
+        rnum > pi1 & rnum <= pi2 ~ 2,
+        rnum > pi2 & rnum <= pi3 ~ 3,
+        rnum > pi3 ~ 4,
+        TRUE ~ NA_integer_
+        # need to add context label
+      ),
+      # create profile context label
+      context_label = case_when(
+        context == 1 ~ "black_low",
+        context == 2 ~ "black_high",
+        context == 3 ~ "white_low",
+        context == 4 ~ "white_high",
+        TRUE ~ NA_character_
+      ),
+      context = factor(context,
+        levels = c(1:4),
+        ordered = TRUE
+      )
+    ) %>%
     verify(!is.na(context))
 }
 
