@@ -13,13 +13,14 @@ update_outcomes <- function(df, num_contexts, num_outcome, outcome_value) {
   return(num_outcome + obs_outcome)
 }
 
-update_outcomes_loop <- function(df, num_contexts, num_outcome1, num_outcome0) {
+update_outcomes_loop <- function(df, varname, num_contexts, num_outcome1, num_outcome0) {
+  var <- enquo(varname)
   # iterate through each context number
   # update the number of 1,0 responses based on the data
   for (i in 1:num_contexts) {
     obs_responses <- df %>%
       filter(context == i) %>%
-      pull(chose_younger)
+      pull(!!var)
     num_outcome1[i] <- num_outcome1[i] + sum(obs_responses)
     num_outcome0[i] <- num_outcome0[i] + sum(obs_responses == 0)
   }
@@ -30,7 +31,7 @@ update_outcomes_loop <- function(df, num_contexts, num_outcome1, num_outcome0) {
   return(lst(num_outcome1, num_outcome0))
 }
 
-update_ts <- function(df, num_sim, num_contexts, num_outcome1, num_outcome0, cdf, type) {
+update_ts <- function(df, varname, num_sim, num_contexts, num_outcome1, num_outcome0, cdf, type) {
   # with the data provided
   # calculated the observed outcomes = 1, and outcomes = 0
 
@@ -39,7 +40,7 @@ update_ts <- function(df, num_sim, num_contexts, num_outcome1, num_outcome0, cdf
   # num_outcome0 <- update_outcomes(df, num_contexts, num_outcome0, 0)
 
   # this approach uses a for loop
-  upd_outcomes <- update_outcomes_loop(df, num_contexts, num_outcome1, num_outcome0)
+  upd_outcomes <- update_outcomes_loop(df, varname, num_contexts, num_outcome1, num_outcome0)
   num_outcome1 <- upd_outcomes$num_outcome1
   num_outcome0 <- upd_outcomes$num_outcome0
 
