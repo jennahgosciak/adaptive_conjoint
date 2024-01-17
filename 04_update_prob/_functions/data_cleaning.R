@@ -35,18 +35,18 @@ create_outcome_var_political <- function(df) {
       rowSums(na.rm = T))
 }
 
-clean_job_data <- function(df) {
+create_outcome_var_jobs <- function(df) {
   df %>%
     # = 1 if selecting non-mother
     # = 0 if selecting mother candidate
     mutate(across(str_c("Q", 1:8), ~ case_when(
-      . == "Candidate 1" & rnum_mother <= 0.5 ~ 1,
-      . == "Candidate 2" & rnum_mother > 0.5 ~ 1,
-      . == "Candidate 1" & rnum_mother > 0.5 ~ 0,
-      . == "Candidate 2" & rnum_mother <= 0.5 ~ 0,
+      . == "Candidate 2" & rnum_mother <= 0.5 ~ 1,
+      . == "Candidate 1" & rnum_mother > 0.5 ~ 1,
+      . == "Candidate 2" & rnum_mother > 0.5 ~ 0,
+      . == "Candidate 1" & rnum_mother <= 0.5 ~ 0,
       TRUE ~ NA_real_
     ))) %>%
-    mutate(candidate_response = select(., str_c("Q", 1:8)) %>%
+    mutate(chose_mother = select(., str_c("Q", 1:8)) %>%
       rowSums(na.rm = T))
 }
 
@@ -242,6 +242,18 @@ create_context_var_jobs <- function(df, pi) {
       rnum > pi3 ~ 4,
       TRUE ~ NA_integer_
       # need to add context label
+    ),
+    # create profile context label
+    context_label = case_when(
+      context == 1 ~ "black_low",
+      context == 2 ~ "black_high",
+      context == 3 ~ "white_low",
+      context == 4 ~ "white_high",
+      TRUE ~ NA_character_
+    ),
+    context = factor(context,
+                     levels = c(1:4),
+                     ordered = TRUE
     )) %>% 
     verify(!is.na(context))
 }

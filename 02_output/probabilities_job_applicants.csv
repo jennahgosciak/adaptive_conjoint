@@ -1,1 +1,4 @@
 Batch,Embedded data variable,CDF_Threshold,Batch Type
+0,pi1,0.25,Warmup
+0,pi2,0.5,Warmup
+0,pi3,0.75,Warmup

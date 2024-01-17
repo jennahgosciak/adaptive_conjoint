@@ -50,8 +50,8 @@ df %>%
 # drop test data
 df <- df %>%
   mutate(StartDate_clean = ymd_hms(StartDate)) %>%
-  verify(is.na(StartDate_clean) == is.na(StartDate))# %>%
-  # filter(StartDate_clean >= ymd_hms("2024-01-15-00-00-00"))
+  verify(is.na(StartDate_clean) == is.na(StartDate)) %>% 
+  filter(StartDate_clean >= ymd_hms("2024-01-15-00-00-00"))
 
 df %>%
   nrow()
@@ -91,16 +91,16 @@ df <- df %>%
   mutate(
     batch_id = case_when(
       # NEED TO CHANGE
-      StartDate_clean <= ymd_hms("2024-01-16-00-00-00") ~ 0,
+      StartDate_clean <= ymd_hms("2024-01-17-12-00-00") ~ 0,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
       batch_id == 0 ~ "Warmup",
       TRUE ~ NA_character_
     )
-  ) #%>% 
-  #verify(!is.na(batch_id)) %>% 
-  #verify(!is.na(batch_type))
+  ) %>% 
+  verify(!is.na(batch_id)) %>% 
+  verify(!is.na(batch_type))
   
 df %>%
   group_by(batch_type, batch_id) %>%
@@ -127,8 +127,8 @@ if (!all(unique(df$Status) == "IP Address")) {
 
 ```{r, check embed data}
 # check embedded data variables match probabilities for all iterative batches
-# df %>%
-#   check_pi_vars(probabilities, 7)
+df %>%
+  check_pi_vars(probabilities, 3)
 ```
 
 ```{r}
@@ -221,11 +221,6 @@ df %>%
 df %>%
   group_by(batch_type, batch_id) %>%
   summarize(n = n())
-
-df %>% 
-  filter(batch_id == 100) %>% 
-  group_by(context) %>% 
-  summarize(n = n())
 ```
 
 ```{r}
@@ -289,7 +284,7 @@ df %>%
 df  %>%
   filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Max")) %>%
   group_by(batch_id, batch_type) %>%
-  select(str_c("pi", 1:7)) %>% 
+  select(str_c("pi", 1:3)) %>% 
   distinct() %>% 
   pivot_longer(-c(batch_id, batch_type)) %>% 
   mutate(context = str_replace_all(name, "pi", "")) %>%
@@ -301,7 +296,7 @@ df  %>%
 df  %>%
   filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>% 
   group_by(batch_id, batch_type) %>%
-  select(str_c("pi", 1:7)) %>% 
+  select(str_c("pi", 1:3)) %>% 
   distinct() %>% 
   pivot_longer(-c(batch_id, batch_type)) %>% 
   mutate(context = str_replace_all(name, "pi", "")) %>%
@@ -316,35 +311,32 @@ df  %>%
 ## Clean Qualtrics Data
 
 ```{r}
-df_clean <- create_outcome_var_political(df)
+df_clean <- create_outcome_var_jobs(df)
 
 # each question number is the random ordering of the context attributes
 df_clean %>%
-  select(chose_younger, str_c("Q", 1:8), context) %>%
-  verify(!is.na(chose_younger))
+  select(chose_mother, str_c("Q", 1:8), context) %>%
+  verify(!is.na(chose_mother))
 
 df_clean %>%
   group_by(context) %>%
   summarize(
     n = n(),
-    resp1 = sum(chose_younger),
-    resp0 = sum(chose_younger == 0)
+    resp1 = sum(chose_mother),
+    resp0 = sum(chose_mother == 0)
   )
 ```
 
 ```{r, response breakdown}
 # identify context desc
 df_clean %>%
-  select(context, starts_with("first_name"), starts_with("pol_exp")) %>%
+  select(context, context_label, starts_with("name"), starts_with("education")) %>%
   distinct() %>%
   arrange(context)
 ```
 
 ```{r, attention check}
-df_clean %>%
-  mutate(older_candidate = if_else(rnum_age <= 0.5, "Candidate 2", "Candidate 1")) %>%
-  mutate(pass_attention_check = if_else(Manipulation_Q1 == older_candidate, 1, 0)) %>%
-  summarize(per_pass_attention_check = mean(pass_attention_check))
+# no manipulation question!!
 ```
 
 ```{r, demog}
@@ -424,11 +416,11 @@ if (check_rowtotal == FALSE) {
 
 ```{r}
 df_clean %>%
-  select(context, context_label, batch_id, batch_type, chose_younger, race, age, female, hispanic) %>%
+  select(context, context_label, batch_id, batch_type, chose_mother, race, age, female, hispanic) %>%
   saveRDS("../../02_output/job_applicants_data_clean.RDS")
 
 df_clean %>%
-  select(context, context_label, batch_id, batch_type, chose_younger, race, age, female, hispanic) %>%
+  select(context, context_label, batch_id, batch_type, chose_mother, race, age, female, hispanic) %>%
   write_csv("../../02_output/job_applicants_data_clean.csv")
 ```
 
