@@ -1,60 +1,0 @@
-  |                                                                                                         |                                                                                                 |   0%  |                                                                                                         |====                                                                                             |   4%  |                                                                                                         |=================                                                                                |  17%  |                                                                                                         |===============================                                                                  |  32%  |                                                                                                         |==========================================                                                       |  44%  |                                                                                                         |=====================================================                                            |  55%  |                                                                                                         |================================================================                                 |  66%  |                                                                                                         |===============================================================================                  |  82%  |                                                                                                         |==========================================================================================       |  93%  |                                                                                                         |================================================================================================ |  99%  |                                                                                                         |=================================================================================================| 100%
-[1mindexing[0m [34mPolitical Candidates.csv[0m [==================================================] [32m559.72MB/s[0m, eta: [36m 0s[0m                                                                                                                                              [1mindexing[0m [34mPolitical Candidates.csv[0m [==================================================] [32m173.05MB/s[0m, eta: [36m 0s[0m                                                                                                                                              
-── Column specification ───────────────────────────────────────────────────────────────────────────────────
-cols(
-  .default = col_character(),
-  StartDate = col_datetime(format = ""),
-  EndDate = col_datetime(format = ""),
-  Progress = col_double(),
-  `Duration (in seconds)` = col_double(),
-  Finished = col_logical(),
-  RecordedDate = col_datetime(format = ""),
-  RecipientLastName = col_logical(),
-  RecipientFirstName = col_logical(),
-  RecipientEmail = col_logical(),
-  ExternalReference = col_logical(),
-  LocationLatitude = col_double(),
-  LocationLongitude = col_double(),
-  QD2_1_TEXT = col_double(),
-  rnum = col_double(),
-  pi1 = col_double(),
-  pi2 = col_double(),
-  pi3 = col_double(),
-  pi4 = col_double(),
-  pi5 = col_double(),
-  pi6 = col_double()
-  # ... with 13 more columns
-)
-ℹ Use `spec()` for the full column specifications.
-
-
-Number of observations in data
-[1] 5265
-
-Number of observations after dropping test cases
-[1] 4861
-Warning messages:
-1: Unknown or uninitialised column: `Prolific ID Q`. 
-2: ID is not unique 
-Warning message:
-Unknown or uninitialised column: `Status`. 
-Warning messages:
-1: In check_consent(.) : Dropping 1 survey respondents who do not consent
-2: In check_consent(.) :
-  1 survey respondents who do not consent with non-missing responses
-3: In check_consent(.) : 4860 respondents in the data
-Warning messages:
-1: In check_completion(.) :
-  Dropping 10 survey respondents who did not finish
-2: In check_completion(.) : 4850 respondents in the data
-Warning messages:
-1: In check_commitment(.) :
-  Dropping 4 survey respondents did not pass commitment check 1
-2: In check_commitment(.) : 4846 respondents in the data
-3: In check_commitment(.) :
-  Dropping 4 survey respondents who did not pass commitment check 2
-4: In check_commitment(.) : 4842 respondents in the data
-[1mwrote[0m [32m12.65kB[0m in [36m 0s[0m, [32m40.29MB/s[0m                                                                                                         [1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                         Error in gzfile(file, "rb") : cannot open the connection
-In addition: Warning message:
-In gzfile(file, "rb") :
-  cannot open compressed file '01_intermediate/qualtrics_data_political_candidates_clean_all_phases.RDS', probable reason 'No such file or directory'

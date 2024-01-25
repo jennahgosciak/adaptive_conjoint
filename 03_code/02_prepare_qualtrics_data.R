@@ -15,7 +15,7 @@ sink(file, type = "message")
 ###############################################
 # Load Qualtrics data
 ###############################################
-survey_lab <- "political_candidates"
+survey_lab <- "job_applicants"
 add_all_phases <- TRUE
 if (add_all_phases == TRUE) {
   fname <- "00_data/qualtrics_data_{survey_lab}_all_phases.RDS"

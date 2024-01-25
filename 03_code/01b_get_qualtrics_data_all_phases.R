@@ -19,8 +19,8 @@ source("./03_code/_data_cleaning.R")
 # Load Qualtrics
 ###############################################
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
-survey_name <- "Political Candidates"
-survey_lab <- "political_candidates"
+survey_name <- "Job Applicants"
+survey_lab <- "job_applicants"
 survey_id <- config$pol_candidates_survey_id
 
 df_survey <- load_qualtrics(survey_name)
@@ -127,9 +127,17 @@ df_survey <- df_survey %>%
 ###############################################
 # Generate new ID
 ###############################################
+
+# select variables to subset
+if (survey_name == "Job Applicants") {
+  varlist <- expr(c(batch_id, batch_type, PreScreen_Q1:education2, -`Create New Field or Choose From Dropdown...`))
+} else {
+  varlist <- expr(c(batch_id, batch_type, PreScreen_Q1:rnum_mother, age1:career2))
+}
+
 # create cleaned version for saving locally
 df_clean <- df_survey %>%
-  select(batch_id, batch_type, PreScreen_Q1:rnum_age, age1:career2) %>%
+  select(!!varlist) %>%
   # create a new unique random ID for linking
   mutate(id = runif(nrow(df_survey), 0, 1)) %>%
   arrange(id) %>%

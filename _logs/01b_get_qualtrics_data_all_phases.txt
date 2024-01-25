@@ -1,119 +1,0 @@
-  |                                                                                                                                                              |                                                                                                                                                      |   0%  |                                                                                                                                                              |==================================                                                                                                                    |  23%  |                                                                                                                                                              |===================================================                                                                                                   |  34%  |                                                                                                                                                              |=================================================================================================                                                     |  65%  |                                                                                                                                                              |====================================================================================================================================================  |  99%  |                                                                                                                                                              |======================================================================================================================================================| 100%
-[1mindexing[0m [34mPolitical Candidates.csv[0m [=========================================================================================================] [32m2.15GB/s[0m, eta: [36m 0s[0m                                                                                                                                                                                                   [1mindexing[0m [34mPolitical Candidates.csv[0m [=======================================================================================================] [32m223.03MB/s[0m, eta: [36m 0s[0m                                                                                                                                                                                                   
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-cols(
-  .default = col_character(),
-  StartDate = col_datetime(format = ""),
-  EndDate = col_datetime(format = ""),
-  Progress = col_double(),
-  `Duration (in seconds)` = col_double(),
-  Finished = col_logical(),
-  RecordedDate = col_datetime(format = ""),
-  RecipientLastName = col_logical(),
-  RecipientFirstName = col_logical(),
-  RecipientEmail = col_logical(),
-  ExternalReference = col_logical(),
-  LocationLatitude = col_double(),
-  LocationLongitude = col_double(),
-  QD2_1_TEXT = col_double(),
-  rnum = col_double(),
-  pi1 = col_double(),
-  pi2 = col_double(),
-  pi3 = col_double(),
-  pi4 = col_double(),
-  pi5 = col_double(),
-  pi6 = col_double()
-  # ... with 13 more columns
-)
-ℹ Use `spec()` for the full column specifications.
-
-
-Number of observations in data
-[1] 5265
-
-Number of observations after dropping test cases
-[1] 4738
-`summarise()` has grouped output by 'batch_id'. You can override using the `.groups` argument.
-# A tibble: 26 × 3
-# Groups:   batch_id [22]
-   batch_id batch_type                     n
-      <dbl> <chr>                      <int>
- 1        0 Warmup                       323
- 2        1 Iterative Batch Phase: Max   102
- 3        1 Iterative Batch Phase: Min   101
- 4        2 Iterative Batch Phase: Max   100
- 5        2 Iterative Batch Phase: Min   101
- 6        3 Iterative Batch Phase: Max   102
- 7        3 Iterative Batch Phase: Min   100
- 8        4 Iterative Batch Phase: Max   101
- 9        4 Iterative Batch Phase: Min    99
-10        5 Iterative Batch Phase: Min   101
-11        6 Iterative Batch Phase: Min   101
-12        7 Iterative Batch Phase: Min   101
-13        8 Iterative Batch Phase: Min   100
-14        9 Iterative Batch Phase: Min   102
-15       10 Iterative Batch Phase: Min   100
-16       11 Iterative Batch Phase: Min   100
-17       12 Iterative Batch Phase: Min   100
-18       13 Iterative Batch Phase: Min   101
-19       14 Iterative Batch Phase: Min   100
-20       15 Iterative Batch Phase: Min   100
-21       16 Iterative Batch Phase: Min   100
-22       17 Iterative Batch Phase: Min   100
-23       18 Iterative Batch Phase: Min   102
-24       19 Iterative Batch Phase: Min   100
-25       20 Iterative Batch Phase: Min   101
-26      100 Validation                  2000
-Warning messages:
-1: Unknown or uninitialised column: `Prolific ID Q`. 
-2: ID is not unique 
-Warning message:
-Unknown or uninitialised column: `Status`. 
-Warning messages:
-1: In check_consent(.) : Dropping 1 survey respondents who do not consent
-2: In check_consent(.) :
-  1 survey respondents who do not consent with non-missing responses
-3: In check_consent(.) : 4737 respondents in the data
-Warning messages:
-1: In check_completion(.) :
-  Dropping 8 survey respondents who did not finish
-2: In check_completion(.) : 4729 respondents in the data
-Warning messages:
-1: In check_commitment(.) :
-  Dropping 4 survey respondents did not pass commitment check 1
-2: In check_commitment(.) : 4725 respondents in the data
-3: In check_commitment(.) :
-  Dropping 4 survey respondents who did not pass commitment check 2
-4: In check_commitment(.) : 4721 respondents in the data
-`summarise()` has grouped output by 'batch_id'. You can override using the `.groups` argument.
-# A tibble: 26 × 3
-# Groups:   batch_id [22]
-   batch_id batch_type                     n
-      <dbl> <chr>                      <int>
- 1        0 Warmup                       317
- 2        1 Iterative Batch Phase: Max    99
- 3        1 Iterative Batch Phase: Min   101
- 4        2 Iterative Batch Phase: Max   100
- 5        2 Iterative Batch Phase: Min   101
- 6        3 Iterative Batch Phase: Max   100
- 7        3 Iterative Batch Phase: Min   100
- 8        4 Iterative Batch Phase: Max   100
- 9        4 Iterative Batch Phase: Min    99
-10        5 Iterative Batch Phase: Min   101
-11        6 Iterative Batch Phase: Min   101
-12        7 Iterative Batch Phase: Min   101
-13        8 Iterative Batch Phase: Min   100
-14        9 Iterative Batch Phase: Min   102
-15       10 Iterative Batch Phase: Min   100
-16       11 Iterative Batch Phase: Min   100
-17       12 Iterative Batch Phase: Min   100
-18       13 Iterative Batch Phase: Min   101
-19       14 Iterative Batch Phase: Min   100
-20       15 Iterative Batch Phase: Min   100
-21       16 Iterative Batch Phase: Min    99
-22       17 Iterative Batch Phase: Min   100
-23       18 Iterative Batch Phase: Min   102
-24       19 Iterative Batch Phase: Min   100
-25       20 Iterative Batch Phase: Min   101
-26      100 Validation                  1996
-[1mwrote[0m [32m11.57kB[0m in [36m 0s[0m, [32m724.11MB/s[0m                                                                                                                                                              [1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                                                              
