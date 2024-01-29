@@ -29,3 +29,19 @@ Simple mean estimates
 2 6       black male  low          738   286 0.725  1004    0.721  0.693  0.748
 
 Bootstrap estimates
+# A tibble: 2 × 7
+  context context_label   method         estimate     se ci_min ci_max
+  <ord>   <chr>           <chr>             <dbl>  <dbl>  <dbl>  <dbl>
+1 5       black_male_high poststratified    0.699 0.0204  0.659  0.739
+2 6       black_male_low  poststratified    0.639 0.0195  0.600  0.677
+
+Results: simple mean and poststratification estimates
+# A tibble: 4 × 7
+# Groups:   context [2]
+  context context_label   method         estimate     se ci_min ci_max
+  <ord>   <chr>           <chr>             <dbl>  <dbl>  <dbl>  <dbl>
+1 5       black_male_high simple_mean       0.746 0.0138  0.719  0.773
+2 6       black_male_low  simple_mean       0.725 0.0141  0.697  0.753
+3 5       black_male_high poststratified    0.699 0.0204  0.659  0.739
+4 6       black_male_low  poststratified    0.639 0.0195  0.600  0.677
+[1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                     
