@@ -1,0 +1,49 @@
+  |                                                                                                                     |                                                                                                             |   0%  |                                                                                                                     |==========                                                                                                   |   9%  |                                                                                                                     |=====================                                                                                        |  19%  |                                                                                                                     |=================================                                                                            |  30%  |                                                                                                                     |===============================================                                                              |  43%  |                                                                                                                     |==============================================================                                               |  57%  |                                                                                                                     |========================================================================                                     |  66%  |                                                                                                                     |===========================================================================================                  |  83%  |                                                                                                                     |===========================================================================================================  |  98%  |                                                                                                                     |=============================================================================================================| 100%
+[1mindexing[0m [34mPolitical Candidates.csv[0m [================================================================] [32m2.15GB/s[0m, eta: [36m 0s[0m                                                                                                                                                          [1mindexing[0m [34mPolitical Candidates.csv[0m [==============================================================] [32m288.40MB/s[0m, eta: [36m 0s[0m                                                                                                                                                          
+── Column specification ───────────────────────────────────────────────────────────────────────────────────────────────
+cols(
+  .default = col_character(),
+  StartDate = col_datetime(format = ""),
+  EndDate = col_datetime(format = ""),
+  Progress = col_double(),
+  `Duration (in seconds)` = col_double(),
+  Finished = col_logical(),
+  RecordedDate = col_datetime(format = ""),
+  RecipientLastName = col_logical(),
+  RecipientFirstName = col_logical(),
+  RecipientEmail = col_logical(),
+  ExternalReference = col_logical(),
+  LocationLatitude = col_double(),
+  LocationLongitude = col_double(),
+  Manipulation_Q2 = col_logical(),
+  Manipulation_Q2_TEXT = col_logical(),
+  QD2_1_TEXT = col_double(),
+  rnum = col_double(),
+  pi1 = col_double(),
+  pi2 = col_double(),
+  pi3 = col_double(),
+  pi4 = col_double()
+  # ... with 15 more columns
+)
+ℹ Use `spec()` for the full column specifications.
+
+
+Number of observations in data
+[1] 5293
+
+Number of observations after dropping test cases
+[1] 2010
+Warning message:
+ID is not unique 
+Warning messages:
+1: In check_completion(.) :
+  Dropping 10 survey respondents who did not finish
+2: In check_completion(.) : 2000 respondents in the data
+Warning messages:
+1: In check_commitment(.) :
+  Dropping 2 survey respondents did not pass commitment check 1
+2: In check_commitment(.) : 1998 respondents in the data
+3: In check_commitment(.) :
+  Dropping 2 survey respondents who did not pass commitment check 2
+4: In check_commitment(.) : 1996 respondents in the data
+[1mwrote[0m [32m4.01kB[0m in [36m 0s[0m, [32m251.22MB/s[0m                                                                                                                     [1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                     

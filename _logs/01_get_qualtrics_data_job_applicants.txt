@@ -1,6 +1,6 @@
-  |                                                                                                                                                              |                                                                                                                                                      |   0%  |                                                                                                                                                              |======================================================================================================================================================| 100%
-[1mindexing[0m [34mJob Applicants.csv[0m [===============================================================================================================] [32m7.91MB/s[0m, eta: [36m 0s[0m                                                                                                                                                                                                   
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  |                                                                                                                     |                                                                                                             |   0%  |                                                                                                                     |=============================================================================================================| 100%
+[1mindexing[0m [34mJob Applicants.csv[0m [======================================================================] [32m2.15GB/s[0m, eta: [36m 0s[0m                                                                                                                                                          
+── Column specification ───────────────────────────────────────────────────────────────────────────────────────────────
 cols(
   .default = col_character(),
   StartDate = col_datetime(format = ""),
@@ -27,38 +27,21 @@ cols(
 )
 ℹ Use `spec()` for the full column specifications.
 
-'StartDate', 'EndDate', and 'RecordedDate' were converted without a specific timezone
-• To set a timezone, visit https://www.qualtrics.com/support/survey-platform/managing-your-account/
-• Timezone information is under 'User Settings'
-• See https://api.qualtrics.com/instructions/docs/Instructions/dates-and-times.md for more
 
 Number of observations in data
 [1] 69
 
 Number of observations after dropping test cases
 [1] 60
-Warning messages:
-1: Unknown or uninitialised column: `Prolific ID Q`. 
-2: ID is not unique 
 Warning message:
-Unknown or uninitialised column: `Status`. 
-Warning messages:
-1: In check_consent(.) : Dropping 1 survey respondents who do not consent
-2: In check_consent(.) :
-  1 survey respondents who do not consent with non-missing responses
-3: In check_consent(.) : 59 respondents in the data
+ID is not unique 
+Number of observations in data: 60
+Status values in data: IP Address, Survey Preview
+Number of observations left in data: 51
+Warning message:
+Test/spam data included in the analysis file 
 Warning messages:
 1: In check_completion(.) :
   Dropping 1 survey respondents who did not finish
-2: In check_completion(.) : 58 respondents in the data
-Warning messages:
-1: In check_location_screen(.) :
-  Dropping 5 survey respondents who are not in the US
-2: In check_location_screen(.) :
-  5 survey respondents who are not in the US with non-missing responses
-3: In check_location_screen(.) : 53 respondents in the data
-Warning messages:
-1: In check_commitment(.) :
-  Dropping 1 survey respondents did not pass commitment check 1
-2: In check_commitment(.) : 52 respondents in the data
-[1mwrote[0m [32m11.57kB[0m in [36m 0s[0m, [32m351.50MB/s[0m                                                                                                                                                              [1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                                                              
+2: In check_completion(.) : 50 respondents in the data
+[1mwrote[0m [32m11.61kB[0m in [36m 0s[0m, [32m685.56MB/s[0m                                                                                                                     [1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                     

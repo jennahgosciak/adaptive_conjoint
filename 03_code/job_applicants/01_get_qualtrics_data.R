@@ -41,17 +41,17 @@ nrow(df_survey)
 ###############################################
 
 # check ID uniquely identifies rows in data
-if (length(unique(df$`Prolific ID Q`)) != nrow(df)) {
+if (length(unique(df_survey$`Prolific ID Q`)) != nrow(df_survey)) {
   warning("ID is not unique")
 }
 
-if (!all(unique(df$Status) == "IP Address")) {
+if (!all(unique(df_survey$Status) == "IP Address")) {
   warning("Test/spam data included in the analysis file")
-  print(str_glue("Number of observations in data: {nrow(df)}"))
-  print(str_glue("Status values in data: {str_c(unique(df$Status), collapse=', ')}"))
-  df <- df %>% 
+  print(str_glue("Number of observations in data: {nrow(df_survey)}"))
+  print(str_glue("Status values in data: {str_c(unique(df_survey$Status), collapse=', ')}"))
+  df_survey <- df_survey %>% 
     filter(Status == "IP Address")
-  print(str_glue("Number of observations left in data: {nrow(df)}"))
+  print(str_glue("Number of observations left in data: {nrow(df_survey)}"))
 }
 
 # check we have consent from all participants
