@@ -32,7 +32,7 @@ create_outcome_var <- function(df, survey_lab) {
         TRUE ~ NA_real_
       ))) %>%
       mutate(chose_younger = select(., str_c("Q", 1:8)) %>%
-               rowSums(na.rm = T))
+        rowSums(na.rm = T))
   } else if (survey_lab == "job_applicants") {
     df %>%
       # = 1 if selecting non-mother
@@ -45,7 +45,7 @@ create_outcome_var <- function(df, survey_lab) {
         TRUE ~ NA_real_
       ))) %>%
       mutate(chose_mother = select(., str_c("Q", 1:8)) %>%
-               rowSums(na.rm = T))
+        rowSums(na.rm = T))
   } else {
     warning("Incorrect survey label specified")
   }
@@ -137,34 +137,34 @@ check_commitment <- function(df) {
     distinct(Commitment_Q1) %>%
     equals("Yes, I will") %>%
     all()
-  
+
   if (commitment_check1 != TRUE | is.na(commitment_check1)) {
     num_respondents <- df %>%
       filter(Commitment_Q1 != "Yes, I will") %>%
       nrow()
-    
+
     df <- df %>%
       filter(Commitment_Q1 == "Yes, I will")
-    
+
     warning(str_glue("Dropping {num_respondents} survey respondents did not pass commitment check 1"))
     warning(str_glue("{nrow(df)} respondents in the data"))
   }
-  
+
   commitment_check2 <- df %>%
     mutate(Commitment_Q2 = str_to_lower(Commitment_Q2)) %>%
     select(Commitment_Q2) %>%
     equals("purple") %>%
     all()
-  
+
   if (commitment_check2 != TRUE | is.na(commitment_check2)) {
     num_respondents <- df %>%
       mutate(Commitment_Q2 = str_to_lower(Commitment_Q2)) %>%
       filter(Commitment_Q2 != "purple") %>%
       nrow()
-    
+
     df <- df %>%
       filter(str_to_lower(Commitment_Q2) == "purple")
-    
+
     warning(str_glue("Dropping {num_respondents} survey respondents who did not pass commitment check 2"))
     warning(str_glue("{nrow(df)} respondents in the data"))
   }
@@ -198,10 +198,10 @@ create_context_var <- function(df, survey_lab) {
           context == 8 ~ "white_male_low"
         ),
         context = factor(context,
-                         levels = c(1:8),
-                         ordered = TRUE
+          levels = c(1:8),
+          ordered = TRUE
         )
-      ) %>% 
+      ) %>%
       verify(!is.na(context))
   } else {
     df %>%
@@ -224,8 +224,8 @@ create_context_var <- function(df, survey_lab) {
           TRUE ~ NA_character_
         ),
         context = factor(context,
-                         levels = c(1:4),
-                         ordered = TRUE
+          levels = c(1:4),
+          ordered = TRUE
         )
       ) %>%
       verify(!is.na(context))

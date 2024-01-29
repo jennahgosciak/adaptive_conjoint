@@ -16,20 +16,20 @@ sink(file, type = "message")
 # Load Data
 ###############################################
 survey_lab <- "political_candidates"
-df_analysis <- readRDS(str_glue("01_intermediate/qualtrics_data_{survey_lab}_clean_all_phases.RDS")) %>% 
-  filter(batch_type != 'Validation')
+df_analysis <- readRDS(str_glue("01_intermediate/qualtrics_data_{survey_lab}_clean_all_phases.RDS")) %>%
+  filter(batch_type != "Validation")
 
-df_analysis %>% 
-  group_by(batch_id, batch_type) %>% 
-  summarize(n = n()) %>% 
-  print(n=50)
+df_analysis %>%
+  group_by(batch_id, batch_type) %>%
+  summarize(n = n()) %>%
+  print(n = 50)
 
 # identify the distinct contexts in the data
 c_val <- c(5, 6)
-c_desc <- c('black_male_high', 'black_male_low')
+c_desc <- c("black_male_high", "black_male_low")
 
-df_analysis <- df_analysis %>% 
-  filter(context %in% c_val) %>% 
+df_analysis <- df_analysis %>%
+  filter(context %in% c_val) %>%
   mutate(context = as.numeric(context))
 
 cat(str_c(
@@ -51,19 +51,23 @@ nrow(df_analysis)
 # (1) Simple Mean
 ###############################################
 df_simple_mean <- df_analysis %>%
-  verify(context %in% c_val) %>% 
+  verify(context %in% c_val) %>%
   group_by(context, context_label) %>%
   summarize(
     estimate = mean(chose_younger),
     estimate_var = (estimate * (1 - estimate)) / length(chose_younger)
   ) %>%
-  ungroup() %>% 
-  summarize(estimate = abs(diff(estimate)),
-         se = sqrt(sum(estimate_var))) %>%
-  mutate(ci.min = estimate - qnorm(.975) * se,
-         ci.max = estimate + qnorm(.975) * se,
-         pval = 2 * pnorm(estimate / se, lower.tail = F),
-         method = "simple_mean") %>%
+  ungroup() %>%
+  summarize(
+    estimate = abs(diff(estimate)),
+    se = sqrt(sum(estimate_var))
+  ) %>%
+  mutate(
+    ci.min = estimate - qnorm(.975) * se,
+    ci.max = estimate + qnorm(.975) * se,
+    pval = 2 * pnorm(estimate / se, lower.tail = F),
+    method = "simple_mean"
+  ) %>%
   select(method, estimate, se, ci.min, ci.max, pval)
 
 cat("\nSimple mean estimates\n")
@@ -87,7 +91,7 @@ glm_drop_cons_factors <- function(df, vars) {
   # need to drop factors that don't vary (e.g., only one racial category appears)
   if (length(unique(df$race)) <= 1) vars <- vars[vars != "race"]
   form <- str_c(vars, collapse = " + ")
-  
+
   glm(
     formula = str_c("chose_younger ~ ", form),
     family = "binomial",
@@ -101,7 +105,7 @@ compute_weighted_prob <- function(df, wgts, lm) {
   # exclude race categories that aren't in the data we have
   wgts <- wgts %>%
     filter(race %in% unique(as_tibble(df)[["race"]]))
-  
+
   # predict probabilities
   prob <- predict(lm, newdata = wgts, type = "response")
   # return weighted mean
@@ -109,7 +113,7 @@ compute_weighted_prob <- function(df, wgts, lm) {
 }
 
 df_models <- df_filter %>%
-  verify(context %in% c_val) %>% 
+  verify(context %in% c_val) %>%
   arrange(context) %>%
   group_by(context, context_label) %>%
   nest() %>%
@@ -147,14 +151,14 @@ produce_bootstrap_estimates <- function(df, c_val, c_desc, iter = 1000) {
         c("female", "hispanic", "age", "race")
       )
     ))
-  
+
   # produce bootstrap estimate
   bootstrap_est <- map2(
     df_bootstrap$strap, df_bootstrap$glm,
     ~ compute_weighted_prob(.x, wgts, .y)
   ) %>%
     unlist()
-  
+
   # produce mean and sd
   tibble(
     se = sd(bootstrap_est),
@@ -168,8 +172,10 @@ cat("\nBootstrap estimates\n")
 df_post_bootstrap <- map2_dfr(c_val, c_desc, ~ produce_bootstrap_estimates(df_filter, .x, .y)) %>%
   full_join(df_post, ., by = c("context", "context_label")) %>%
   # adding bootstrap standard error to calculation of ci with point estimate of the mean
-  summarize(estimate = abs(diff(estimate)),
-            se = sqrt(sum(se ^ 2))) %>% 
+  summarize(
+    estimate = abs(diff(estimate)),
+    se = sqrt(sum(se^2))
+  ) %>%
   mutate(
     method = "poststratified",
     ci.min = estimate - qnorm(.975) * se,

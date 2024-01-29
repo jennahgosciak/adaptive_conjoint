@@ -70,13 +70,13 @@ df_survey <- df_survey %>%
     batch_type = case_when(
       batch_id == 0 ~ "Warmup",
       StartDate_clean <= ymd_hms("2023-12-27-16-54-00") ~ "Iterative Batch Phase: Max",
-      StartDate_clean > ymd_hms("2023-12-27-16-54-00") & StartDate_clean <= ymd_hms("2024-01-08-20-00-00")~ "Iterative Batch Phase: Min",
+      StartDate_clean > ymd_hms("2023-12-27-16-54-00") & StartDate_clean <= ymd_hms("2024-01-08-20-00-00") ~ "Iterative Batch Phase: Min",
       StartDate_clean > ymd_hms("2023-12-27-16-54-00") ~ "Validation",
       TRUE ~ NA_character_
     )
-  ) %>% 
-  verify(!is.na(batch_id)) %>% 
-  verify(!is.na(batch_type)) %>% 
+  ) %>%
+  verify(!is.na(batch_id)) %>%
+  verify(!is.na(batch_type)) %>%
   # drop the 21st batch
   filter(batch_id != 21)
 
@@ -85,8 +85,8 @@ nrow(df_survey)
 
 df_survey %>%
   group_by(batch_id, batch_type) %>%
-  summarize(n = n()) %>% 
-  print(n=50)
+  summarize(n = n()) %>%
+  print(n = 50)
 
 ###############################################
 # Survey Validation
@@ -101,7 +101,7 @@ if (!all(unique(df$Status) == "IP Address")) {
   warning("Test/spam data included in the analysis file")
   print(str_glue("Number of observations in data: {nrow(df)}"))
   print(str_glue("Status values in data: {str_c(unique(df$Status), collapse=', ')}"))
-  df <- df %>% 
+  df <- df %>%
     filter(Status == "IP Address")
   print(str_glue("Number of observations left in data: {nrow(df)}"))
 }
@@ -146,8 +146,8 @@ df_clean <- df_survey %>%
 
 df_clean %>%
   group_by(batch_id, batch_type) %>%
-  summarize(n = n()) %>% 
-  print(n=50)
+  summarize(n = n()) %>%
+  print(n = 50)
 
 # saving locally
 df_clean %>%

@@ -30,9 +30,9 @@ nrow(df_clean)
 # check attention, percent who pass the attention check
 cat("\nAttention check results\n")
 df_clean %>%
-    mutate(older_candidate = if_else(rnum_age <= 0.5, "Candidate 2", "Candidate 1")) %>%
-    mutate(pass_attention_check = if_else(Manipulation_Q1 == older_candidate, 1, 0)) %>%
-    summarize(per_pass_attention_check = mean(pass_attention_check))
+  mutate(older_candidate = if_else(rnum_age <= 0.5, "Candidate 2", "Candidate 1")) %>%
+  mutate(pass_attention_check = if_else(Manipulation_Q1 == older_candidate, 1, 0)) %>%
+  summarize(per_pass_attention_check = mean(pass_attention_check))
 
 
 ###############################################
@@ -45,8 +45,8 @@ df_clean <- create_outcome_var(df_clean, survey_lab)
 # create profile context variable
 df_clean <- create_context_var(df_clean, survey_lab)
 
-df_clean %>% 
-  group_by(context) %>% 
+df_clean %>%
+  group_by(context) %>%
   summarize(n = n())
 
 # validation of outcome variable
@@ -57,13 +57,15 @@ df_clean %>%
   select(chose_younger, all_of(str_c("Q", 1:8))) %>%
   verify(!is.na(chose_younger))
 
-df_clean %>% 
-  mutate(chose_older = 1 - chose_younger) %>% 
-  group_by(context, context_label) %>% 
-  summarize(mean_chose_younger = mean(chose_younger),
-            mean_chose_older = mean(chose_older))
+df_clean %>%
+  mutate(chose_older = 1 - chose_younger) %>%
+  group_by(context, context_label) %>%
+  summarize(
+    mean_chose_younger = mean(chose_younger),
+    mean_chose_older = mean(chose_older)
+  )
 
- # create cleaned demographic variables
+# create cleaned demographic variables
 df_demo <- df_clean %>%
   mutate(
     hispanic = if_else(QD4 == "Yes", TRUE, FALSE),
@@ -105,11 +107,11 @@ if (add_all_phases == TRUE) {
       context, context_label
     )
   output_fname <- str_glue("01_intermediate/qualtrics_data_{survey_lab}_clean_all_phases")
-  
+
   df_demo %>%
     group_by(batch_id, batch_type) %>%
-    summarize(n = n()) %>% 
-    print(n=50)
+    summarize(n = n()) %>%
+    print(n = 50)
 } else {
   df_demo <- df_demo %>%
     select(

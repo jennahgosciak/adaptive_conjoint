@@ -49,7 +49,7 @@ if (!all(unique(df_survey$Status) == "IP Address")) {
   warning("Test/spam data included in the analysis file")
   print(str_glue("Number of observations in data: {nrow(df_survey)}"))
   print(str_glue("Status values in data: {str_c(unique(df_survey$Status), collapse=', ')}"))
-  df_survey <- df_survey %>% 
+  df_survey <- df_survey %>%
     filter(Status == "IP Address")
   print(str_glue("Number of observations left in data: {nrow(df_survey)}"))
 }

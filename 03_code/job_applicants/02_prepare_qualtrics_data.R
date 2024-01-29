@@ -25,18 +25,22 @@ nrow(df_clean)
 # check attention, percent who pass the attention check
 cat("\nAttention check results\n")
 
-  df_clean %>%
-    mutate(candidate_mother = if_else(rnum_mother <= 0.5, "Candidate 2", "Candidate 1"),
-           manipulation_check_total = rowSums(select(., starts_with("Manipulation_Q1_")) %>% 
-                                                is.na())) %>%
-    mutate(pass_attention_check = case_when((rnum_mother <= 0.5) & 
-                                        (Manipulation_Q1_2 == "Candidate 2") &
-                                        (manipulation_check_total == 2) ~ 1,
-                                      (rnum_mother > 0.5) & 
-                                        (Manipulation_Q1_2 == "Candidate 1") &
-                                        (manipulation_check_total == 2) ~ 1,
-                                      TRUE ~ 0)) %>%
-    summarize(per_pass_attention_check = mean(pass_attention_check))
+df_clean %>%
+  mutate(
+    candidate_mother = if_else(rnum_mother <= 0.5, "Candidate 2", "Candidate 1"),
+    manipulation_check_total = rowSums(select(., starts_with("Manipulation_Q1_")) %>%
+      is.na())
+  ) %>%
+  mutate(pass_attention_check = case_when(
+    (rnum_mother <= 0.5) &
+      (Manipulation_Q1_2 == "Candidate 2") &
+      (manipulation_check_total == 2) ~ 1,
+    (rnum_mother > 0.5) &
+      (Manipulation_Q1_2 == "Candidate 1") &
+      (manipulation_check_total == 2) ~ 1,
+    TRUE ~ 0
+  )) %>%
+  summarize(per_pass_attention_check = mean(pass_attention_check))
 
 ###############################################
 # Process Qualtrics data
@@ -48,8 +52,8 @@ df_clean <- create_outcome_var(df_clean, survey_lab)
 # create profile context variable
 df_clean <- create_context_var(df_clean, survey_lab)
 
-df_clean %>% 
-  group_by(context) %>% 
+df_clean %>%
+  group_by(context) %>%
   summarize(n = n())
 
 # validation of outcome variable
@@ -60,13 +64,15 @@ df_clean %>%
   select(chose_mother, all_of(str_c("Q", 1:8))) %>%
   verify(!is.na(chose_mother))
 
-df_clean %>% 
-  mutate(chose_nonmother = 1 - chose_mother) %>% 
-  group_by(context, context_label) %>% 
-  summarize(mean_chose_younger = mean(chose_mother),
-            mean_chose_older = mean(chose_nonmother))
+df_clean %>%
+  mutate(chose_nonmother = 1 - chose_mother) %>%
+  group_by(context, context_label) %>%
+  summarize(
+    mean_chose_younger = mean(chose_mother),
+    mean_chose_older = mean(chose_nonmother)
+  )
 
- # create cleaned demographic variables
+# create cleaned demographic variables
 df_demo <- df_clean %>%
   mutate(
     hispanic = if_else(QD4 == "Yes", TRUE, FALSE),
@@ -102,11 +108,11 @@ df_demo <- df_clean %>%
 
 # filter to only the variables we need
 df_demo <- df_demo %>%
-    select(
-      id, chose_mother, race, female, age, hispanic, drop_demo_flag,
-      context, context_label
-    )
-  output_fname <- str_glue("01_intermediate/qualtrics_data_{survey_lab}_clean")
+  select(
+    id, chose_mother, race, female, age, hispanic, drop_demo_flag,
+    context, context_label
+  )
+output_fname <- str_glue("01_intermediate/qualtrics_data_{survey_lab}_clean")
 
 # saving locally
 df_demo %>%
