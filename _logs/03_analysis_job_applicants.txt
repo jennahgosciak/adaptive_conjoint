@@ -1,0 +1,71 @@
+Distinct contexts for the validation phase: 1, 2, 3, 4
+Population weights
+# A tibble: 6 × 6
+  race                      female hispanic   age  weight   num
+  <fct>                     <lgl>  <lgl>    <dbl>   <dbl> <int>
+1 Black or African American FALSE  FALSE       18 0.00113  2335
+2 Black or African American FALSE  FALSE       19 0.00108  2430
+3 Black or African American FALSE  FALSE       20 0.00118  2319
+4 Black or African American FALSE  FALSE       21 0.00122  2270
+5 Black or African American FALSE  FALSE       22 0.00114  1998
+6 Black or African American FALSE  FALSE       23 0.00111  1934
+
+Number of rows in data[1] 52
+`summarise()` has grouped output by 'context'. You can override using the `.groups` argument.
+
+Simple mean estimates
+# A tibble: 4 × 7
+# Groups:   context [4]
+  context context_label method      estimate    se ci_min ci_max
+  <ord>   <chr>         <chr>          <dbl> <dbl>  <dbl>  <dbl>
+1 1       black_low     simple_mean    0.412 0.119  0.178  0.646
+2 2       black_high    simple_mean    0.444 0.166  0.120  0.769
+3 3       white_low     simple_mean    0.529 0.121  0.292  0.767
+4 4       white_high    simple_mean    0.667 0.157  0.359  0.975
+`summarise()` has grouped output by 'context'. You can override using the `.groups` argument.
+Warning message:
+Expected 3 pieces. Missing pieces filled with `NA` in 4 rows [1, 2, 3, 4]. 
+# A tibble: 4 × 11
+# Groups:   context [4]
+  context race  sex   experience alpha  beta  mean     n estimate ci.min ci.max
+  <ord>   <chr> <chr> <chr>      <dbl> <dbl> <dbl> <int>    <dbl>  <dbl>  <dbl>
+1 1       black low   <NA>          17    20 0.412    17    0.459  0.304  0.619
+2 2       black high  <NA>          14    15 0.444     9    0.483  0.306  0.661
+3 3       white low   <NA>          19    18 0.529    17    0.514  0.355  0.671
+4 4       white high  <NA>          16    13 0.667     9    0.552  0.372  0.725
+Warning message:
+There were 2 warnings in `mutate()`.
+The first warning was:
+ℹ In argument: `glm = map(...)`.
+ℹ In group 2: `context = 2`, `context_label = "black_high"`.
+Caused by warning:
+! glm.fit: fitted probabilities numerically 0 or 1 occurred
+ℹ Run `dplyr::last_dplyr_warnings()` to see the 1 remaining warning. 
+Warning message:
+In predict.lm(object, newdata, se.fit, scale = 1, type = if (type ==  :
+  prediction from a rank-deficient fit may be misleading
+
+Bootstrap estimates
+There were 50 or more warnings (use warnings() to see the first 50)
+# A tibble: 4 × 7
+  context context_label method         estimate    se ci_min ci_max
+  <ord>   <chr>         <chr>             <dbl> <dbl>  <dbl>  <dbl>
+1 1       black_low     poststratified    0.648 0.214  0.228  1.07 
+2 2       black_high    poststratified    0.624 0.159  0.313  0.935
+3 3       white_low     poststratified    0.191 0.256 -0.311  0.694
+4 4       white_high    poststratified    0.604 0.212  0.188  1.02 
+
+Results: simple mean and poststratification estimates
+# A tibble: 8 × 7
+# Groups:   context [4]
+  context context_label method         estimate    se ci_min ci_max
+  <ord>   <chr>         <chr>             <dbl> <dbl>  <dbl>  <dbl>
+1 1       black_low     simple_mean       0.412 0.119  0.178  0.646
+2 2       black_high    simple_mean       0.444 0.166  0.120  0.769
+3 3       white_low     simple_mean       0.529 0.121  0.292  0.767
+4 4       white_high    simple_mean       0.667 0.157  0.359  0.975
+5 1       black_low     poststratified    0.648 0.214  0.228  1.07 
+6 2       black_high    poststratified    0.624 0.159  0.313  0.935
+7 3       white_low     poststratified    0.191 0.256 -0.311  0.694
+8 4       white_high    poststratified    0.604 0.212  0.188  1.02 
+[1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                     

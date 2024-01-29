@@ -8,9 +8,9 @@ library(modelr)
 set.seed(2023)
 
 source("./03_code/_data_cleaning.R")
-# file <- file("./_logs/03_analysis.txt", open = "wt")
-# sink(file, type = "output")
-# sink(file, type = "message")
+file <- file("./_logs/03_analysis_job_applicants.txt", open = "wt")
+sink(file, type = "output")
+sink(file, type = "message")
 
 ###############################################
 # Load Data
@@ -195,6 +195,6 @@ cat("\nResults: simple mean and poststratification estimates\n")
 df_final
 
 df_final %>%
-  write_csv("02_output/validation_results.csv")
+  write_csv("02_output/validation_results_job_applicants.csv")
 
-# sink()
+sink()

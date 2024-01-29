@@ -1,0 +1,43 @@
+
+Number of rows in data
+[1] 52
+
+Attention check results
+# A tibble: 1 × 1
+  per_pass_attention_check
+                     <dbl>
+1                        0
+# A tibble: 4 × 2
+  context     n
+  <ord>   <int>
+1 1          17
+2 2           9
+3 3          17
+4 4           9
+
+Validation of outcome data
+# A tibble: 52 × 9
+   chose_mother    Q1    Q2    Q3    Q4    Q5    Q6    Q7    Q8
+          <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+ 1            1    NA    NA    NA    NA    NA    NA    NA     1
+ 2            1    NA    NA    NA    NA    NA     1    NA    NA
+ 3            0     0    NA    NA    NA    NA    NA    NA    NA
+ 4            0    NA    NA    NA     0    NA    NA    NA    NA
+ 5            0    NA     0    NA    NA    NA    NA    NA    NA
+ 6            0    NA    NA    NA    NA    NA     0    NA    NA
+ 7            0    NA    NA    NA    NA    NA     0    NA    NA
+ 8            1    NA    NA    NA    NA    NA    NA    NA     1
+ 9            0     0    NA    NA    NA    NA    NA    NA    NA
+10            0    NA    NA    NA    NA    NA    NA     0    NA
+# ℹ 42 more rows
+# ℹ Use `print(n = ...)` to see more rows
+`summarise()` has grouped output by 'context'. You can override using the `.groups` argument.
+# A tibble: 4 × 4
+# Groups:   context [4]
+  context context_label mean_chose_younger mean_chose_older
+  <ord>   <chr>                      <dbl>            <dbl>
+1 1       black_low                  0.412            0.588
+2 2       black_high                 0.444            0.556
+3 3       white_low                  0.529            0.471
+4 4       white_high                 0.667            0.333
+[1mwrote[0m [32m392.00B[0m in [36m 0s[0m, [32m8.70MB/s[0m                                                                                                                                                              [1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                                                              
