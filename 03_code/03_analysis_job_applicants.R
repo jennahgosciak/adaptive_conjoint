@@ -16,15 +16,7 @@ source("./03_code/_data_cleaning.R")
 # Load Data
 ###############################################
 survey_lab <- "job_applicants"
-if (survey_lab == "political_candidates") {
-  outcome_var <- "chose_younger"
-} else {
-  outcome_var <- "chose_mother"
-}
-
-df_analysis <- readRDS(str_glue("01_intermediate/qualtrics_data_{survey_lab}_clean.RDS")) %>% 
-  # rename for ease of manipulation
-  rename(outcome = outcome_var)
+df_analysis <- readRDS(str_glue("01_intermediate/qualtrics_data_{survey_lab}_clean.RDS"))
 
 # identify the distinct contexts in the data
 distinct_contexts <- df_analysis %>%
@@ -54,8 +46,8 @@ nrow(df_analysis)
 df_simple_mean <- df_analysis %>%
   group_by(context, context_label) %>%
   summarize(
-    estimate = mean(outcome),
-    se = sqrt((estimate * (1 - estimate)) / length(outcome)),
+    estimate = mean(chose_mother),
+    se = sqrt((estimate * (1 - estimate)) / length(chose_mother)),
     ci_min = estimate - (qnorm(.975) * se),
     ci_max = estimate + (qnorm(.975) * se)
   ) %>%
@@ -68,9 +60,9 @@ df_simple_mean
 # validation phase, estimate
 estimates_validation_data <- df_analysis %>%
   group_by(context, context_label) %>%
-  summarize(alpha = sum(outcome) + 10,
-            beta = sum(1 - outcome) + 10,
-            mean = mean(outcome),
+  summarize(alpha = sum(chose_mother) + 10,
+            beta = sum(1 - chose_mother) + 10,
+            mean = mean(chose_mother),
             n = n()) %>%
   mutate(estimate = alpha / (alpha + beta),
          ci.min = qbeta(.025, shape1 = alpha, shape2 = beta),
@@ -109,7 +101,7 @@ glm_drop_cons_factors <- function(df, vars) {
   form <- str_c(vars, collapse = " + ")
 
   glm(
-    formula = str_c("outcome ~ ", form),
+    formula = str_c("chose_mother ~ ", form),
     family = "binomial",
     data = df
   )

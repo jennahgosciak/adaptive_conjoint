@@ -19,19 +19,36 @@ filter_test_data <- function(df) {
     filter(Status == "Survey Test")
 }
 
-create_outcome_var <- function(df) {
-  df %>%
-    # = 1 if selecting the younger candidate
-    # = 0 if selecting the older candidate
-    mutate(across(str_c("Q", 1:8), ~ case_when(
-      . == "Candidate 1" & rnum_age <= 0.5 ~ 1,
-      . == "Candidate 2" & rnum_age <= 0.5 ~ 0,
-      . == "Candidate 2" & rnum_age > 0.5 ~ 1,
-      . == "Candidate 1" & rnum_age > 0.5 ~ 0,
-      TRUE ~ NA_real_
-    ))) %>%
-    mutate(chose_younger = select(., str_c("Q", 1:8)) %>%
-      rowSums(na.rm = T))
+create_outcome_var <- function(df, survey_lab) {
+  if (survey_lab == "political_candidates") {
+    df %>%
+      # = 1 if selecting the younger candidate
+      # = 0 if selecting the older candidate
+      mutate(across(str_c("Q", 1:8), ~ case_when(
+        . == "Candidate 1" & rnum_age <= 0.5 ~ 1,
+        . == "Candidate 2" & rnum_age <= 0.5 ~ 0,
+        . == "Candidate 2" & rnum_age > 0.5 ~ 1,
+        . == "Candidate 1" & rnum_age > 0.5 ~ 0,
+        TRUE ~ NA_real_
+      ))) %>%
+      mutate(chose_younger = select(., str_c("Q", 1:8)) %>%
+               rowSums(na.rm = T))
+  } else if (survey_lab == "job_applicants") {
+    df %>%
+      # = 1 if selecting non-mother
+      # = 0 if selecting mother candidate
+      mutate(across(str_c("Q", 1:8), ~ case_when(
+        . == "Candidate 2" & rnum_mother <= 0.5 ~ 1,
+        . == "Candidate 1" & rnum_mother > 0.5 ~ 1,
+        . == "Candidate 2" & rnum_mother > 0.5 ~ 0,
+        . == "Candidate 1" & rnum_mother <= 0.5 ~ 0,
+        TRUE ~ NA_real_
+      ))) %>%
+      mutate(chose_mother = select(., str_c("Q", 1:8)) %>%
+               rowSums(na.rm = T))
+  } else {
+    warning("Incorrect survey label specified")
+  }
 }
 
 # should be missing if participants do not consent
@@ -154,34 +171,63 @@ check_commitment <- function(df) {
   return(df)
 }
 
-create_context_var <- function(df) {
-  df %>%
-    # create profile context variable
-    mutate(
-      context = case_when(
-        rnum <= pi1 ~ 1,
-        rnum > pi1 & rnum <= pi2 ~ 2,
-        rnum > pi2 & rnum <= pi3 ~ 3,
-        rnum > pi3 & rnum <= pi4 ~ 4,
-        rnum > pi4 & rnum <= pi5 ~ 5,
-        rnum > pi5 & rnum <= pi6 ~ 6,
-        rnum > pi6 & rnum <= pi7 ~ 7,
-        rnum > pi7 ~ 8
-      ),
-      # create profile context label
-      context_label = case_when(
-        context == 1 ~ "white_female_high",
-        context == 2 ~ "white_female_low",
-        context == 3 ~ "black_female_high",
-        context == 4 ~ "black_female_low",
-        context == 5 ~ "black_male_high",
-        context == 6 ~ "black_male_low",
-        context == 7 ~ "white_male_high",
-        context == 8 ~ "white_male_low"
-      ),
-      context = factor(context,
-        levels = c(1:8),
-        ordered = TRUE
-      )
-    )
+create_context_var <- function(df, survey_lab) {
+  if (survey_lab == "political_candidates") {
+    df %>%
+      # create profile context variable
+      mutate(
+        context = case_when(
+          rnum <= pi1 ~ 1,
+          rnum > pi1 & rnum <= pi2 ~ 2,
+          rnum > pi2 & rnum <= pi3 ~ 3,
+          rnum > pi3 & rnum <= pi4 ~ 4,
+          rnum > pi4 & rnum <= pi5 ~ 5,
+          rnum > pi5 & rnum <= pi6 ~ 6,
+          rnum > pi6 & rnum <= pi7 ~ 7,
+          rnum > pi7 ~ 8
+        ),
+        # create profile context label
+        context_label = case_when(
+          context == 1 ~ "white_female_high",
+          context == 2 ~ "white_female_low",
+          context == 3 ~ "black_female_high",
+          context == 4 ~ "black_female_low",
+          context == 5 ~ "black_male_high",
+          context == 6 ~ "black_male_low",
+          context == 7 ~ "white_male_high",
+          context == 8 ~ "white_male_low"
+        ),
+        context = factor(context,
+                         levels = c(1:8),
+                         ordered = TRUE
+        )
+      ) %>% 
+      verify(!is.na(context))
+  } else {
+    df %>%
+      # create 'context' variable
+      mutate(
+        context = case_when(
+          rnum <= pi1 ~ 1,
+          rnum > pi1 & rnum <= pi2 ~ 2,
+          rnum > pi2 & rnum <= pi3 ~ 3,
+          rnum > pi3 ~ 4,
+          TRUE ~ NA_integer_
+          # need to add context label
+        ),
+        # create profile context label
+        context_label = case_when(
+          context == 1 ~ "black_low",
+          context == 2 ~ "black_high",
+          context == 3 ~ "white_low",
+          context == 4 ~ "white_high",
+          TRUE ~ NA_character_
+        ),
+        context = factor(context,
+                         levels = c(1:4),
+                         ordered = TRUE
+        )
+      ) %>%
+      verify(!is.na(context))
+  }
 }

@@ -1,0 +1,68 @@
+  |                                                                                                                                                              |                                                                                                                                                      |   0%  |                                                                                                                                                              |======================================================================================================================================================| 100%
+[1mindexing[0m [34mJob Applicants.csv[0m [===============================================================================================================] [32m2.15GB/s[0m, eta: [36m 0s[0m                                                                                                                                                                                                   
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+cols(
+  .default = col_character(),
+  StartDate = col_datetime(format = ""),
+  EndDate = col_datetime(format = ""),
+  Progress = col_double(),
+  `Duration (in seconds)` = col_double(),
+  Finished = col_logical(),
+  RecordedDate = col_datetime(format = ""),
+  Manipulation_Q1_1 = col_logical(),
+  Manipulation_Q1_2 = col_logical(),
+  Manipulation_Q1_3 = col_logical(),
+  Manipulation_Q2 = col_logical(),
+  Manipulation_Q2_TEXT = col_logical(),
+  QD2_1_TEXT = col_double(),
+  QD3_7 = col_logical(),
+  rnum = col_double(),
+  pi1 = col_double(),
+  pi2 = col_double(),
+  pi3 = col_double(),
+  `Create New Field or Choose From Dropdown...` = col_logical(),
+  rnum_mother = col_double(),
+  EmbeddedDataQuestions_DO_Q8 = col_double()
+  # ... with 8 more columns
+)
+ℹ Use `spec()` for the full column specifications.
+
+
+Number of observations in data
+[1] 66
+
+Number of observations after dropping test cases
+[1] 57
+`summarise()` has grouped output by 'batch_id'. You can override using the `.groups` argument.
+# A tibble: 1 × 3
+# Groups:   batch_id [1]
+  batch_id batch_type     n
+     <dbl> <chr>      <int>
+1      100 Validation    57
+Warning messages:
+1: Unknown or uninitialised column: `Prolific ID Q`. 
+2: ID is not unique 
+Warning message:
+Unknown or uninitialised column: `Status`. 
+Warning messages:
+1: In check_consent(.) : Dropping 1 survey respondents who do not consent
+2: In check_consent(.) :
+  1 survey respondents who do not consent with non-missing responses
+3: In check_consent(.) : 56 respondents in the data
+Warning messages:
+1: In check_completion(.) :
+  Dropping 1 survey respondents who did not finish
+2: In check_completion(.) : 55 respondents in the data
+Warning messages:
+1: In check_location_screen(.) :
+  Dropping 5 survey respondents who are not in the US
+2: In check_location_screen(.) :
+  5 survey respondents who are not in the US with non-missing responses
+3: In check_location_screen(.) : 50 respondents in the data
+`summarise()` has grouped output by 'batch_id'. You can override using the `.groups` argument.
+# A tibble: 1 × 3
+# Groups:   batch_id [1]
+  batch_id batch_type     n
+     <dbl> <chr>      <int>
+1      100 Validation    50
+[1mwrote[0m [32m11.73kB[0m in [36m 0s[0m, [32m292.73MB/s[0m                                                                                                                                                              [1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                                                              

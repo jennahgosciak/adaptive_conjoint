@@ -1,82 +1,54 @@
 
 Number of rows in data
-[1] 4721
+[1] 52
 
 Attention check results
 # A tibble: 1 × 1
   per_pass_attention_check
                      <dbl>
-1                    0.965
-# A tibble: 8 × 2
+1                        0
+# A tibble: 4 × 2
   context     n
   <ord>   <int>
-1 1         164
-2 2         234
-3 3         236
-4 4         566
-5 5        1486
-6 6        1686
-7 7         191
-8 8         158
+1 1          17
+2 2           9
+3 3          17
+4 4           9
 
 Validation of outcome data
-# A tibble: 4,721 × 9
-   chose_younger    Q1    Q2    Q3    Q4    Q5    Q6    Q7    Q8
-           <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
- 1             1    NA    NA    NA    NA    NA     1    NA    NA
- 2             1    NA    NA     1    NA    NA    NA    NA    NA
- 3             1    NA    NA     1    NA    NA    NA    NA    NA
- 4             1    NA    NA     1    NA    NA    NA    NA    NA
- 5             1    NA    NA    NA    NA    NA     1    NA    NA
- 6             1    NA    NA     1    NA    NA    NA    NA    NA
- 7             1    NA     1    NA    NA    NA    NA    NA    NA
- 8             1    NA    NA    NA    NA    NA    NA     1    NA
- 9             1    NA     1    NA    NA    NA    NA    NA    NA
-10             0    NA     0    NA    NA    NA    NA    NA    NA
-# ℹ 4,711 more rows
+# A tibble: 52 × 9
+   outcome    Q1    Q2    Q3    Q4    Q5    Q6    Q7    Q8
+     <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+ 1       1    NA    NA    NA    NA    NA    NA    NA     1
+ 2       1    NA    NA    NA    NA    NA     1    NA    NA
+ 3       0     0    NA    NA    NA    NA    NA    NA    NA
+ 4       0    NA    NA    NA     0    NA    NA    NA    NA
+ 5       0    NA     0    NA    NA    NA    NA    NA    NA
+ 6       0    NA    NA    NA    NA    NA     0    NA    NA
+ 7       0    NA    NA    NA    NA    NA     0    NA    NA
+ 8       1    NA    NA    NA    NA    NA    NA    NA     1
+ 9       0     0    NA    NA    NA    NA    NA    NA    NA
+10       0    NA    NA    NA    NA    NA    NA     0    NA
+# ℹ 42 more rows
 # ℹ Use `print(n = ...)` to see more rows
 `summarise()` has grouped output by 'context'. You can override using the `.groups` argument.
-# A tibble: 8 × 4
-# Groups:   context [8]
-  context context_label     mean_chose_younger mean_chose_older
-  <ord>   <chr>                          <dbl>            <dbl>
-1 1       white_female_high              0.756            0.244
-2 2       white_female_low               0.752            0.248
-3 3       black_female_high              0.75             0.25 
-4 4       black_female_low               0.701            0.299
-5 5       black_male_high                0.752            0.248
-6 6       black_male_low                 0.712            0.288
-7 7       white_male_high                0.775            0.225
-8 8       white_male_low                 0.766            0.234
-`summarise()` has grouped output by 'batch_id'. You can override using the `.groups` argument.
-# A tibble: 26 × 3
-# Groups:   batch_id [22]
-   batch_id batch_type                     n
-      <dbl> <chr>                      <int>
- 1        0 Warmup                       317
- 2        1 Iterative Batch Phase: Max    99
- 3        1 Iterative Batch Phase: Min   101
- 4        2 Iterative Batch Phase: Max   100
- 5        2 Iterative Batch Phase: Min   101
- 6        3 Iterative Batch Phase: Max   100
- 7        3 Iterative Batch Phase: Min   100
- 8        4 Iterative Batch Phase: Max   100
- 9        4 Iterative Batch Phase: Min    99
-10        5 Iterative Batch Phase: Min   101
-11        6 Iterative Batch Phase: Min   101
-12        7 Iterative Batch Phase: Min   101
-13        8 Iterative Batch Phase: Min   100
-14        9 Iterative Batch Phase: Min   102
-15       10 Iterative Batch Phase: Min   100
-16       11 Iterative Batch Phase: Min   100
-17       12 Iterative Batch Phase: Min   100
-18       13 Iterative Batch Phase: Min   101
-19       14 Iterative Batch Phase: Min   100
-20       15 Iterative Batch Phase: Min   100
-21       16 Iterative Batch Phase: Min    99
-22       17 Iterative Batch Phase: Min   100
-23       18 Iterative Batch Phase: Min   102
-24       19 Iterative Batch Phase: Min   100
-25       20 Iterative Batch Phase: Min   101
-26      100 Validation                  1996
-[1mwrote[0m [32m3.00kB[0m in [36m 0s[0m, [32m216.87MB/s[0m                                                                                                                                                              [1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                                                              
+# A tibble: 4 × 4
+# Groups:   context [4]
+  context context_label mean_chose_younger mean_chose_older
+  <ord>   <chr>                      <dbl>            <dbl>
+1 1       black_low                  0.412            0.588
+2 2       black_high                 0.444            0.556
+3 3       white_low                  0.529            0.471
+4 4       white_high                 0.667            0.333
+Error in `summarize()`:
+ℹ In argument: `estimate = mean(chose_younger)`.
+ℹ In group 1: `context = 1`, `context_label = "black_low"`.
+Caused by error in `mean()`:
+! object 'chose_younger' not found
+Run `rlang::last_trace()` to see where the error occurred.
+Error in `summarize()`:
+ℹ In argument: `estimate = mean(chose_younger)`.
+ℹ In group 1: `context = 1`, `context_label = "black_low"`.
+Caused by error in `mean()`:
+! object 'chose_younger' not found
+Run `rlang::last_trace()` to see where the error occurred.

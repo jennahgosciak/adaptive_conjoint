@@ -1,0 +1,51 @@
+batch_id,batch_type,id,chose_mother,race,female,age,hispanic,drop_demo_flag,context,context_label
+100,Validation,1,1,Asian,TRUE,25,FALSE,FALSE,4,white_high
+100,Validation,2,0,White,FALSE,23,FALSE,TRUE,3,white_low
+100,Validation,3,0,White,FALSE,52,FALSE,FALSE,2,black_high
+100,Validation,4,0,Two or More Races,FALSE,21,TRUE,TRUE,4,white_high
+100,Validation,5,0,Black or African American,TRUE,54,FALSE,FALSE,2,black_high
+100,Validation,6,0,White,TRUE,27,FALSE,FALSE,1,black_low
+100,Validation,7,1,White,FALSE,32,FALSE,TRUE,3,white_low
+100,Validation,8,0,Asian,TRUE,21,FALSE,FALSE,3,white_low
+100,Validation,9,0,White,TRUE,40,FALSE,FALSE,1,black_low
+100,Validation,10,1,White,FALSE,22,FALSE,FALSE,3,white_low
+100,Validation,11,0,Asian,FALSE,25,FALSE,FALSE,1,black_low
+100,Validation,12,0,Asian,FALSE,43,FALSE,FALSE,2,black_high
+100,Validation,13,0,Asian,TRUE,23,FALSE,FALSE,3,white_low
+100,Validation,14,0,White,TRUE,41,FALSE,FALSE,1,black_low
+100,Validation,15,1,White,TRUE,37,FALSE,FALSE,1,black_low
+100,Validation,16,1,White,FALSE,61,FALSE,FALSE,1,black_low
+100,Validation,17,0,American Indian or Alaska Native,TRUE,27,TRUE,FALSE,4,white_high
+100,Validation,18,1,White,FALSE,26,FALSE,TRUE,3,white_low
+100,Validation,19,1,White,FALSE,23,TRUE,FALSE,4,white_high
+100,Validation,20,1,White,FALSE,24,FALSE,FALSE,2,black_high
+100,Validation,21,1,Black or African American,FALSE,30,FALSE,FALSE,1,black_low
+100,Validation,22,0,Black or African American,FALSE,42,TRUE,FALSE,2,black_high
+100,Validation,23,1,Asian,TRUE,27,FALSE,FALSE,1,black_low
+100,Validation,24,1,White,FALSE,22,FALSE,FALSE,3,white_low
+100,Validation,25,0,White,TRUE,38,FALSE,FALSE,4,white_high
+100,Validation,26,1,Two or More Races,FALSE,33,FALSE,FALSE,2,black_high
+100,Validation,27,0,Black or African American,FALSE,28,FALSE,FALSE,2,black_high
+100,Validation,28,1,White,FALSE,31,FALSE,FALSE,4,white_high
+100,Validation,29,0,Asian,TRUE,22,FALSE,FALSE,3,white_low
+100,Validation,30,0,White,FALSE,40,FALSE,FALSE,3,white_low
+100,Validation,31,1,White,TRUE,24,FALSE,FALSE,3,white_low
+100,Validation,32,1,White,FALSE,27,TRUE,FALSE,3,white_low
+100,Validation,33,0,White,TRUE,33,FALSE,FALSE,3,white_low
+100,Validation,34,0,White,TRUE,39,FALSE,FALSE,3,white_low
+100,Validation,35,0,White,FALSE,25,FALSE,FALSE,1,black_low
+100,Validation,36,1,White,TRUE,35,FALSE,FALSE,2,black_high
+100,Validation,37,0,White,FALSE,22,FALSE,FALSE,1,black_low
+100,Validation,38,0,White,TRUE,26,FALSE,FALSE,1,black_low
+100,Validation,39,1,Black or African American,TRUE,22,FALSE,FALSE,4,white_high
+100,Validation,40,1,White,TRUE,68,FALSE,FALSE,2,black_high
+100,Validation,41,0,Other,TRUE,23,TRUE,FALSE,3,white_low
+100,Validation,42,0,White,FALSE,29,FALSE,FALSE,1,black_low
+100,Validation,43,1,Black or African American,TRUE,26,FALSE,FALSE,1,black_low
+100,Validation,44,1,Asian,TRUE,27,FALSE,FALSE,1,black_low
+100,Validation,45,1,White,TRUE,35,FALSE,FALSE,1,black_low
+100,Validation,46,1,Asian,TRUE,50,FALSE,FALSE,4,white_high
+100,Validation,47,0,Asian,TRUE,27,FALSE,FALSE,1,black_low
+100,Validation,48,0,White,FALSE,37,FALSE,FALSE,1,black_low
+100,Validation,49,1,White,FALSE,72,FALSE,FALSE,4,white_high
+100,Validation,50,1,White,FALSE,23,FALSE,FALSE,3,white_low

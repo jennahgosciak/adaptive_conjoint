@@ -16,7 +16,7 @@ sink(file, type = "message")
 # Load Qualtrics data
 ###############################################
 survey_lab <- "job_applicants"
-add_all_phases <- TRUE
+add_all_phases <- FALSE
 if (add_all_phases == TRUE) {
   fname <- "00_data/qualtrics_data_{survey_lab}_all_phases.RDS"
 } else {
@@ -29,20 +29,35 @@ nrow(df_clean)
 
 # check attention, percent who pass the attention check
 cat("\nAttention check results\n")
-df_clean %>%
-  mutate(older_candidate = if_else(rnum_age <= 0.5, "Candidate 2", "Candidate 1")) %>%
-  mutate(pass_attention_check = if_else(Manipulation_Q1 == older_candidate, 1, 0)) %>%
-  summarize(per_pass_attention_check = mean(pass_attention_check))
+if (survey_lab == "political_candidates") {
+  df_clean %>%
+    mutate(older_candidate = if_else(rnum_age <= 0.5, "Candidate 2", "Candidate 1")) %>%
+    mutate(pass_attention_check = if_else(Manipulation_Q1 == older_candidate, 1, 0)) %>%
+    summarize(per_pass_attention_check = mean(pass_attention_check))
+} else {
+  df_clean %>%
+    mutate(candidate_mother = if_else(rnum_mother <= 0.5, "Candidate 2", "Candidate 1"),
+           manipulation_check_total = rowSums(select(., starts_with("Manipulation_Q1_")) %>% 
+                                                is.na())) %>%
+    mutate(pass_attention_check = case_when((rnum_mother <= 0.5) & 
+                                        (Manipulation_Q1_2 == "Candidate 2") &
+                                        (manipulation_check_total == 2) ~ 1,
+                                      (rnum_mother > 0.5) & 
+                                        (Manipulation_Q1_2 == "Candidate 1") &
+                                        (manipulation_check_total == 2) ~ 1,
+                                      TRUE ~ 0)) %>%
+    summarize(per_pass_attention_check = mean(pass_attention_check))
+}
 
 ###############################################
 # Process Qualtrics data
 ###############################################
 
 # create outcome variable
-df_clean <- create_outcome_var(df_clean)
+df_clean <- create_outcome_var(df_clean, survey_lab)
 
 # create profile context variable
-df_clean <- create_context_var(df_clean)
+df_clean <- create_context_var(df_clean, survey_lab)
 
 df_clean %>% 
   group_by(context) %>% 
@@ -50,18 +65,25 @@ df_clean %>%
 
 # validation of outcome variable
 # each question number is the random ordering of the context attributes
+if (survey_lab=="political_candidates") {
+  outcome_var <- chose_younger
+} else if (survey_lab=="job_applicants") {
+  outcome_var <- "chose_mother"
+}
+
 cat("\nValidation of outcome data\n")
 df_clean %>%
-  select(chose_younger, str_c("Q", 1:8)) %>%
-  verify(!is.na(chose_younger))
+  select(outcome = outcome_var, all_of(str_c("Q", 1:8))) %>%
+  verify(!is.na(outcome))
 
 df_clean %>% 
-  mutate(chose_older = 1 - chose_younger) %>% 
+  rename(outcome = outcome_var) %>% 
+  mutate(neg_outcome = 1 - outcome) %>% 
   group_by(context, context_label) %>% 
-  summarize(mean_chose_younger = mean(chose_younger),
-            mean_chose_older = mean(chose_older))
+  summarize(mean_chose_younger = mean(outcome),
+            mean_chose_older = mean(neg_outcome))
 
-# create cleaned demographic variables
+ # create cleaned demographic variables
 df_demo <- df_clean %>%
   mutate(
     hispanic = if_else(QD4 == "Yes", TRUE, FALSE),
@@ -99,23 +121,23 @@ df_demo <- df_clean %>%
 if (add_all_phases == TRUE) {
   df_demo <- df_demo %>%
     select(
-      batch_id, batch_type, id, chose_younger, race, female, age, hispanic, drop_demo_flag,
+      batch_id, batch_type, id, outcome_var, race, female, age, hispanic, drop_demo_flag,
       context, context_label
     )
   output_fname <- str_glue("01_intermediate/qualtrics_data_{survey_lab}_clean_all_phases")
+  
+  df_demo %>%
+    group_by(batch_id, batch_type) %>%
+    summarize(n = n()) %>% 
+    print(n=50)
 } else {
   df_demo <- df_demo %>%
     select(
-      id, chose_younger, race, female, age, hispanic, drop_demo_flag,
+      id, outcome_var, race, female, age, hispanic, drop_demo_flag,
       context, context_label
     )
   output_fname <- str_glue("01_intermediate/qualtrics_data_{survey_lab}_clean")
 }
-
-df_demo %>%
-  group_by(batch_id, batch_type) %>%
-  summarize(n = n()) %>% 
-  print(n=50)
 
 # saving locally
 df_demo %>%
