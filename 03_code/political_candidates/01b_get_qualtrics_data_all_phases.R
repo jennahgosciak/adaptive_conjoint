@@ -9,7 +9,7 @@ library(assertr)
 set.seed(2023)
 config <- config::get()
 
-file <- file("./_logs/01b_get_qualtrics_data_all_phases.txt", open = "wt")
+file <- file("./_logs/01b_get_qualtrics_data_all_phases_political_candidates.txt", open = "wt")
 sink(file, type = "output")
 sink(file, type = "message")
 
@@ -19,8 +19,8 @@ source("./03_code/_data_cleaning.R")
 # Load Qualtrics
 ###############################################
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
-survey_name <- "Job Applicants"
-survey_lab <- "job_applicants"
+survey_name <- "Political Candidates"
+survey_lab <- "political_candidates"
 survey_id <- config$pol_candidates_survey_id
 
 df_survey <- load_qualtrics(survey_name)
@@ -93,17 +93,17 @@ df_survey %>%
 ###############################################
 
 # check ID uniquely identifies rows in data
-if (length(unique(df$`Prolific ID Q`)) != nrow(df)) {
+if (length(unique(df_survey$`Prolific ID Q`)) != nrow(df_survey)) {
   warning("ID is not unique")
 }
 
-if (!all(unique(df$Status) == "IP Address")) {
+if (!all(unique(df_survey$Status) == "IP Address")) {
   warning("Test/spam data included in the analysis file")
-  print(str_glue("Number of observations in data: {nrow(df)}"))
-  print(str_glue("Status values in data: {str_c(unique(df$Status), collapse=', ')}"))
-  df <- df %>%
+  print(str_glue("Number of observations in data: {nrow(df_survey)}"))
+  print(str_glue("Status values in data: {str_c(unique(df_survey$Status), collapse=', ')}"))
+  df_survey <- df_survey %>%
     filter(Status == "IP Address")
-  print(str_glue("Number of observations left in data: {nrow(df)}"))
+  print(str_glue("Number of observations left in data: {nrow(df_survey)}"))
 }
 
 # check we have consent from all participants
@@ -128,16 +128,9 @@ df_survey <- df_survey %>%
 # Generate new ID
 ###############################################
 
-# select variables to subset
-if (survey_name == "Job Applicants") {
-  varlist <- expr(c(batch_id, batch_type, PreScreen_Q1:education2, -`Create New Field or Choose From Dropdown...`))
-} else {
-  varlist <- expr(c(batch_id, batch_type, PreScreen_Q1:rnum_mother, age1:career2))
-}
-
 # create cleaned version for saving locally
 df_clean <- df_survey %>%
-  select(!!varlist) %>%
+  select(c(batch_id, batch_type, PreScreen_Q1:rnum_age, age1:career2)) %>%
   # create a new unique random ID for linking
   mutate(id = runif(nrow(df_survey), 0, 1)) %>%
   arrange(id) %>%

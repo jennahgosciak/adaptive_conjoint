@@ -10,7 +10,7 @@ Population weights
 5 Black or African American FALSE  FALSE       22 0.00114  1998
 6 Black or African American FALSE  FALSE       23 0.00111  1934
 
-Number of rows in data[1] 52
+Number of rows in data[1] 50
 `summarise()` has grouped output by 'context'. You can override using the `.groups` argument.
 
 Simple mean estimates
@@ -20,7 +20,7 @@ Simple mean estimates
   <ord>   <chr>         <chr>          <dbl> <dbl>  <dbl>  <dbl>
 1 1       black_low     simple_mean    0.412 0.119  0.178  0.646
 2 2       black_high    simple_mean    0.444 0.166  0.120  0.769
-3 3       white_low     simple_mean    0.529 0.121  0.292  0.767
+3 3       white_low     simple_mean    0.467 0.129  0.214  0.719
 4 4       white_high    simple_mean    0.667 0.157  0.359  0.975
 `summarise()` has grouped output by 'context'. You can override using the `.groups` argument.
 Warning message:
@@ -31,7 +31,7 @@ Expected 3 pieces. Missing pieces filled with `NA` in 4 rows [1, 2, 3, 4].
   <ord>   <chr> <chr> <chr>      <dbl> <dbl> <dbl> <int>    <dbl>  <dbl>  <dbl>
 1 1       black low   <NA>          17    20 0.412    17    0.459  0.304  0.619
 2 2       black high  <NA>          14    15 0.444     9    0.483  0.306  0.661
-3 3       white low   <NA>          19    18 0.529    17    0.514  0.355  0.671
+3 3       white low   <NA>          17    18 0.467    15    0.486  0.324  0.649
 4 4       white high  <NA>          16    13 0.667     9    0.552  0.372  0.725
 Warning message:
 There were 2 warnings in `mutate()`.
@@ -52,8 +52,8 @@ There were 50 or more warnings (use warnings() to see the first 50)
   <ord>   <chr>         <chr>             <dbl> <dbl>  <dbl>  <dbl>
 1 1       black_low     poststratified    0.648 0.214  0.228  1.07 
 2 2       black_high    poststratified    0.624 0.159  0.313  0.935
-3 3       white_low     poststratified    0.191 0.256 -0.311  0.694
-4 4       white_high    poststratified    0.604 0.212  0.188  1.02 
+3 3       white_low     poststratified    0.137 0.214 -0.283  0.556
+4 4       white_high    poststratified    0.604 0.211  0.190  1.02 
 
 Results: simple mean and poststratification estimates
 # A tibble: 8 × 7
@@ -62,10 +62,10 @@ Results: simple mean and poststratification estimates
   <ord>   <chr>         <chr>             <dbl> <dbl>  <dbl>  <dbl>
 1 1       black_low     simple_mean       0.412 0.119  0.178  0.646
 2 2       black_high    simple_mean       0.444 0.166  0.120  0.769
-3 3       white_low     simple_mean       0.529 0.121  0.292  0.767
+3 3       white_low     simple_mean       0.467 0.129  0.214  0.719
 4 4       white_high    simple_mean       0.667 0.157  0.359  0.975
 5 1       black_low     poststratified    0.648 0.214  0.228  1.07 
 6 2       black_high    poststratified    0.624 0.159  0.313  0.935
-7 3       white_low     poststratified    0.191 0.256 -0.311  0.694
-8 4       white_high    poststratified    0.604 0.212  0.188  1.02 
+7 3       white_low     poststratified    0.137 0.214 -0.283  0.556
+8 4       white_high    poststratified    0.604 0.211  0.190  1.02 
 [1mwrote[0m [32m2.15GB[0m in [36m 0s[0m, [32m2.15GB/s[0m                                                                                                                     

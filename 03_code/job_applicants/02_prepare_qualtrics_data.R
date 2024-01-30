@@ -28,16 +28,18 @@ cat("\nAttention check results\n")
 df_clean %>%
   mutate(
     candidate_mother = if_else(rnum_mother <= 0.5, "Candidate 2", "Candidate 1"),
-    manipulation_check_total = rowSums(select(., starts_with("Manipulation_Q1_")) %>%
+    manipulation_check_missing = rowSums(select(., starts_with("Manipulation_Q1_")) %>%
       is.na())
   ) %>%
   mutate(pass_attention_check = case_when(
     (rnum_mother <= 0.5) &
       (Manipulation_Q1_2 == "Candidate 2") &
-      (manipulation_check_total == 2) ~ 1,
+      # only when they've selected one response, i.e. missing = 2
+      (manipulation_check_missing == 2) ~ 1,
     (rnum_mother > 0.5) &
       (Manipulation_Q1_2 == "Candidate 1") &
-      (manipulation_check_total == 2) ~ 1,
+      # only when they've selected one response, i.e. missing = 2
+      (manipulation_check_missing == 2) ~ 1,
     TRUE ~ 0
   )) %>%
   summarize(per_pass_attention_check = mean(pass_attention_check))
@@ -68,8 +70,8 @@ df_clean %>%
   mutate(chose_nonmother = 1 - chose_mother) %>%
   group_by(context, context_label) %>%
   summarize(
-    mean_chose_younger = mean(chose_mother),
-    mean_chose_older = mean(chose_nonmother)
+    mean_chose_mother = mean(chose_mother),
+    mean_chose_nonmother = mean(chose_nonmother)
   )
 
 # create cleaned demographic variables
