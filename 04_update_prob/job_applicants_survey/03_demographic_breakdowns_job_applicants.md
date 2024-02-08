@@ -28,7 +28,7 @@ df %>%
     ## # Groups:   batch_type [1]
     ##   batch_type batch_id     n
     ##   <ord>         <dbl> <int>
-    ## 1 Warmup            0    50
+    ## 1 Warmup            0    20
 
 ``` r
 df %>%
@@ -39,7 +39,7 @@ df %>%
     ## # A tibble: 1 × 2
     ##   batch_type     n
     ##   <ord>      <int>
-    ## 1 Warmup        50
+    ## 1 Warmup        20
 
 ## Examining female and hispanicity
 
@@ -59,7 +59,7 @@ df %>%
     ## # A tibble: 1 × 5
     ##   batch_type female_n female_per hispanic_n hispanic_per
     ##   <ord>         <int>      <dbl>      <int>        <dbl>
-    ## 1 Warmup           25        0.5          6         0.12
+    ## 1 Warmup           12        0.6          1         0.05
 
 ## Examining differences in ages
 
@@ -77,21 +77,26 @@ df %>%
     ## `summarise()` has grouped output by 'batch_type'. You can override using the
     ## `.groups` argument.
 
-    ## # A tibble: 27 × 4
+    ## # A tibble: 16 × 4
     ## # Groups:   batch_type [1]
     ##    batch_type   age     n   per
     ##    <ord>      <dbl> <int> <dbl>
-    ##  1 Warmup        21     2  0.04
-    ##  2 Warmup        22     5  0.1 
-    ##  3 Warmup        23     5  0.1 
-    ##  4 Warmup        24     2  0.04
-    ##  5 Warmup        25     3  0.06
-    ##  6 Warmup        26     3  0.06
-    ##  7 Warmup        27     6  0.12
-    ##  8 Warmup        28     1  0.02
-    ##  9 Warmup        29     1  0.02
-    ## 10 Warmup        30     1  0.02
-    ## # ℹ 17 more rows
+    ##  1 Warmup        26     2  0.1 
+    ##  2 Warmup        28     1  0.05
+    ##  3 Warmup        29     1  0.05
+    ##  4 Warmup        32     1  0.05
+    ##  5 Warmup        33     1  0.05
+    ##  6 Warmup        34     2  0.1 
+    ##  7 Warmup        35     1  0.05
+    ##  8 Warmup        38     1  0.05
+    ##  9 Warmup        39     2  0.1 
+    ## 10 Warmup        42     2  0.1 
+    ## 11 Warmup        47     1  0.05
+    ## 12 Warmup        52     1  0.05
+    ## 13 Warmup        53     1  0.05
+    ## 14 Warmup        56     1  0.05
+    ## 15 Warmup        66     1  0.05
+    ## 16 Warmup        68     1  0.05
 
 ``` r
 df %>%
@@ -119,15 +124,12 @@ df %>%
   arrange(desc(per))
 ```
 
-    ## # A tibble: 6 × 3
-    ##   race                                  n   per
-    ##   <chr>                             <int> <dbl>
-    ## 1 White                                30  0.6 
-    ## 2 Asian                                10  0.2 
-    ## 3 Black or African American             6  0.12
-    ## 4 Multiracial                           2  0.04
-    ## 5 American Indian or Alaskan Native     1  0.02
-    ## 6 Other                                 1  0.02
+    ## # A tibble: 3 × 3
+    ##   race                          n   per
+    ##   <chr>                     <int> <dbl>
+    ## 1 White                        16  0.8 
+    ## 2 Asian                         3  0.15
+    ## 3 Black or African American     1  0.05
 
 ``` r
 df %>%

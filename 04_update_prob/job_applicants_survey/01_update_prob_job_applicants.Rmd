@@ -94,7 +94,7 @@ names(pi_ts) <- str_c("pi", 1:(num_contexts - 1))
 ```
 ```{r}
 # Retrieve current survey flow (full structure)
-current_flow <- get_survey_flow(config$api_token, config$pol_candidates_survey_id, config$datacenter_id)
+current_flow <- get_survey_flow(config$api_token, survey_id, config$datacenter_id)
 # Extract just the flow part for modification
 current_flow_data <- current_flow$result$Flow
 

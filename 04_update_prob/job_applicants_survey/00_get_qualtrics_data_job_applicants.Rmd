@@ -51,7 +51,7 @@ df %>%
 df <- df %>%
   mutate(StartDate_clean = ymd_hms(StartDate)) %>%
   verify(is.na(StartDate_clean) == is.na(StartDate)) %>%
-  filter(StartDate_clean >= ymd_hms("2024-01-15-00-00-00"))
+  filter(StartDate_clean >= ymd_hms("2024-02-08-00-00-00"))
 
 df %>%
   nrow()
@@ -91,7 +91,7 @@ df <- df %>%
   mutate(
     batch_id = case_when(
       # NEED TO CHANGE
-      StartDate_clean <= ymd_hms("2024-01-17-12-00-00") ~ 0,
+      StartDate_clean <= ymd_hms("2024-02-09-00-00-00") ~ 0,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
@@ -211,11 +211,11 @@ stopifnot(length(unique(df$`Prolific ID Q`)) == nrow(df))
 # create context variable
 df <- df %>%
   create_context_var_jobs() %>%
-  verify(!is.na(context)) # %>%
-# verify(!is.na(context_label))
+  verify(!is.na(context))   %>%
+  verify(!is.na(context_label))
 
 df %>%
-  group_by(batch_type, context) %>%
+  group_by(batch_type, context, context_label) %>%
   summarize(n = n())
 
 df %>%
@@ -342,8 +342,42 @@ df_clean %>%
 ```
 
 ```{r, attention check}
-# no manipulation question!!
+# check manipulation questions
+df_clean %>%
+  mutate(
+    candidate_mother = if_else(rnum_mother <= 0.5, "Candidate 2", "Candidate 1"),
+    manipulation_check_missing = rowSums(select(., starts_with("Manipulation_Q1_")) %>%
+      is.na())
+  ) %>%
+  mutate(pass_attention_check = case_when(
+    (rnum_mother <= 0.5) &
+      (Manipulation_Q1_2 == "Candidate 2") &
+      # only when they've selected one response, i.e. missing = 2
+      (manipulation_check_missing == 2) ~ 1,
+    (rnum_mother > 0.5) &
+      (Manipulation_Q1_2 == "Candidate 1") &
+      # only when they've selected one response, i.e. missing = 2
+      (manipulation_check_missing == 2) ~ 1,
+    TRUE ~ 0
+  ),
+  unsure_attention_check = if_else(Manipulation_Q1_3 == "Not sure" & !is.na(Manipulation_Q1_3), 1, 0)) %>%
+  summarize(per_pass_attention_check = mean(pass_attention_check),
+            per_unsure = mean(unsure_attention_check))
+
+df_clean %>% 
+  mutate(candidate_mother = if_else(rnum_mother <= 0.5, "Candidate 2", "Candidate 1")) %>% 
+  select(rnum_mother, candidate_mother, starts_with("volunteer"), starts_with("Manipulation_Q1_"))
 ```
+```{r, hiring attention check}
+df_clean %>% 
+  select(Manipulation_Q2, Manipulation_Q2_TEXT) %>% 
+  mutate(Fail_Manipulation_Q2 = if_else(Manipulation_Q2 != "Yes", 1, 0)) %>% 
+  summarize(across(Fail_Manipulation_Q2, .fns = lst(n = ~sum(.), per = ~mean(.))))
+
+df_clean %>% 
+  distinct(Manipulation_Q2_TEXT)
+```
+
 
 ```{r, demog}
 df_clean <- df_clean %>%
