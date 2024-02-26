@@ -321,6 +321,19 @@ df %>%
     y = "Cumulative Probability"
   )
 ```
+```{r}
+# check randomness of question ordering
+# plot counts by question order
+df %>% 
+  select(str_c("Q", 1:8)) %>% 
+  pivot_longer(everything()) %>%
+  filter(value == 'Candidate 1' | value == 'Candidate 2') %>% 
+  mutate(order_val = as.numeric(str_replace_all(name, "Q", ""))) %>% 
+  ggplot() +
+  geom_histogram(aes(order_val)) +
+  theme_classic() +
+  labs(x = 'Order', y = 'Number of responses')
+```
 
 ## Clean Qualtrics Data
 
@@ -349,19 +362,6 @@ df_clean %>%
     chose_nonmother_total = sum(chose_mother == 0)
   ) %>% 
   mutate(diff = abs(chose_mother_total - chose_nonmother_total))
-```
-```{r}
-# check randomness of question ordering
-# plot counts by question order
-df %>% 
-  select(str_c("Q", 1:8)) %>% 
-  pivot_longer(everything()) %>%
-  filter(value == 'Candidate 1' | value == 'Candidate 2') %>% 
-  mutate(order_val = as.numeric(str_replace_all(name, "Q", ""))) %>% 
-  ggplot() +
-  geom_histogram(aes(order_val)) +
-  theme_classic() +
-  labs(x = 'Order', y = 'Number of responses')
 ```
 
 

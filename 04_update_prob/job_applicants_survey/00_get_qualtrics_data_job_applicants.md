@@ -25,18 +25,21 @@ probabilities <- read_csv("../../02_output/probabilities_job_applicants.csv")
 probabilities
 ```
 
-    ## # A tibble: 9 × 4
-    ##   Batch `Embedded data variable` CDF_Threshold `Batch Type`              
-    ##   <dbl> <chr>                            <dbl> <chr>                     
-    ## 1     0 pi1                              0.25  Warmup                    
-    ## 2     0 pi2                              0.5   Warmup                    
-    ## 3     0 pi3                              0.75  Warmup                    
-    ## 4     1 pi1                              0.313 Iterative Batch Phase: Max
-    ## 5     1 pi2                              0.367 Iterative Batch Phase: Max
-    ## 6     1 pi3                              0.889 Iterative Batch Phase: Max
-    ## 7     2 pi1                              0.378 Iterative Batch Phase: Max
-    ## 8     2 pi2                              0.398 Iterative Batch Phase: Max
-    ## 9     2 pi3                              0.91  Iterative Batch Phase: Max
+    ## # A tibble: 12 × 4
+    ##    Batch `Embedded data variable` CDF_Threshold `Batch Type`              
+    ##    <dbl> <chr>                            <dbl> <chr>                     
+    ##  1     0 pi1                              0.25  Warmup                    
+    ##  2     0 pi2                              0.5   Warmup                    
+    ##  3     0 pi3                              0.75  Warmup                    
+    ##  4     1 pi1                              0.11  Iterative Batch Phase: Max
+    ##  5     1 pi2                              0.639 Iterative Batch Phase: Max
+    ##  6     1 pi3                              0.709 Iterative Batch Phase: Max
+    ##  7     2 pi1                              0.378 Iterative Batch Phase: Max
+    ##  8     2 pi2                              0.398 Iterative Batch Phase: Max
+    ##  9     2 pi3                              0.91  Iterative Batch Phase: Max
+    ## 10     1 pi1                              0.11  Iterative Batch Phase: Min
+    ## 11     1 pi2                              0.639 Iterative Batch Phase: Min
+    ## 12     1 pi3                              0.709 Iterative Batch Phase: Min
 
 ``` r
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
@@ -52,7 +55,7 @@ df <- load_qualtrics(survey_name)
 ```
 
     ## Loading survey data for Job Applicants
-    ##   |                                                                              |                                                                      |   0%  |                                                                              |====================================                                  |  51%  |                                                                              |======================================================================| 100%
+    ##   |                                                                              |                                                                      |   0%  |                                                                              |==================                                                    |  26%  |                                                                              |======================================================                |  77%  |                                                                              |======================================================================| 100%
 
     ## 
     ## ── Column specification ────────────────────────────────────────────────────────
@@ -212,6 +215,17 @@ if (!all(unique(df$Status) == "IP Address")) {
 df %>%
   check_pi_vars(probabilities, 3)
 ```
+
+    ## Warning in check_pi_vars(., probabilities, 3): Embedded data variables do not
+    ## match probabilities in log
+
+    ## # A tibble: 3 × 6
+    ##   batch_id batch_type   Embedded data variab…¹ CDF_Data CDF_Threshold Comparison
+    ##      <dbl> <chr>        <chr>                     <dbl>         <dbl> <lgl>     
+    ## 1        1 Iterative B… pi1                       0.313         0.11  FALSE     
+    ## 2        1 Iterative B… pi2                       0.367         0.639 FALSE     
+    ## 3        1 Iterative B… pi3                       0.889         0.709 FALSE     
+    ## # ℹ abbreviated name: ¹​`Embedded data variable`
 
 ``` r
 # check distinct probabilities based on embedded data
@@ -528,6 +542,24 @@ df %>%
 
 ![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
 
+``` r
+# check randomness of question ordering
+# plot counts by question order
+df %>% 
+  select(str_c("Q", 1:8)) %>% 
+  pivot_longer(everything()) %>%
+  filter(value == 'Candidate 1' | value == 'Candidate 2') %>% 
+  mutate(order_val = as.numeric(str_replace_all(name, "Q", ""))) %>% 
+  ggplot() +
+  geom_histogram(aes(order_val)) +
+  theme_classic() +
+  labs(x = 'Order', y = 'Number of responses')
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+
 ## Clean Qualtrics Data
 
 ``` r
@@ -556,7 +588,7 @@ df_clean %>%
 
 ``` r
 df_clean %>%
-  group_by(context_label) %>%
+  group_by(context, context_label) %>%
   summarize(
     n = n(),
     chose_mother_total = sum(chose_mother),
@@ -565,17 +597,21 @@ df_clean %>%
   mutate(diff = abs(chose_mother_total - chose_nonmother_total))
 ```
 
-    ## # A tibble: 4 × 5
-    ##   context_label     n chose_mother_total chose_nonmother_total  diff
-    ##   <chr>         <int>              <dbl>                 <int> <dbl>
-    ## 1 black_high       45                 16                    29    13
-    ## 2 black_low        72                 37                    35     2
-    ## 3 white_high       53                 23                    30     7
-    ## 4 white_low        83                 44                    39     5
+    ## `summarise()` has grouped output by 'context'. You can override using the
+    ## `.groups` argument.
+
+    ## # A tibble: 4 × 6
+    ## # Groups:   context [4]
+    ##   context context_label     n chose_mother_total chose_nonmother_total  diff
+    ##   <ord>   <chr>         <int>              <dbl>                 <int> <dbl>
+    ## 1 1       black_low        72                 37                    35     2
+    ## 2 2       black_high       45                 16                    29    13
+    ## 3 3       white_low        83                 44                    39     5
+    ## 4 4       white_high       53                 23                    30     7
 
 ``` r
 df_clean %>%
-  group_by(batch_id, batch_type, context_label) %>%
+  group_by(batch_id, batch_type, context, context_label) %>%
   summarize(
     n = n(),
     chose_mother_total = sum(chose_mother),
@@ -584,40 +620,22 @@ df_clean %>%
   mutate(diff = abs(chose_mother_total - chose_nonmother_total))
 ```
 
-    ## `summarise()` has grouped output by 'batch_id', 'batch_type'. You can override
-    ## using the `.groups` argument.
+    ## `summarise()` has grouped output by 'batch_id', 'batch_type', 'context'. You
+    ## can override using the `.groups` argument.
 
-    ## # A tibble: 8 × 7
-    ## # Groups:   batch_id, batch_type [2]
-    ##   batch_id batch_type                 context_label     n chose_mother_total
-    ##      <dbl> <chr>                      <chr>         <int>              <dbl>
-    ## 1        0 Warmup                     black_high       41                 15
-    ## 2        0 Warmup                     black_low        40                 19
-    ## 3        0 Warmup                     white_high       46                 19
-    ## 4        0 Warmup                     white_low        27                 14
-    ## 5        1 Iterative Batch Phase: Max black_high        4                  1
-    ## 6        1 Iterative Batch Phase: Max black_low        32                 18
-    ## 7        1 Iterative Batch Phase: Max white_high        7                  4
-    ## 8        1 Iterative Batch Phase: Max white_low        56                 30
+    ## # A tibble: 8 × 8
+    ## # Groups:   batch_id, batch_type, context [8]
+    ##   batch_id batch_type             context context_label     n chose_mother_total
+    ##      <dbl> <chr>                  <ord>   <chr>         <int>              <dbl>
+    ## 1        0 Warmup                 1       black_low        40                 19
+    ## 2        0 Warmup                 2       black_high       41                 15
+    ## 3        0 Warmup                 3       white_low        27                 14
+    ## 4        0 Warmup                 4       white_high       46                 19
+    ## 5        1 Iterative Batch Phase… 1       black_low        32                 18
+    ## 6        1 Iterative Batch Phase… 2       black_high        4                  1
+    ## 7        1 Iterative Batch Phase… 3       white_low        56                 30
+    ## 8        1 Iterative Batch Phase… 4       white_high        7                  4
     ## # ℹ 2 more variables: chose_nonmother_total <int>, diff <dbl>
-
-``` r
-# check randomness of question ordering
-# plot counts by question order
-df %>% 
-  select(str_c("Q", 1:8)) %>% 
-  pivot_longer(everything()) %>%
-  filter(value == 'Candidate 1' | value == 'Candidate 2') %>% 
-  mutate(order_val = as.numeric(str_replace_all(name, "Q", ""))) %>% 
-  ggplot() +
-  geom_histogram(aes(order_val)) +
-  theme_classic() +
-  labs(x = 'Order', y = 'Number of responses')
-```
-
-    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-
-![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
 # identify context desc
