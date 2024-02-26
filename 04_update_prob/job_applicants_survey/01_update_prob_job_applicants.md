@@ -23,7 +23,7 @@ probabilities <- read_csv("../../02_output/probabilities_job_applicants.csv")
 probabilities
 ```
 
-    ## # A tibble: 15 × 4
+    ## # A tibble: 21 × 4
     ##    Batch `Embedded data variable` CDF_Threshold `Batch Type`              
     ##    <dbl> <chr>                            <dbl> <chr>                     
     ##  1     0 pi1                              0.25  Warmup                    
@@ -36,11 +36,7 @@ probabilities
     ##  8     2 pi2                              0.398 Iterative Batch Phase: Max
     ##  9     2 pi3                              0.91  Iterative Batch Phase: Max
     ## 10     3 pi1                              0.569 Iterative Batch Phase: Max
-    ## 11     3 pi2                              0.58  Iterative Batch Phase: Max
-    ## 12     3 pi3                              0.95  Iterative Batch Phase: Max
-    ## 13     1 pi1                              0.11  Iterative Batch Phase: Min
-    ## 14     1 pi2                              0.639 Iterative Batch Phase: Min
-    ## 15     1 pi3                              0.709 Iterative Batch Phase: Min
+    ## # ℹ 11 more rows
 
 ``` r
 df_clean <- readRDS("../../02_output/job_applicants_data_clean.RDS")
@@ -70,7 +66,7 @@ num_outcome0 <- integer(num_contexts)
 print(str_glue("Number of rows in data: {nrow(df_clean)}"))
 ```
 
-    ## Number of rows in data: 446
+    ## Number of rows in data: 543
 
 ``` r
 # filter for correct batch types (whether max discriminatory or min)
@@ -87,13 +83,13 @@ if (current_batch_num != max(df_clean$batch_id)) {
 print(str_glue("Current batch ID: {current_batch_num}"))
 ```
 
-    ## Current batch ID: 3
+    ## Current batch ID: 4
 
 ``` r
 print(str_glue("Number of rows left in data: {nrow(df_clean)}"))
 ```
 
-    ## Number of rows left in data: 446
+    ## Number of rows left in data: 543
 
 ``` r
 print(str_glue("Only batch type in data: {str_c(unique(df_clean$batch_type), collapse=', ')}"))
@@ -106,7 +102,7 @@ set.seed(2023)
 nrow(df_clean)
 ```
 
-    ## [1] 446
+    ## [1] 543
 
 ``` r
 # generate prob of most (or least) discriminatory context
@@ -119,21 +115,21 @@ output <- update_ts(df_clean, "chose_mother", num_sim, num_contexts, num_outcome
 
     ## [1] 1e+06
     ## [1] "Predicting the most discriminatory context: taking the argmax"
-    ## [1] "PDF: 0.313676,0.044792,0.518271,0.123261"
-    ## [1] "CDF: 0.313676,0.358468,0.876739,1"
+    ## [1] "PDF: 0.31036,0.118508,0.323844,0.247288"
+    ## [1] "CDF: 0.31036,0.428868,0.752712,1"
 
 ``` r
 output
 ```
 
     ## $pi
-    ## [1] 0.313676 0.358468 0.876739 1.000000
+    ## [1] 0.310360 0.428868 0.752712 1.000000
     ## 
     ## $num_outcome1
-    ## [1] 79 19 88 31
+    ## [1]  89  22 106  41
     ## 
     ## $num_outcome0
-    ## [1] 79 30 82 38
+    ## [1]  95  31 112  47
 
 ``` r
 # check total is equal to number of observations in data
@@ -164,9 +160,9 @@ modified_flow_data <- update_flow_with_probabilities(
 )
 ```
 
-    ## For pi1, replacing old probability 0.569 with new probability 0.314
-    ## For pi2, replacing old probability 0.58 with new probability 0.358
-    ## For pi3, replacing old probability 0.95 with new probability 0.877
+    ## For pi1, replacing old probability 0.31 with new probability 0.31
+    ## For pi2, replacing old probability 0.429 with new probability 0.429
+    ## For pi3, replacing old probability 0.753 with new probability 0.753
 
 ``` r
 # Reconstruct the full survey configuration with the modified flow part
@@ -191,7 +187,7 @@ print(update_response)
     ## [1] "200 - OK"
     ## 
     ## $meta$requestId
-    ## [1] "1ed8eb15-8518-437d-98c9-14643042264d"
+    ## [1] "c296b652-8836-4498-b3e8-7699341f737d"
 
 ``` r
 tibble(

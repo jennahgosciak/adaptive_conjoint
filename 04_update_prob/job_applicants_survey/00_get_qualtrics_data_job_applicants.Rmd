@@ -95,11 +95,12 @@ df <- df %>%
       StartDate_clean <= ymd_hms("2024-02-26-00-00-00") ~ 1,
       StartDate_clean <= ymd_hms("2024-02-26-12-40-00") ~ 2,
       StartDate_clean <= ymd_hms("2024-02-26-13-30-00") ~ 3,
+      StartDate_clean <= ymd_hms("2024-02-26-14-50-00") ~ 4,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
       batch_id == 0 ~ "Warmup",
-      StartDate_clean <= ymd_hms("2024-02-26-13-30-00") ~ "Iterative Batch Phase: Max",
+      StartDate_clean <= ymd_hms("2024-02-26-14-50-00") ~ "Iterative Batch Phase: Max",
       TRUE ~ NA_character_
     )
   ) %>%
@@ -336,7 +337,6 @@ df %>%
   theme_classic() +
   labs(x = 'Order', y = 'Number of responses')
 ```
-
 
 ## Clean Qualtrics Data
 
