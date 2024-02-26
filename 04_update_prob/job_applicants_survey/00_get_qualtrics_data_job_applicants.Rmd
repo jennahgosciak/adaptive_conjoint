@@ -339,22 +339,17 @@ df_clean %>%
   verify(!is.na(chose_mother))
 
 df_clean %>%
-  group_by(context) %>%
+  group_by(context, context_label) %>%
   summarize(
     n = n(),
     chose_mother_total = sum(chose_mother),
     chose_nonmother_total = sum(chose_mother == 0)
-  )
+  ) %>% 
+  mutate(difference = abs(chose_mother_total - chose_nonmother_total))
 ```
 ```{r}
 # check randomness of question ordering
-df_clean %>% 
-  mutate(check_rand_num = case_when(rnum < 0.25 ~ 1,
-                                    rnum < 0.5 ~ 2,
-                                    rnum < 0.75 ~ 3,
-                                    TRUE ~ 4))
-
-# plot counts by order
+# plot counts by question order
 df %>% 
   select(str_c("Q", 1:8)) %>% 
   pivot_longer(everything()) %>%
@@ -392,12 +387,18 @@ df_attention_check <- df_clean %>%
       (Manipulation_Q1_1 == "Candidate 1") &
       # only when they've selected one response, i.e. missing = 2
       (manipulation_check_missing == 2) ~ 1,
-    TRUE ~ 0
-  ),
+    TRUE ~ 0),
+    pass_attention_check_any = case_when(
+    (rnum_mother <= 0.5) &
+      (Manipulation_Q1_2 == "Candidate 2") ~ 1,
+    (rnum_mother > 0.5) &
+      (Manipulation_Q1_1 == "Candidate 1") ~ 1,
+    TRUE ~ 0),
   unsure_attention_check = if_else(Manipulation_Q1_3 == "Not sure" & !is.na(Manipulation_Q1_3), 1, 0))
 
 df_attention_check %>%
   summarize(per_pass_attention_check = mean(pass_attention_check),
+            per_pass_attention_check_any = mean(pass_attention_check_any),
             per_unsure = mean(unsure_attention_check))
 
 df_attention_check %>% 

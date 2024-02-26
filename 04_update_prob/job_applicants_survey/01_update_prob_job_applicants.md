@@ -29,9 +29,9 @@ probabilities
     ## 1     0 pi1                              0.25  Warmup                    
     ## 2     0 pi2                              0.5   Warmup                    
     ## 3     0 pi3                              0.75  Warmup                    
-    ## 4     1 pi1                              0.401 Iterative Batch Phase: Max
-    ## 5     1 pi2                              0.734 Iterative Batch Phase: Max
-    ## 6     1 pi3                              0.805 Iterative Batch Phase: Max
+    ## 4     1 pi1                              0.313 Iterative Batch Phase: Max
+    ## 5     1 pi2                              0.367 Iterative Batch Phase: Max
+    ## 6     1 pi3                              0.889 Iterative Batch Phase: Max
 
 ``` r
 df_clean <- readRDS("../../02_output/job_applicants_data_clean.RDS")
@@ -61,7 +61,7 @@ num_outcome0 <- integer(num_contexts)
 print(str_glue("Number of rows in data: {nrow(df_clean)}"))
 ```
 
-    ## Number of rows in data: 20
+    ## Number of rows in data: 154
 
 ``` r
 # filter for correct batch types (whether max discriminatory or min)
@@ -84,7 +84,7 @@ print(str_glue("Current batch ID: {current_batch_num}"))
 print(str_glue("Number of rows left in data: {nrow(df_clean)}"))
 ```
 
-    ## Number of rows left in data: 20
+    ## Number of rows left in data: 154
 
 ``` r
 print(str_glue("Only batch type in data: {str_c(unique(df_clean$batch_type), collapse=', ')}"))
@@ -97,7 +97,7 @@ set.seed(2023)
 nrow(df_clean)
 ```
 
-    ## [1] 20
+    ## [1] 154
 
 ``` r
 # generate prob of most (or least) discriminatory context
@@ -110,21 +110,21 @@ output <- update_ts(df_clean, "chose_mother", num_sim, num_contexts, num_outcome
 
     ## [1] 1e+06
     ## [1] "Predicting the most discriminatory context: taking the argmax"
-    ## [1] "PDF: 0.400846,0.333207,0.071119,0.194828"
-    ## [1] "CDF: 0.400846,0.734053,0.805172,1"
+    ## [1] "PDF: 0.312994,0.053875,0.521876,0.111255"
+    ## [1] "CDF: 0.312994,0.366869,0.888745,1"
 
 ``` r
 output
 ```
 
     ## $pi
-    ## [1] 0.400846 0.734053 0.805172 1.000000
+    ## [1] 0.312994 0.366869 0.888745 1.000000
     ## 
     ## $num_outcome1
-    ## [1] 5 3 0 1
+    ## [1] 19 15 14 19
     ## 
     ## $num_outcome0
-    ## [1] 3 2 4 2
+    ## [1] 21 26 13 27
 
 ``` r
 # check total is equal to number of observations in data
@@ -155,9 +155,9 @@ modified_flow_data <- update_flow_with_probabilities(
 )
 ```
 
-    ## For pi1, replacing old probability 0.401 with new probability 0.401
-    ## For pi2, replacing old probability 0.734 with new probability 0.734
-    ## For pi3, replacing old probability 0.805 with new probability 0.805
+    ## For pi1, replacing old probability 0.313 with new probability 0.313
+    ## For pi2, replacing old probability 0.367 with new probability 0.367
+    ## For pi3, replacing old probability 0.889 with new probability 0.889
 
 ``` r
 # Reconstruct the full survey configuration with the modified flow part
@@ -182,7 +182,7 @@ print(update_response)
     ## [1] "200 - OK"
     ## 
     ## $meta$requestId
-    ## [1] "5b2b2ca7-c26b-4d64-997a-55384eaf5b05"
+    ## [1] "b8e893ef-cc03-400a-b70e-7d09f5680c92"
 
 ``` r
 tibble(

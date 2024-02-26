@@ -31,9 +31,9 @@ probabilities
     ## 1     0 pi1                              0.25  Warmup                    
     ## 2     0 pi2                              0.5   Warmup                    
     ## 3     0 pi3                              0.75  Warmup                    
-    ## 4     1 pi1                              0.401 Iterative Batch Phase: Max
-    ## 5     1 pi2                              0.734 Iterative Batch Phase: Max
-    ## 6     1 pi3                              0.805 Iterative Batch Phase: Max
+    ## 4     1 pi1                              0.313 Iterative Batch Phase: Max
+    ## 5     1 pi2                              0.367 Iterative Batch Phase: Max
+    ## 6     1 pi3                              0.889 Iterative Batch Phase: Max
 
 ``` r
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
@@ -49,7 +49,7 @@ df <- load_qualtrics(survey_name)
 ```
 
     ## Loading survey data for Job Applicants
-    ##   |                                                                              |                                                                      |   0%  |                                                                              |======================================================================| 100%
+    ##   |                                                                              |                                                                      |   0%  |                                                                              |=================================================                     |  70%  |                                                                              |======================================================================| 100%
 
     ## 
     ## ── Column specification ────────────────────────────────────────────────────────
@@ -67,15 +67,15 @@ df <- load_qualtrics(survey_name)
     ##   pi1 = col_double(),
     ##   pi2 = col_double(),
     ##   pi3 = col_double(),
-    ##   `Create New Field or Choose From Dropdown...` = col_logical(),
     ##   rnum_mother = col_double(),
     ##   EmbeddedDataQuestions_DO_Q8 = col_double(),
     ##   EmbeddedDataQuestions_DO_Q7 = col_double(),
     ##   EmbeddedDataQuestions_DO_Q6 = col_double(),
     ##   EmbeddedDataQuestions_DO_Q5 = col_double(),
     ##   EmbeddedDataQuestions_DO_Q4 = col_double(),
-    ##   EmbeddedDataQuestions_DO_Introduction = col_double()
-    ##   # ... with 3 more columns
+    ##   EmbeddedDataQuestions_DO_Introduction = col_double(),
+    ##   EmbeddedDataQuestions_DO_Q3 = col_double()
+    ##   # ... with 2 more columns
     ## )
     ## ℹ Use `spec()` for the full column specifications.
 
@@ -84,20 +84,20 @@ df %>%
   nrow()
 ```
 
-    ## [1] 93
+    ## [1] 287
 
 ``` r
 # drop test data
 df <- df %>%
   mutate(StartDate_clean = ymd_hms(StartDate)) %>%
   verify(is.na(StartDate_clean) == is.na(StartDate)) %>%
-  filter(StartDate_clean >= ymd_hms("2024-02-08-00-00-00"))
+  filter(StartDate_clean >= ymd_hms("2024-02-25-18-00-00"))
 
 df %>%
   nrow()
 ```
 
-    ## [1] 23
+    ## [1] 166
 
 ``` r
 # average finished rate
@@ -111,7 +111,7 @@ mean(df$Finished)
 mean(df$`Duration (in seconds)`)
 ```
 
-    ## [1] 185.6957
+    ## [1] 243.5843
 
 ``` r
 # compare amount of time spent
@@ -129,7 +129,7 @@ df %>%
     ## # A tibble: 1 × 4
     ##   `Duration (in seconds)_mean` Duration (in seconds)_mi…¹ Duration (in seconds…²
     ##                          <dbl>                      <dbl>                  <dbl>
-    ## 1                         3.09                       0.15                   18.4
+    ## 1                         4.06                        0.1                   22.6
     ## # ℹ abbreviated names: ¹​`Duration (in seconds)_min`,
     ## #   ²​`Duration (in seconds)_max`
     ## # ℹ 1 more variable: `Duration (in seconds)_median` <dbl>
@@ -150,7 +150,7 @@ df %>%
     ## # A tibble: 1 × 2
     ##   date       max_date_time      
     ##   <date>     <dttm>             
-    ## 1 2024-02-08 2024-02-08 14:41:26
+    ## 1 2024-02-25 2024-02-25 19:53:09
 
 ``` r
 df <- df %>%
@@ -158,7 +158,7 @@ df <- df %>%
   mutate(
     batch_id = case_when(
       # NEED TO CHANGE
-      StartDate_clean <= ymd_hms("2024-02-09-00-00-00") ~ 0,
+      StartDate_clean <= ymd_hms("2024-02-25-20-00-00") ~ 0,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
@@ -181,7 +181,7 @@ df %>%
     ## # Groups:   batch_type [1]
     ##   batch_type batch_id     n
     ##   <chr>         <dbl> <int>
-    ## 1 Warmup            0    23
+    ## 1 Warmup            0   166
 
 ## Survey Validation
 
@@ -190,11 +190,7 @@ df %>%
 if (length(unique(df$`Prolific ID Q`)) != nrow(df)) {
   warning("ID is not unique")
 }
-```
 
-    ## Warning: ID is not unique
-
-``` r
 if (!all(unique(df$Status) == "IP Address")) {
   warning("Test/spam data included in the analysis file")
   print(str_glue("Number of observations in data: {nrow(df)}"))
@@ -230,23 +226,14 @@ df %>%
   select(Consent, `Duration (in seconds)`, Finished, batch_id, batch_type)
 ```
 
-    ## # A tibble: 1 × 5
-    ##   Consent                    Duration (in seconds…¹ Finished batch_id batch_type
-    ##   <ord>                                       <dbl> <lgl>       <dbl> <chr>     
-    ## 1 I do not consent to parti…                      9 TRUE            0 Warmup    
-    ## # ℹ abbreviated name: ¹​`Duration (in seconds)`
+    ## # A tibble: 0 × 5
+    ## # ℹ 5 variables: Consent <ord>, Duration (in seconds) <dbl>, Finished <lgl>,
+    ## #   batch_id <dbl>, batch_type <chr>
 
 ``` r
 df <- df %>%
   check_consent()
 ```
-
-    ## Warning in check_consent(.): Dropping 1 survey respondents who do not consent
-
-    ## Warning in check_consent(.): 1 survey respondents who do not consent with
-    ## non-missing responses
-
-    ## Warning in check_consent(.): 22 respondents in the data
 
 ``` r
 # check that all completed
@@ -258,10 +245,10 @@ df %>%
     ## # A tibble: 0 × 32
     ## # ℹ 32 variables: StartDate_clean <dttm>, EndDate <dttm>,
     ## #   Duration (in seconds) <dbl>, Finished <lgl>, Consent <ord>,
-    ## #   PreScreen_Q1 <ord>, Commitment_Q1 <ord>, Commitment_Q2 <chr>, Q1 <ord>,
-    ## #   Q2 <ord>, Q3 <ord>, Q4 <ord>, Q5 <ord>, Q6 <ord>, Q7 <ord>, Q8 <ord>,
-    ## #   Manipulation_Q1_1 <chr>, Manipulation_Q1_2 <chr>, Manipulation_Q1_3 <chr>,
-    ## #   Manipulation_Q2 <ord>, Manipulation_Q2_TEXT <chr>, QD2 <ord>,
+    ## #   PreScreen_Q1 <ord>, Prescreen_Q2 <ord>, Manipulation_Q2_TEXT <chr>,
+    ## #   Commitment_Q1 <ord>, Commitment_Q2 <chr>, Q1 <ord>, Q2 <ord>, Q3 <ord>,
+    ## #   Q4 <ord>, Q5 <ord>, Q6 <ord>, Q7 <ord>, Q8 <ord>, Manipulation_Q1_1 <chr>,
+    ## #   Manipulation_Q1_2 <chr>, Manipulation_Q1_3 <chr>, QD2 <ord>,
     ## #   QD2_1_TEXT <dbl>, QD3_1 <chr>, QD3_2 <chr>, QD3_3 <chr>, QD3_4 <chr>, …
 
 ``` r
@@ -270,35 +257,65 @@ df <- df %>%
 ```
 
 ``` r
-df <- df %>%
-  check_location_screen()
+df %>% 
+  filter(PROLIFIC_PID %in% c('54e32a60fdf99b3eae9de85b',
+                             '5a68c01031b87a0001c752c3',
+                             '6584461360db3318b8baee08',
+                             '61089ae8e543ce2d1e9c62fa',
+                             '5ca1c71d44a54a00166d1dd7'))
 ```
 
-    ## Warning in check_location_screen(.): Dropping 1 survey respondents who are not
-    ## in the US
+    ## # A tibble: 5 × 94
+    ##   StartDate           EndDate             Status     IPAddress Progress
+    ##   <dttm>              <dttm>              <chr>      <chr>        <dbl>
+    ## 1 2024-02-25 18:58:48 2024-02-25 19:00:44 IP Address *******        100
+    ## 2 2024-02-25 19:06:23 2024-02-25 19:06:40 IP Address *******        100
+    ## 3 2024-02-25 19:10:23 2024-02-25 19:10:42 IP Address *******        100
+    ## 4 2024-02-25 19:14:44 2024-02-25 19:15:03 IP Address *******        100
+    ## 5 2024-02-25 19:17:58 2024-02-25 19:23:45 IP Address *******        100
+    ## # ℹ 89 more variables: `Duration (in seconds)` <dbl>, Finished <lgl>,
+    ## #   RecordedDate <dttm>, ResponseId <chr>, RecipientLastName <chr>,
+    ## #   RecipientFirstName <chr>, RecipientEmail <chr>, ExternalReference <chr>,
+    ## #   LocationLatitude <chr>, LocationLongitude <chr>, DistributionChannel <chr>,
+    ## #   UserLanguage <chr>, Consent <ord>, `Prolific ID Q` <chr>,
+    ## #   PreScreen_Q1 <ord>, Prescreen_Q2 <ord>, Manipulation_Q2_TEXT <chr>,
+    ## #   Commitment_Q1 <ord>, Commitment_Q2 <chr>, Q1 <ord>, Q2 <ord>, Q3 <ord>, …
 
-    ## Warning in check_location_screen(.): 1 survey respondents who are not in the US
-    ## with non-missing responses
+``` r
+df <- df %>%
+  check_location_screen()
 
-    ## Warning in check_location_screen(.): 21 respondents in the data
+df <- df %>% 
+  check_hiring_screen()
+```
+
+    ## Warning in check_hiring_screen(.): Dropping 11 survey respondents who have not
+    ## been involved in hiring decisions
+
+    ## Warning in check_hiring_screen(.): 11 survey respondents who have not been
+    ## involved in hiring decisions
+
+    ## # A tibble: 155 × 1
+    ##    Manipulation_Q2_TEXT                                                         
+    ##    <chr>                                                                        
+    ##  1 To hire my replacement for a job and hire other people on my team            
+    ##  2 Interviewed the candidates and went with the best fit. Has never been too ha…
+    ##  3 I was part of the decision making process with a group of people. I met the …
+    ##  4 I interviewed job candidates and gave feedback to the hiring committee.      
+    ##  5 I make hiring decisions based on a criteria that my company provides me and …
+    ##  6 as a hiring manager and as a teammate                                        
+    ##  7 I have been the direct hiring manager for multiple staff members that work f…
+    ##  8 I reviewed applications to recommend to my boss.                             
+    ##  9 Helping interview candidates                                                 
+    ## 10 Interviewed a candidate, discussed said candidate with fellow management, ma…
+    ## # ℹ 145 more rows
+
+    ## Warning in check_hiring_screen(.): 155 respondents in the data
 
 ``` r
 # visually assessing why these respondents failed the commitment check
 df %>%
   filter(Commitment_Q1 != "Yes, I will") %>%
-  select(Commitment_Q1, Commitment_Q2, `Duration (in seconds)`, Finished, batch_id, batch_type)
-```
-
-    ## # A tibble: 1 × 6
-    ##   Commitment_Q1           Commitment_Q2 Duration (in seconds…¹ Finished batch_id
-    ##   <ord>                   <chr>                          <dbl> <lgl>       <dbl>
-    ## 1 I can't promise either… purple                            55 TRUE            0
-    ## # ℹ abbreviated name: ¹​`Duration (in seconds)`
-    ## # ℹ 1 more variable: batch_type <chr>
-
-``` r
-df %>%
-  filter(str_to_lower(Commitment_Q2) != "purple") %>%
   select(Commitment_Q1, Commitment_Q2, `Duration (in seconds)`, Finished, batch_id, batch_type)
 ```
 
@@ -308,14 +325,26 @@ df %>%
     ## #   batch_type <chr>
 
 ``` r
+df %>%
+  filter(str_to_lower(Commitment_Q2) != "purple") %>%
+  select(Commitment_Q1, Commitment_Q2, `Duration (in seconds)`, Finished, batch_id, batch_type)
+```
+
+    ## # A tibble: 1 × 6
+    ##   Commitment_Q1 Commitment_Q2 `Duration (in seconds)` Finished batch_id
+    ##   <ord>         <chr>                           <dbl> <lgl>       <dbl>
+    ## 1 Yes, I will   puple                             183 TRUE            0
+    ## # ℹ 1 more variable: batch_type <chr>
+
+``` r
 df <- df %>%
   check_commitment()
 ```
 
-    ## Warning in check_commitment(.): Dropping 1 survey respondents did not pass
-    ## commitment check 1
+    ## Warning in check_commitment(.): Dropping 1 survey respondents who did not pass
+    ## commitment check 2
 
-    ## Warning in check_commitment(.): 20 respondents in the data
+    ## Warning in check_commitment(.): 154 respondents in the data
 
 ``` r
 # check ID is unique again
@@ -350,6 +379,7 @@ stopifnot(length(unique(df$`Prolific ID Q`)) == nrow(df))
 ``` r
 # create context variable
 df <- df %>%
+  mutate(across(str_c("Q", 1:8), .fns = lst(orig = ~.))) %>% 
   create_context_var_jobs() %>%
   verify(!is.na(context))   %>%
   verify(!is.na(context_label))
@@ -366,10 +396,10 @@ df %>%
     ## # Groups:   batch_type, context [4]
     ##   batch_type context context_label     n
     ##   <chr>      <ord>   <chr>         <int>
-    ## 1 Warmup     1       black_low         8
-    ## 2 Warmup     2       black_high        5
-    ## 3 Warmup     3       white_low         4
-    ## 4 Warmup     4       white_high        3
+    ## 1 Warmup     1       black_low        40
+    ## 2 Warmup     2       black_high       41
+    ## 3 Warmup     3       white_low        27
+    ## 4 Warmup     4       white_high       46
 
 ``` r
 df %>%
@@ -384,7 +414,7 @@ df %>%
     ## # Groups:   batch_type [1]
     ##   batch_type batch_id     n
     ##   <chr>         <dbl> <int>
-    ## 1 Warmup            0    20
+    ## 1 Warmup            0   154
 
 ``` r
 df %>%
@@ -406,7 +436,7 @@ df %>%
     ## `summarise()` has grouped output by 'context', 'batch_type'. You can override
     ## using the `.groups` argument.
 
-![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 ``` r
 df %>%
@@ -428,7 +458,7 @@ df %>%
     ## `summarise()` has grouped output by 'context', 'batch_type'. You can override
     ## using the `.groups` argument.
 
-![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->
+![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
 
 ``` r
 df %>%
@@ -448,7 +478,7 @@ df %>%
     ## `summarise()` has grouped output by 'context', 'batch_type'. You can override
     ## using the `.groups` argument.
 
-![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ``` r
 df %>%
@@ -468,7 +498,7 @@ df %>%
     ## `summarise()` has grouped output by 'context', 'batch_type'. You can override
     ## using the `.groups` argument.
 
-![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
+![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
 
 ``` r
 df %>%
@@ -486,7 +516,7 @@ df %>%
 
     ## Adding missing grouping variables: `batch_id`, `batch_type`
 
-![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
 df %>%
@@ -508,7 +538,7 @@ df %>%
 
     ## Adding missing grouping variables: `batch_id`, `batch_type`
 
-![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
+![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-14-2.png)<!-- -->
 
 ## Clean Qualtrics Data
 
@@ -521,47 +551,62 @@ df_clean %>%
   verify(!is.na(chose_mother))
 ```
 
-    ## # A tibble: 20 × 10
+    ## # A tibble: 154 × 10
     ##    chose_mother    Q1    Q2    Q3    Q4    Q5    Q6    Q7    Q8 context
     ##           <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <ord>  
-    ##  1            0     0    NA    NA    NA    NA    NA    NA    NA 4      
-    ##  2            1     1    NA    NA    NA    NA    NA    NA    NA 1      
-    ##  3            0    NA    NA    NA    NA    NA    NA    NA     0 2      
-    ##  4            1    NA    NA    NA    NA    NA     1    NA    NA 1      
-    ##  5            0    NA    NA    NA    NA    NA     0    NA    NA 4      
-    ##  6            1    NA    NA    NA    NA    NA    NA    NA     1 1      
-    ##  7            0    NA    NA    NA     0    NA    NA    NA    NA 1      
-    ##  8            1    NA    NA    NA    NA     1    NA    NA    NA 2      
-    ##  9            1    NA     1    NA    NA    NA    NA    NA    NA 2      
-    ## 10            0    NA    NA    NA    NA    NA    NA    NA     0 3      
-    ## 11            1    NA    NA    NA     1    NA    NA    NA    NA 4      
-    ## 12            1    NA    NA    NA     1    NA    NA    NA    NA 1      
-    ## 13            0    NA    NA    NA    NA    NA    NA    NA     0 3      
-    ## 14            1    NA    NA    NA    NA    NA     1    NA    NA 1      
-    ## 15            0    NA    NA    NA    NA    NA     0    NA    NA 1      
-    ## 16            0    NA    NA    NA    NA    NA    NA     0    NA 1      
-    ## 17            1    NA     1    NA    NA    NA    NA    NA    NA 2      
-    ## 18            0    NA    NA    NA     0    NA    NA    NA    NA 3      
-    ## 19            0    NA    NA    NA    NA    NA    NA     0    NA 3      
-    ## 20            0    NA    NA    NA     0    NA    NA    NA    NA 2
+    ##  1            0     0    NA    NA    NA    NA    NA    NA    NA 3      
+    ##  2            0    NA    NA    NA    NA    NA    NA     0    NA 4      
+    ##  3            0    NA    NA    NA    NA     0    NA    NA    NA 3      
+    ##  4            0    NA    NA    NA    NA     0    NA    NA    NA 2      
+    ##  5            0    NA    NA    NA    NA    NA    NA     0    NA 2      
+    ##  6            0    NA     0    NA    NA    NA    NA    NA    NA 4      
+    ##  7            0     0    NA    NA    NA    NA    NA    NA    NA 4      
+    ##  8            1    NA    NA    NA    NA     1    NA    NA    NA 4      
+    ##  9            0    NA    NA    NA    NA    NA    NA    NA     0 2      
+    ## 10            0    NA    NA    NA    NA    NA     0    NA    NA 3      
+    ## # ℹ 144 more rows
 
 ``` r
 df_clean %>%
-  group_by(context) %>%
+  group_by(context, context_label) %>%
   summarize(
     n = n(),
-    resp1 = sum(chose_mother),
-    resp0 = sum(chose_mother == 0)
-  )
+    chose_mother_total = sum(chose_mother),
+    chose_nonmother_total = sum(chose_mother == 0)
+  ) %>% 
+  mutate(difference = abs(chose_mother_total - chose_nonmother_total))
 ```
 
-    ## # A tibble: 4 × 4
-    ##   context     n resp1 resp0
-    ##   <ord>   <int> <dbl> <int>
-    ## 1 1           8     5     3
-    ## 2 2           5     3     2
-    ## 3 3           4     0     4
-    ## 4 4           3     1     2
+    ## `summarise()` has grouped output by 'context'. You can override using the
+    ## `.groups` argument.
+
+    ## # A tibble: 4 × 6
+    ## # Groups:   context [4]
+    ##   context context_label     n chose_mother_total chose_nonmother_total
+    ##   <ord>   <chr>         <int>              <dbl>                 <int>
+    ## 1 1       black_low        40                 19                    21
+    ## 2 2       black_high       41                 15                    26
+    ## 3 3       white_low        27                 14                    13
+    ## 4 4       white_high       46                 19                    27
+    ## # ℹ 1 more variable: difference <dbl>
+
+``` r
+# check randomness of question ordering
+# plot counts by question order
+df %>% 
+  select(str_c("Q", 1:8)) %>% 
+  pivot_longer(everything()) %>%
+  filter(value == 'Candidate 1' | value == 'Candidate 2') %>% 
+  mutate(order_val = as.numeric(str_replace_all(name, "Q", ""))) %>% 
+  ggplot() +
+  geom_histogram(aes(order_val)) +
+  theme_classic() +
+  labs(x = 'Order', y = 'Number of responses')
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ``` r
 # identify context desc
@@ -571,17 +616,18 @@ df_clean %>%
   arrange(context)
 ```
 
-    ## # A tibble: 4 × 6
-    ##   context context_label name1          name2             education1   education2
-    ##   <ord>   <chr>         <chr>          <chr>             <chr>        <chr>     
-    ## 1 1       black_low     Tanisha Rivers Keisha Mosely     B.S. in Bus… B.A. in M…
-    ## 2 2       black_high    Tanisha Rivers Keisha Mosely     B.S. in Bus… B.A. in M…
-    ## 3 3       white_low     Laurie Schmitt Allison O’Connell B.S. in Bus… B.A. in M…
-    ## 4 4       white_high    Laurie Schmitt Allison O’Connell B.S. in Bus… B.A. in M…
+    ## # A tibble: 4 × 8
+    ##   context context_label name1          name2  name_short1 name_short2 education1
+    ##   <ord>   <chr>         <chr>          <chr>  <chr>       <chr>       <chr>     
+    ## 1 1       black_low     Tanisha Rivers Keish… Tanisha     Keisha      B.S. in B…
+    ## 2 2       black_high    Tanisha Rivers Keish… Tanisha     Keisha      B.S. in B…
+    ## 3 3       white_low     Laurie Schmitt Allis… Laurie      Allison     B.S. in B…
+    ## 4 4       white_high    Laurie Schmitt Allis… Laurie      Allison     B.S. in B…
+    ## # ℹ 1 more variable: education2 <chr>
 
 ``` r
 # check manipulation questions
-df_clean %>%
+df_attention_check <- df_clean %>%
   mutate(
     candidate_mother = if_else(rnum_mother <= 0.5, "Candidate 2", "Candidate 1"),
     manipulation_check_missing = rowSums(select(., starts_with("Manipulation_Q1_")) %>%
@@ -593,91 +639,79 @@ df_clean %>%
       # only when they've selected one response, i.e. missing = 2
       (manipulation_check_missing == 2) ~ 1,
     (rnum_mother > 0.5) &
-      (Manipulation_Q1_2 == "Candidate 1") &
+      (Manipulation_Q1_1 == "Candidate 1") &
       # only when they've selected one response, i.e. missing = 2
       (manipulation_check_missing == 2) ~ 1,
-    TRUE ~ 0
-  ),
-  unsure_attention_check = if_else(Manipulation_Q1_3 == "Not sure" & !is.na(Manipulation_Q1_3), 1, 0)) %>%
+    TRUE ~ 0),
+    pass_attention_check_any = case_when(
+    (rnum_mother <= 0.5) &
+      (Manipulation_Q1_2 == "Candidate 2") ~ 1,
+    (rnum_mother > 0.5) &
+      (Manipulation_Q1_1 == "Candidate 1") ~ 1,
+    TRUE ~ 0),
+  unsure_attention_check = if_else(Manipulation_Q1_3 == "Not sure" & !is.na(Manipulation_Q1_3), 1, 0))
+
+df_attention_check %>%
   summarize(per_pass_attention_check = mean(pass_attention_check),
+            per_pass_attention_check_any = mean(pass_attention_check_any),
             per_unsure = mean(unsure_attention_check))
 ```
 
-    ## # A tibble: 1 × 2
-    ##   per_pass_attention_check per_unsure
-    ##                      <dbl>      <dbl>
-    ## 1                      0.3        0.4
+    ## # A tibble: 1 × 3
+    ##   per_pass_attention_check per_pass_attention_check_any per_unsure
+    ##                      <dbl>                        <dbl>      <dbl>
+    ## 1                    0.662                        0.727      0.260
 
 ``` r
-df_clean %>% 
+df_attention_check %>% 
   mutate(candidate_mother = if_else(rnum_mother <= 0.5, "Candidate 2", "Candidate 1")) %>% 
-  select(rnum_mother, candidate_mother, starts_with("volunteer"), starts_with("Manipulation_Q1_"))
+  select(rnum_mother, candidate_mother, pass_attention_check, chose_mother, str_c("Q", 1:8, "_orig"),
+         starts_with("volunteer"), starts_with("Manipulation_Q1_"))
 ```
 
-    ## # A tibble: 20 × 7
-    ##    rnum_mother candidate_mother volunteer1          volunteer2 Manipulation_Q1_1
-    ##          <dbl> <chr>            <chr>               <chr>      <chr>            
-    ##  1    0.640    Candidate 1      Parent Teacher Ass… Volunteer… <NA>             
-    ##  2    0.450    Candidate 2      Volunteer Treasure… Parent Te… <NA>             
-    ##  3    0.147    Candidate 2      Volunteer Treasure… Parent Te… <NA>             
-    ##  4    0.291    Candidate 2      Volunteer Treasure… Parent Te… <NA>             
-    ##  5    0.000294 Candidate 2      Volunteer Treasure… Parent Te… <NA>             
-    ##  6    0.917    Candidate 1      Parent Teacher Ass… Volunteer… Candidate 1      
-    ##  7    0.878    Candidate 1      Parent Teacher Ass… Volunteer… Candidate 1      
-    ##  8    0.362    Candidate 2      Volunteer Treasure… Parent Te… Candidate 1      
-    ##  9    0.944    Candidate 1      Parent Teacher Ass… Volunteer… <NA>             
-    ## 10    0.472    Candidate 2      Volunteer Treasure… Parent Te… <NA>             
-    ## 11    0.0252   Candidate 2      Volunteer Treasure… Parent Te… <NA>             
-    ## 12    0.748    Candidate 1      Parent Teacher Ass… Volunteer… <NA>             
-    ## 13    0.595    Candidate 1      Parent Teacher Ass… Volunteer… Candidate 1      
-    ## 14    0.510    Candidate 1      Parent Teacher Ass… Volunteer… <NA>             
-    ## 15    0.450    Candidate 2      Volunteer Treasure… Parent Te… <NA>             
-    ## 16    0.478    Candidate 2      Volunteer Treasure… Parent Te… <NA>             
-    ## 17    0.447    Candidate 2      Volunteer Treasure… Parent Te… <NA>             
-    ## 18    0.356    Candidate 2      Volunteer Treasure… Parent Te… <NA>             
-    ## 19    0.201    Candidate 2      Volunteer Treasure… Parent Te… <NA>             
-    ## 20    0.586    Candidate 1      Parent Teacher Ass… Volunteer… Candidate 1      
-    ## # ℹ 2 more variables: Manipulation_Q1_2 <chr>, Manipulation_Q1_3 <chr>
+    ## # A tibble: 154 × 17
+    ##    rnum_mother candidate_mother pass_attention_check chose_mother Q1_orig    
+    ##          <dbl> <chr>                           <dbl>        <dbl> <ord>      
+    ##  1      0.782  Candidate 1                         1            0 Candidate 2
+    ##  2      0.501  Candidate 1                         1            0 <NA>       
+    ##  3      0.0982 Candidate 2                         0            0 <NA>       
+    ##  4      0.0183 Candidate 2                         0            0 <NA>       
+    ##  5      0.437  Candidate 2                         1            0 <NA>       
+    ##  6      0.259  Candidate 2                         1            0 <NA>       
+    ##  7      0.662  Candidate 1                         0            0 Candidate 2
+    ##  8      0.387  Candidate 2                         0            1 <NA>       
+    ##  9      0.0362 Candidate 2                         0            0 <NA>       
+    ## 10      0.515  Candidate 1                         0            0 <NA>       
+    ## # ℹ 144 more rows
+    ## # ℹ 12 more variables: Q2_orig <ord>, Q3_orig <ord>, Q4_orig <ord>,
+    ## #   Q5_orig <ord>, Q6_orig <ord>, Q7_orig <ord>, Q8_orig <ord>,
+    ## #   volunteer1 <chr>, volunteer2 <chr>, Manipulation_Q1_1 <chr>,
+    ## #   Manipulation_Q1_2 <chr>, Manipulation_Q1_3 <chr>
 
 ``` r
-df_clean %>% 
-  select(Manipulation_Q2, Manipulation_Q2_TEXT) %>% 
-  mutate(Fail_Manipulation_Q2 = if_else(Manipulation_Q2 != "Yes", 1, 0)) %>% 
-  summarize(across(Fail_Manipulation_Q2, .fns = lst(n = ~sum(.), per = ~mean(.))))
+df_attention_check %>% 
+  mutate(candidate_mother = if_else(rnum_mother <= 0.5, "Candidate 2", "Candidate 1")) %>% 
+  select(rnum_mother, candidate_mother, pass_attention_check, chose_mother, starts_with("Manipulation_Q1_"),
+         manipulation_check_missing, starts_with("volunteer"))
 ```
 
-    ## # A tibble: 1 × 2
-    ##   Fail_Manipulation_Q2_n Fail_Manipulation_Q2_per
-    ##                    <dbl>                    <dbl>
-    ## 1                      2                      0.1
-
-``` r
-df_clean %>% 
-  distinct(Manipulation_Q2_TEXT)
-```
-
-    ## # A tibble: 19 × 1
-    ##    Manipulation_Q2_TEXT                                                         
-    ##    <chr>                                                                        
-    ##  1 Her resume was slightly better written.                                      
-    ##  2 I based my decision on experience. Candidate 2 had some experience in doing …
-    ##  3 I sat with a panel to interview and hire teachers for the school I worked fo…
-    ##  4 The person who gave more info on the SEO website creation is the one I went …
-    ##  5 I was a general manager for jackson hewitt. I had to interview candidates an…
-    ##  6 <NA>                                                                         
-    ##  7 After interviewing an individual, I would asses whether they were well-spoke…
-    ##  8 I’ve hired for my company for seven years.                                   
-    ##  9 Interviewing                                                                 
-    ## 10 I chose which employees I'd like to interview and who we would ultimitaly ch…
-    ## 11 I made the decision based off her school. I had previous candidates that wer…
-    ## 12 I was a participant in panel interviews where I contributed me ranking of ea…
-    ## 13 Hiring caseworkers for American Red Cross                                    
-    ## 14 Candidate 1 had experience that was in line with the job.                    
-    ## 15 The top candidate had both marketing and digital marketing experience and th…
-    ## 16 I interviewed applicants for a software development team.                    
-    ## 17 Candidate 1 had a better work history for the position being applied for     
-    ## 18 I chose the first candidate as they had a major in marketing but also a mino…
-    ## 19 I’m in charge of hiring for my department.
+    ## # A tibble: 154 × 10
+    ##    rnum_mother candidate_mother pass_attention_check chose_mother
+    ##          <dbl> <chr>                           <dbl>        <dbl>
+    ##  1      0.782  Candidate 1                         1            0
+    ##  2      0.501  Candidate 1                         1            0
+    ##  3      0.0982 Candidate 2                         0            0
+    ##  4      0.0183 Candidate 2                         0            0
+    ##  5      0.437  Candidate 2                         1            0
+    ##  6      0.259  Candidate 2                         1            0
+    ##  7      0.662  Candidate 1                         0            0
+    ##  8      0.387  Candidate 2                         0            1
+    ##  9      0.0362 Candidate 2                         0            0
+    ## 10      0.515  Candidate 1                         0            0
+    ## # ℹ 144 more rows
+    ## # ℹ 6 more variables: Manipulation_Q1_1 <chr>, Manipulation_Q1_2 <chr>,
+    ## #   Manipulation_Q1_3 <chr>, manipulation_check_missing <dbl>,
+    ## #   volunteer1 <chr>, volunteer2 <chr>
 
 ``` r
 df_clean <- df_clean %>%
@@ -711,12 +745,16 @@ df_clean %>%
   arrange(desc(per))
 ```
 
-    ## # A tibble: 3 × 3
-    ##   race                          n   per
-    ##   <chr>                     <int> <dbl>
-    ## 1 White                        16  0.8 
-    ## 2 Asian                         3  0.15
-    ## 3 Black or African American     1  0.05
+    ## # A tibble: 7 × 3
+    ##   race                                  n     per
+    ##   <chr>                             <int>   <dbl>
+    ## 1 White                               107 0.695  
+    ## 2 Black or African American            16 0.104  
+    ## 3 Asian                                15 0.0974 
+    ## 4 Multiracial                          12 0.0779 
+    ## 5 Other                                 2 0.0130 
+    ## 6 American Indian or Alaskan Native     1 0.00649
+    ## 7 Native Hawaiian                       1 0.00649
 
 ``` r
 df_clean %>%
@@ -737,8 +775,8 @@ df_clean %>%
     ## # A tibble: 2 × 2
     ##   female count
     ##   <lgl>  <int>
-    ## 1 FALSE      8
-    ## 2 TRUE      12
+    ## 1 FALSE     73
+    ## 2 TRUE      81
 
 ``` r
 df_clean %>%
@@ -751,7 +789,7 @@ df_clean %>%
     ## # A tibble: 1 × 2
     ##   count_hispanic per_hispanic
     ##            <int>        <dbl>
-    ## 1              1         0.05
+    ## 1             18        0.117
 
 ## Clean Data Validation
 
