@@ -92,10 +92,12 @@ df <- df %>%
     batch_id = case_when(
       # NEED TO CHANGE
       StartDate_clean <= ymd_hms("2024-02-25-20-00-00") ~ 0,
+      StartDate_clean <= ymd_hms("2024-02-26-00-00-00") ~ 1,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
       batch_id == 0 ~ "Warmup",
+      batch_id == 1 ~ "Iterative Batch Phase: Max",
       TRUE ~ NA_character_
     )
   ) %>%
@@ -164,7 +166,8 @@ df %>%
                              '5a68c01031b87a0001c752c3',
                              '6584461360db3318b8baee08',
                              '61089ae8e543ce2d1e9c62fa',
-                             '5ca1c71d44a54a00166d1dd7'))
+                             '5ca1c71d44a54a00166d1dd7',
+                             '65a54e046e70df9084bdb4ec'))
 ```
 
 ```{r}
@@ -397,6 +400,12 @@ df_attention_check <- df_clean %>%
   unsure_attention_check = if_else(Manipulation_Q1_3 == "Not sure" & !is.na(Manipulation_Q1_3), 1, 0))
 
 df_attention_check %>%
+  summarize(per_pass_attention_check = mean(pass_attention_check),
+            per_pass_attention_check_any = mean(pass_attention_check_any),
+            per_unsure = mean(unsure_attention_check))
+
+df_attention_check %>%
+  group_by(batch_id, batch_type) %>% 
   summarize(per_pass_attention_check = mean(pass_attention_check),
             per_pass_attention_check_any = mean(pass_attention_check_any),
             per_unsure = mean(unsure_attention_check))
