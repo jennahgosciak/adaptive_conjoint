@@ -52,7 +52,7 @@ df <- load_qualtrics(survey_name)
 ```
 
     ## Loading survey data for Job Applicants
-    ##   |                                                                              |                                                                      |   0%  |                                                                              |==================                                                    |  26%  |                                                                              |======================================================================| 100%
+    ##   |                                                                              |                                                                      |   0%  |                                                                              |======================================================                |  77%  |                                                                              |======================================================================| 100%
 
     ## 
     ## ── Column specification ────────────────────────────────────────────────────────
@@ -264,33 +264,6 @@ df <- df %>%
 ```
 
 ``` r
-df %>% 
-  filter(PROLIFIC_PID %in% c('54e32a60fdf99b3eae9de85b',
-                             '5a68c01031b87a0001c752c3',
-                             '6584461360db3318b8baee08',
-                             '61089ae8e543ce2d1e9c62fa',
-                             '5ca1c71d44a54a00166d1dd7',
-                             '65a54e046e70df9084bdb4ec'))
-```
-
-    ## # A tibble: 6 × 94
-    ##   StartDate           EndDate             Status     IPAddress Progress
-    ##   <dttm>              <dttm>              <chr>      <chr>        <dbl>
-    ## 1 2024-02-25 18:58:48 2024-02-25 19:00:44 IP Address *******        100
-    ## 2 2024-02-25 19:06:23 2024-02-25 19:06:40 IP Address *******        100
-    ## 3 2024-02-25 19:10:23 2024-02-25 19:10:42 IP Address *******        100
-    ## 4 2024-02-25 19:14:44 2024-02-25 19:15:03 IP Address *******        100
-    ## 5 2024-02-25 19:17:58 2024-02-25 19:23:45 IP Address *******        100
-    ## 6 2024-02-25 22:51:09 2024-02-25 22:54:43 IP Address *******        100
-    ## # ℹ 89 more variables: `Duration (in seconds)` <dbl>, Finished <lgl>,
-    ## #   RecordedDate <dttm>, ResponseId <chr>, RecipientLastName <chr>,
-    ## #   RecipientFirstName <chr>, RecipientEmail <chr>, ExternalReference <chr>,
-    ## #   LocationLatitude <chr>, LocationLongitude <chr>, DistributionChannel <chr>,
-    ## #   UserLanguage <chr>, Consent <ord>, `Prolific ID Q` <chr>,
-    ## #   PreScreen_Q1 <ord>, Prescreen_Q2 <ord>, Manipulation_Q2_TEXT <chr>,
-    ## #   Commitment_Q1 <ord>, Commitment_Q2 <chr>, Q1 <ord>, Q2 <ord>, Q3 <ord>, …
-
-``` r
 df <- df %>%
   check_location_screen()
 
@@ -451,7 +424,7 @@ df %>%
     ## `summarise()` has grouped output by 'context', 'batch_type'. You can override
     ## using the `.groups` argument.
 
-![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 df %>%
@@ -473,7 +446,7 @@ df %>%
     ## `summarise()` has grouped output by 'context', 'batch_type'. You can override
     ## using the `.groups` argument.
 
-![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
+![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->
 
 ``` r
 df %>%
@@ -493,7 +466,7 @@ df %>%
     ## `summarise()` has grouped output by 'context', 'batch_type'. You can override
     ## using the `.groups` argument.
 
-![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 ``` r
 df %>%
@@ -513,7 +486,7 @@ df %>%
     ## `summarise()` has grouped output by 'context', 'batch_type'. You can override
     ## using the `.groups` argument.
 
-![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
+![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
 
 ``` r
 df %>%
@@ -531,7 +504,7 @@ df %>%
 
     ## Adding missing grouping variables: `batch_id`, `batch_type`
 
-![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ``` r
 df %>%
@@ -553,7 +526,7 @@ df %>%
 
     ## Adding missing grouping variables: `batch_id`, `batch_type`
 
-![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-14-2.png)<!-- -->
+![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
 
 ## Clean Qualtrics Data
 
@@ -606,6 +579,34 @@ df_clean %>%
     ## # ℹ 1 more variable: difference <dbl>
 
 ``` r
+df_clean %>%
+  group_by(batch_id, batch_type, context, context_label) %>%
+  summarize(
+    n = n(),
+    chose_mother_total = sum(chose_mother),
+    chose_nonmother_total = sum(chose_mother == 0)
+  ) %>% 
+  mutate(difference = abs(chose_mother_total - chose_nonmother_total))
+```
+
+    ## `summarise()` has grouped output by 'batch_id', 'batch_type', 'context'. You
+    ## can override using the `.groups` argument.
+
+    ## # A tibble: 8 × 8
+    ## # Groups:   batch_id, batch_type, context [8]
+    ##   batch_id batch_type             context context_label     n chose_mother_total
+    ##      <dbl> <chr>                  <ord>   <chr>         <int>              <dbl>
+    ## 1        0 Warmup                 1       black_low        40                 19
+    ## 2        0 Warmup                 2       black_high       41                 15
+    ## 3        0 Warmup                 3       white_low        27                 14
+    ## 4        0 Warmup                 4       white_high       46                 19
+    ## 5        1 Iterative Batch Phase… 1       black_low        32                 18
+    ## 6        1 Iterative Batch Phase… 2       black_high        4                  1
+    ## 7        1 Iterative Batch Phase… 3       white_low        56                 30
+    ## 8        1 Iterative Batch Phase… 4       white_high        7                  4
+    ## # ℹ 2 more variables: chose_nonmother_total <int>, difference <dbl>
+
+``` r
 # check randomness of question ordering
 # plot counts by question order
 df %>% 
@@ -621,7 +622,7 @@ df %>%
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
 # identify context desc

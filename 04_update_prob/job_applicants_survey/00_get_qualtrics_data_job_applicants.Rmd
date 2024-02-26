@@ -160,15 +160,6 @@ df <- df %>%
   check_completion()
 ```
 
-```{r}
-df %>% 
-  filter(PROLIFIC_PID %in% c('54e32a60fdf99b3eae9de85b',
-                             '5a68c01031b87a0001c752c3',
-                             '6584461360db3318b8baee08',
-                             '61089ae8e543ce2d1e9c62fa',
-                             '5ca1c71d44a54a00166d1dd7',
-                             '65a54e046e70df9084bdb4ec'))
-```
 
 ```{r}
 df <- df %>%
@@ -343,6 +334,15 @@ df_clean %>%
 
 df_clean %>%
   group_by(context, context_label) %>%
+  summarize(
+    n = n(),
+    chose_mother_total = sum(chose_mother),
+    chose_nonmother_total = sum(chose_mother == 0)
+  ) %>% 
+  mutate(difference = abs(chose_mother_total - chose_nonmother_total))
+
+df_clean %>%
+  group_by(batch_id, batch_type, context, context_label) %>%
   summarize(
     n = n(),
     chose_mother_total = sum(chose_mother),
