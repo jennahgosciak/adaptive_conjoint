@@ -335,11 +335,6 @@ df %>%
   theme_classic() +
   labs(x = 'Order', y = 'Number of responses')
 ```
-```{r}
-df %>% 
-  filter(PROLIFIC_PID == '615509a589a34f7cb9fb075f')
-```
-
 
 ## Clean Qualtrics Data
 

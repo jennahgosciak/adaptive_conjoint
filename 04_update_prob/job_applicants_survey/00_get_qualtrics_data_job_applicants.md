@@ -55,7 +55,7 @@ df <- load_qualtrics(survey_name)
 ```
 
     ## Loading survey data for Job Applicants
-    ##   |                                                                              |                                                                      |   0%  |                                                                              |===========================================                           |  61%  |                                                                              |=========================================================             |  81%  |                                                                              |======================================================================| 100%
+    ##   |                                                                              |                                                                      |   0%  |                                                                              |==============                                                        |  20%  |                                                                              |===========================================                           |  61%  |                                                                              |=========================================================             |  81%  |                                                                              |======================================================================| 100%
 
     ## 
     ## ── Column specification ────────────────────────────────────────────────────────
@@ -564,23 +564,6 @@ df %>%
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
 ![](00_get_qualtrics_data_job_applicants_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
-
-``` r
-df %>% 
-  filter(PROLIFIC_PID == '615509a589a34f7cb9fb075f')
-```
-
-    ## # A tibble: 1 × 104
-    ##   StartDate           EndDate             Status     IPAddress Progress
-    ##   <dttm>              <dttm>              <chr>      <chr>        <dbl>
-    ## 1 2024-02-26 12:12:48 2024-02-26 12:13:48 IP Address *******        100
-    ## # ℹ 99 more variables: `Duration (in seconds)` <dbl>, Finished <lgl>,
-    ## #   RecordedDate <dttm>, ResponseId <chr>, RecipientLastName <chr>,
-    ## #   RecipientFirstName <chr>, RecipientEmail <chr>, ExternalReference <chr>,
-    ## #   LocationLatitude <chr>, LocationLongitude <chr>, DistributionChannel <chr>,
-    ## #   UserLanguage <chr>, Consent <ord>, `Prolific ID Q` <chr>,
-    ## #   PreScreen_Q1 <ord>, Prescreen_Q2 <ord>, Manipulation_Q2_TEXT <chr>,
-    ## #   Commitment_Q1 <ord>, Commitment_Q2 <chr>, Q1 <ord>, Q2 <ord>, Q3 <ord>, …
 
 ## Clean Qualtrics Data
 
