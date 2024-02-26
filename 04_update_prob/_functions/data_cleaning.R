@@ -116,6 +116,39 @@ check_location_screen <- function(df) {
   return(df)
 }
 
+check_hiring_screen <- function(df) {
+  no_hiring_prescreen_num <- df %>%
+    filter(Prescreen_Q2 != "Yes") %>%
+    nrow()
+  
+  if (no_hiring_prescreen_num > 0) {
+    warning(str_glue("Dropping {no_hiring_prescreen_num} survey respondents who have not been involved in hiring decisions"))
+    
+    vars <- str_c("Q", 1:8)
+    no_hiring_prescreen_with_data <- df %>%
+      filter(Prescreen_Q2 != "Yes") %>%
+      select(all_of(vars)) %>%
+      is.na() %>%
+      rowSums() %>%
+      equals(0) %>%
+      sum()
+    
+    if (no_hiring_prescreen_with_data > 0) {
+      warning(str_glue("{no_hiring_prescreen_with_data} survey respondents who have not been involved in hiring decisions"))
+    }
+    
+    df <- df %>%
+      filter(Prescreen_Q2 == "Yes")
+    
+    df  %>% 
+      distinct(Manipulation_Q2_TEXT) %>% 
+      print()
+    
+    warning(str_glue("{nrow(df)} respondents in the data"))
+  }
+  return(df)
+}
+
 check_completion <- function(df) {
   completion_outcome <- df %>%
     select("Finished") %>%
