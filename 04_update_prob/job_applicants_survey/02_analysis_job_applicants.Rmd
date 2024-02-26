@@ -16,8 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r, load packages, message=F, warning=F}
 library(tidyverse)
 
-data <- readRDS("../../02_output/job_applicants_data_clean.RDS") %>%
-  filter(batch_type != "Iterative Batch Phase: Max")
+data <- readRDS("../../02_output/job_applicants_data_clean.RDS")
 ```
 
 ```{r}
@@ -55,7 +54,9 @@ aggregated %>%
   )) +
   geom_point() +
   geom_errorbar() +
-  facet_wrap(~context_label)
+  facet_wrap(~context_label) +
+  scale_x_continuous(breaks=c(0,1),
+                     labels=c(0,1))
 ggsave("../02_output/_figures/all_data_estimates_job_applicants.png",
   height = 5, width = 5, dpi = 300
 )

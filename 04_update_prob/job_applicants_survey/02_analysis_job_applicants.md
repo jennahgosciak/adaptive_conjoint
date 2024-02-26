@@ -11,8 +11,7 @@ Candidates Survey
 ``` r
 library(tidyverse)
 
-data <- readRDS("../../02_output/job_applicants_data_clean.RDS") %>%
-  filter(batch_type != "Iterative Batch Phase: Max")
+data <- readRDS("../../02_output/job_applicants_data_clean.RDS")
 ```
 
 ``` r
@@ -28,10 +27,10 @@ data %>%
     ## # Groups:   context [4]
     ##   context context_label     n
     ##   <ord>   <chr>         <int>
-    ## 1 1       black_low        17
-    ## 2 2       black_high        9
-    ## 3 3       white_low        15
-    ## 4 4       white_high        9
+    ## 1 1       black_low        72
+    ## 2 2       black_high       45
+    ## 3 3       white_low        83
+    ## 4 4       white_high       53
 
 ``` r
 # Create an aggregated dataset with the estimate using all data up to the end
@@ -55,14 +54,18 @@ aggregated <- data %>%
 aggregated
 ```
 
-    ## # A tibble: 4 × 15
-    ## # Groups:   context_label, batch_id [4]
-    ##   unique_id context context_label batch_id batch_type chose_mother race      age
-    ##       <int> <ord>   <chr>            <dbl> <chr>             <dbl> <chr>   <dbl>
-    ## 1        44 2       black_high           0 Warmup                1 White      24
-    ## 2        49 1       black_low            0 Warmup                0 White      41
-    ## 3        47 4       white_high           0 Warmup                0 Multir…    21
-    ## 4        50 3       white_low            0 Warmup                1 White      24
+    ## # A tibble: 8 × 15
+    ## # Groups:   context_label, batch_id [8]
+    ##   unique_id context context_label batch_id batch_type   chose_mother race    age
+    ##       <int> <ord>   <chr>            <dbl> <chr>               <dbl> <chr> <dbl>
+    ## 1       150 2       black_high           0 Warmup                  1 White    49
+    ## 2       253 2       black_high           1 Iterative B…            0 White    54
+    ## 3       154 1       black_low            0 Warmup                  0 Blac…    48
+    ## 4       252 1       black_low            1 Iterative B…            1 White    46
+    ## 5       153 4       white_high           0 Warmup                  0 Blac…    28
+    ## 6       234 4       white_high           1 Iterative B…            1 Blac…    28
+    ## 7       145 3       white_low            0 Warmup                  1 White    37
+    ## 8       250 3       white_low            1 Iterative B…            1 White    49
     ## # ℹ 7 more variables: female <lgl>, hispanic <lgl>, index <int>,
     ## #   estimate <dbl>, se <dbl>, ci.min <dbl>, ci.max <dbl>
 
@@ -75,7 +78,9 @@ aggregated %>%
   )) +
   geom_point() +
   geom_errorbar() +
-  facet_wrap(~context_label)
+  facet_wrap(~context_label) +
+  scale_x_continuous(breaks=c(0,1),
+                     labels=c(0,1))
 ```
 
 ![](02_analysis_job_applicants_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->

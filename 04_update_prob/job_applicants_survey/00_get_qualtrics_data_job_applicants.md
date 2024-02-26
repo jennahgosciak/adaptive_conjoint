@@ -52,7 +52,7 @@ df <- load_qualtrics(survey_name)
 ```
 
     ## Loading survey data for Job Applicants
-    ##   |                                                                              |                                                                      |   0%  |                                                                              |======================================================                |  77%  |                                                                              |======================================================================| 100%
+    ##   |                                                                              |                                                                      |   0%  |                                                                              |====================================                                  |  51%  |                                                                              |======================================================================| 100%
 
     ## 
     ## ── Column specification ────────────────────────────────────────────────────────
@@ -556,55 +556,50 @@ df_clean %>%
 
 ``` r
 df_clean %>%
-  group_by(context, context_label) %>%
+  group_by(context_label) %>%
   summarize(
     n = n(),
     chose_mother_total = sum(chose_mother),
     chose_nonmother_total = sum(chose_mother == 0)
   ) %>% 
-  mutate(difference = abs(chose_mother_total - chose_nonmother_total))
+  mutate(diff = abs(chose_mother_total - chose_nonmother_total))
 ```
 
-    ## `summarise()` has grouped output by 'context'. You can override using the
-    ## `.groups` argument.
-
-    ## # A tibble: 4 × 6
-    ## # Groups:   context [4]
-    ##   context context_label     n chose_mother_total chose_nonmother_total
-    ##   <ord>   <chr>         <int>              <dbl>                 <int>
-    ## 1 1       black_low        72                 37                    35
-    ## 2 2       black_high       45                 16                    29
-    ## 3 3       white_low        83                 44                    39
-    ## 4 4       white_high       53                 23                    30
-    ## # ℹ 1 more variable: difference <dbl>
+    ## # A tibble: 4 × 5
+    ##   context_label     n chose_mother_total chose_nonmother_total  diff
+    ##   <chr>         <int>              <dbl>                 <int> <dbl>
+    ## 1 black_high       45                 16                    29    13
+    ## 2 black_low        72                 37                    35     2
+    ## 3 white_high       53                 23                    30     7
+    ## 4 white_low        83                 44                    39     5
 
 ``` r
 df_clean %>%
-  group_by(batch_id, batch_type, context, context_label) %>%
+  group_by(batch_id, batch_type, context_label) %>%
   summarize(
     n = n(),
     chose_mother_total = sum(chose_mother),
     chose_nonmother_total = sum(chose_mother == 0)
   ) %>% 
-  mutate(difference = abs(chose_mother_total - chose_nonmother_total))
+  mutate(diff = abs(chose_mother_total - chose_nonmother_total))
 ```
 
-    ## `summarise()` has grouped output by 'batch_id', 'batch_type', 'context'. You
-    ## can override using the `.groups` argument.
+    ## `summarise()` has grouped output by 'batch_id', 'batch_type'. You can override
+    ## using the `.groups` argument.
 
-    ## # A tibble: 8 × 8
-    ## # Groups:   batch_id, batch_type, context [8]
-    ##   batch_id batch_type             context context_label     n chose_mother_total
-    ##      <dbl> <chr>                  <ord>   <chr>         <int>              <dbl>
-    ## 1        0 Warmup                 1       black_low        40                 19
-    ## 2        0 Warmup                 2       black_high       41                 15
-    ## 3        0 Warmup                 3       white_low        27                 14
-    ## 4        0 Warmup                 4       white_high       46                 19
-    ## 5        1 Iterative Batch Phase… 1       black_low        32                 18
-    ## 6        1 Iterative Batch Phase… 2       black_high        4                  1
-    ## 7        1 Iterative Batch Phase… 3       white_low        56                 30
-    ## 8        1 Iterative Batch Phase… 4       white_high        7                  4
-    ## # ℹ 2 more variables: chose_nonmother_total <int>, difference <dbl>
+    ## # A tibble: 8 × 7
+    ## # Groups:   batch_id, batch_type [2]
+    ##   batch_id batch_type                 context_label     n chose_mother_total
+    ##      <dbl> <chr>                      <chr>         <int>              <dbl>
+    ## 1        0 Warmup                     black_high       41                 15
+    ## 2        0 Warmup                     black_low        40                 19
+    ## 3        0 Warmup                     white_high       46                 19
+    ## 4        0 Warmup                     white_low        27                 14
+    ## 5        1 Iterative Batch Phase: Max black_high        4                  1
+    ## 6        1 Iterative Batch Phase: Max black_low        32                 18
+    ## 7        1 Iterative Batch Phase: Max white_high        7                  4
+    ## 8        1 Iterative Batch Phase: Max white_low        56                 30
+    ## # ℹ 2 more variables: chose_nonmother_total <int>, diff <dbl>
 
 ``` r
 # check randomness of question ordering

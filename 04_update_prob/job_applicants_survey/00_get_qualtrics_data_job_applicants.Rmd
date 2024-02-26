@@ -339,7 +339,7 @@ df_clean %>%
     chose_mother_total = sum(chose_mother),
     chose_nonmother_total = sum(chose_mother == 0)
   ) %>% 
-  mutate(difference = abs(chose_mother_total - chose_nonmother_total))
+  mutate(diff = abs(chose_mother_total - chose_nonmother_total))
 
 df_clean %>%
   group_by(batch_id, batch_type, context, context_label) %>%
@@ -348,7 +348,7 @@ df_clean %>%
     chose_mother_total = sum(chose_mother),
     chose_nonmother_total = sum(chose_mother == 0)
   ) %>% 
-  mutate(difference = abs(chose_mother_total - chose_nonmother_total))
+  mutate(diff = abs(chose_mother_total - chose_nonmother_total))
 ```
 ```{r}
 # check randomness of question ordering
