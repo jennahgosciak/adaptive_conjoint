@@ -93,11 +93,12 @@ df <- df %>%
       # NEED TO CHANGE
       StartDate_clean <= ymd_hms("2024-02-25-20-00-00") ~ 0,
       StartDate_clean <= ymd_hms("2024-02-26-00-00-00") ~ 1,
+      StartDate_clean <= ymd_hms("2024-02-26-12-40-00") ~ 2,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
       batch_id == 0 ~ "Warmup",
-      batch_id == 1 ~ "Iterative Batch Phase: Max",
+      StartDate_clean <= ymd_hms("2024-02-26-12-40-00") ~ "Iterative Batch Phase: Max",
       TRUE ~ NA_character_
     )
   ) %>%
@@ -334,6 +335,11 @@ df %>%
   theme_classic() +
   labs(x = 'Order', y = 'Number of responses')
 ```
+```{r}
+df %>% 
+  filter(PROLIFIC_PID == '615509a589a34f7cb9fb075f')
+```
+
 
 ## Clean Qualtrics Data
 
