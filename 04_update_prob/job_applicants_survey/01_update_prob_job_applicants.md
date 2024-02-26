@@ -23,18 +23,21 @@ probabilities <- read_csv("../../02_output/probabilities_job_applicants.csv")
 probabilities
 ```
 
-    ## # A tibble: 9 × 4
-    ##   Batch `Embedded data variable` CDF_Threshold `Batch Type`              
-    ##   <dbl> <chr>                            <dbl> <chr>                     
-    ## 1     0 pi1                              0.25  Warmup                    
-    ## 2     0 pi2                              0.5   Warmup                    
-    ## 3     0 pi3                              0.75  Warmup                    
-    ## 4     1 pi1                              0.313 Iterative Batch Phase: Max
-    ## 5     1 pi2                              0.367 Iterative Batch Phase: Max
-    ## 6     1 pi3                              0.889 Iterative Batch Phase: Max
-    ## 7     2 pi1                              0.378 Iterative Batch Phase: Max
-    ## 8     2 pi2                              0.398 Iterative Batch Phase: Max
-    ## 9     2 pi3                              0.91  Iterative Batch Phase: Max
+    ## # A tibble: 12 × 4
+    ##    Batch `Embedded data variable` CDF_Threshold `Batch Type`              
+    ##    <dbl> <chr>                            <dbl> <chr>                     
+    ##  1     0 pi1                              0.25  Warmup                    
+    ##  2     0 pi2                              0.5   Warmup                    
+    ##  3     0 pi3                              0.75  Warmup                    
+    ##  4     1 pi1                              0.11  Iterative Batch Phase: Max
+    ##  5     1 pi2                              0.639 Iterative Batch Phase: Max
+    ##  6     1 pi3                              0.709 Iterative Batch Phase: Max
+    ##  7     2 pi1                              0.378 Iterative Batch Phase: Max
+    ##  8     2 pi2                              0.398 Iterative Batch Phase: Max
+    ##  9     2 pi3                              0.91  Iterative Batch Phase: Max
+    ## 10     1 pi1                              0.11  Iterative Batch Phase: Min
+    ## 11     1 pi2                              0.639 Iterative Batch Phase: Min
+    ## 12     1 pi3                              0.709 Iterative Batch Phase: Min
 
 ``` r
 df_clean <- readRDS("../../02_output/job_applicants_data_clean.RDS")
@@ -185,7 +188,7 @@ print(update_response)
     ## [1] "200 - OK"
     ## 
     ## $meta$requestId
-    ## [1] "9cf76659-e8ec-4bcf-86db-dd986a65da4c"
+    ## [1] "d0754bc4-fda9-4c9f-90e8-ed926c9f4468"
 
 ``` r
 tibble(
