@@ -1,544 +1,641 @@
 unique_id,context,context_label,batch_id,batch_type,chose_mother,race,age,female,hispanic
-1,2,black_high,0,Warmup,0,White,48,FALSE,FALSE
-2,2,black_high,0,Warmup,1,White,63,FALSE,FALSE
-3,4,white_high,0,Warmup,1,White,60,FALSE,FALSE
-4,4,white_high,0,Warmup,0,Asian,35,TRUE,FALSE
-5,4,white_high,0,Warmup,1,White,22,FALSE,FALSE
-6,1,black_low,0,Warmup,0,White,46,TRUE,FALSE
-7,4,white_high,0,Warmup,1,Asian,53,TRUE,FALSE
-8,2,black_high,0,Warmup,1,White,59,TRUE,FALSE
+1,3,white_low,0,Warmup,1,White,45,FALSE,FALSE
+2,3,white_low,0,Warmup,0,Black or African American,23,TRUE,FALSE
+3,3,white_low,0,Warmup,0,Asian,25,TRUE,FALSE
+4,4,white_high,0,Warmup,1,White,66,TRUE,FALSE
+5,2,black_high,0,Warmup,0,Asian,25,FALSE,FALSE
+6,2,black_high,0,Warmup,0,Black or African American,32,TRUE,FALSE
+7,1,black_low,0,Warmup,1,Asian,41,FALSE,FALSE
+8,4,white_high,0,Warmup,0,White,35,TRUE,FALSE
 9,4,white_high,0,Warmup,1,White,73,TRUE,FALSE
-10,2,black_high,0,Warmup,0,White,45,FALSE,FALSE
-11,3,white_low,0,Warmup,1,White,37,FALSE,FALSE
-12,4,white_high,0,Warmup,0,Asian,34,TRUE,FALSE
-13,2,black_high,0,Warmup,1,White,51,TRUE,FALSE
-14,2,black_high,0,Warmup,0,White,53,TRUE,FALSE
-15,3,white_low,0,Warmup,0,White,59,TRUE,FALSE
-16,2,black_high,0,Warmup,0,White,31,TRUE,FALSE
-17,3,white_low,0,Warmup,0,White,51,FALSE,TRUE
-18,4,white_high,0,Warmup,1,Black or African American,78,TRUE,TRUE
-19,3,white_low,0,Warmup,0,White,25,TRUE,FALSE
-20,1,black_low,0,Warmup,0,White,31,TRUE,FALSE
-21,1,black_low,0,Warmup,0,White,50,TRUE,FALSE
-22,2,black_high,0,Warmup,0,White,37,FALSE,FALSE
-23,3,white_low,0,Warmup,1,White,61,TRUE,FALSE
-24,2,black_high,0,Warmup,0,Asian,25,FALSE,FALSE
-25,2,black_high,0,Warmup,0,White,31,FALSE,FALSE
-26,2,black_high,0,Warmup,0,Asian,28,TRUE,FALSE
-27,1,black_low,0,Warmup,0,White,59,TRUE,FALSE
-28,1,black_low,0,Warmup,0,White,40,FALSE,FALSE
-29,3,white_low,0,Warmup,1,Black or African American,51,FALSE,FALSE
-30,2,black_high,0,Warmup,0,White,40,FALSE,FALSE
-31,4,white_high,0,Warmup,0,White,40,FALSE,FALSE
-32,2,black_high,0,Warmup,1,White,42,TRUE,FALSE
-33,3,white_low,0,Warmup,0,Black or African American,23,TRUE,FALSE
-34,4,white_high,0,Warmup,1,Asian,36,TRUE,TRUE
-35,4,white_high,0,Warmup,1,White,39,FALSE,FALSE
-36,4,white_high,0,Warmup,0,White,59,TRUE,FALSE
-37,3,white_low,0,Warmup,0,Asian,38,FALSE,FALSE
-38,1,black_low,0,Warmup,1,Black or African American,54,FALSE,FALSE
-39,4,white_high,0,Warmup,1,White,66,TRUE,FALSE
-40,1,black_low,0,Warmup,1,White,40,FALSE,TRUE
-41,2,black_high,0,Warmup,1,White,49,FALSE,FALSE
-42,1,black_low,0,Warmup,0,White,37,FALSE,FALSE
-43,2,black_high,0,Warmup,0,White,23,FALSE,TRUE
-44,3,white_low,0,Warmup,1,White,30,TRUE,FALSE
-45,3,white_low,0,Warmup,0,Multiracial,34,TRUE,FALSE
-46,2,black_high,0,Warmup,1,White,35,FALSE,FALSE
-47,4,white_high,0,Warmup,0,White,56,TRUE,FALSE
-48,4,white_high,0,Warmup,0,White,25,TRUE,FALSE
-49,4,white_high,0,Warmup,0,Black or African American,28,TRUE,FALSE
-50,2,black_high,0,Warmup,0,White,36,FALSE,FALSE
-51,1,black_low,0,Warmup,0,White,55,FALSE,FALSE
-52,4,white_high,0,Warmup,1,White,36,FALSE,FALSE
-53,3,white_low,0,Warmup,0,Multiracial,63,TRUE,TRUE
-54,4,white_high,0,Warmup,0,White,41,TRUE,FALSE
-55,4,white_high,0,Warmup,0,Black or African American,31,TRUE,FALSE
-56,4,white_high,0,Warmup,0,White,41,FALSE,FALSE
-57,4,white_high,0,Warmup,1,White,44,TRUE,FALSE
-58,1,black_low,0,Warmup,0,White,59,FALSE,FALSE
-59,3,white_low,0,Warmup,1,White,48,TRUE,FALSE
-60,4,white_high,0,Warmup,1,White,28,TRUE,FALSE
-61,2,black_high,0,Warmup,0,White,58,FALSE,FALSE
-62,1,black_low,0,Warmup,0,White,62,TRUE,FALSE
-63,1,black_low,0,Warmup,0,White,43,FALSE,FALSE
-64,4,white_high,0,Warmup,0,White,31,TRUE,FALSE
-65,1,black_low,0,Warmup,1,Other,31,FALSE,TRUE
-66,2,black_high,0,Warmup,0,White,46,FALSE,FALSE
-67,1,black_low,0,Warmup,1,White,33,TRUE,FALSE
-68,4,white_high,0,Warmup,0,White,53,TRUE,FALSE
-69,2,black_high,0,Warmup,0,White,32,FALSE,FALSE
-70,1,black_low,0,Warmup,1,Other,53,TRUE,TRUE
-71,1,black_low,0,Warmup,1,White,30,FALSE,FALSE
-72,2,black_high,0,Warmup,0,White,36,TRUE,FALSE
-73,3,white_low,0,Warmup,1,White,53,FALSE,FALSE
-74,4,white_high,0,Warmup,1,Multiracial,38,FALSE,FALSE
-75,1,black_low,0,Warmup,1,Black or African American,30,TRUE,FALSE
-76,2,black_high,0,Warmup,0,White,45,FALSE,TRUE
-77,1,black_low,0,Warmup,0,Multiracial,35,TRUE,TRUE
-78,4,white_high,0,Warmup,0,White,31,FALSE,FALSE
-79,3,white_low,0,Warmup,1,Asian,45,TRUE,TRUE
-80,3,white_low,0,Warmup,1,White,42,FALSE,FALSE
-81,2,black_high,0,Warmup,1,White,72,TRUE,FALSE
-82,3,white_low,0,Warmup,0,White,40,FALSE,FALSE
-83,3,white_low,0,Warmup,0,White,39,TRUE,FALSE
-84,1,black_low,0,Warmup,1,American Indian or Alaskan Native,31,FALSE,TRUE
-85,3,white_low,0,Warmup,1,White,37,TRUE,FALSE
-86,2,black_high,0,Warmup,1,Black or African American,29,FALSE,FALSE
-87,2,black_high,0,Warmup,1,White,46,FALSE,FALSE
-88,4,white_high,0,Warmup,0,White,36,FALSE,FALSE
-89,4,white_high,0,Warmup,0,White,33,FALSE,FALSE
-90,4,white_high,0,Warmup,0,Multiracial,30,TRUE,FALSE
-91,4,white_high,0,Warmup,1,White,44,TRUE,FALSE
-92,2,black_high,0,Warmup,1,White,45,FALSE,FALSE
-93,2,black_high,0,Warmup,0,Black or African American,32,TRUE,FALSE
-94,2,black_high,0,Warmup,0,White,70,FALSE,FALSE
-95,2,black_high,0,Warmup,1,Black or African American,24,TRUE,FALSE
-96,3,white_low,0,Warmup,0,White,54,TRUE,FALSE
-97,1,black_low,0,Warmup,0,White,50,TRUE,FALSE
-98,2,black_high,0,Warmup,0,Multiracial,26,TRUE,FALSE
-99,1,black_low,0,Warmup,1,Multiracial,27,TRUE,TRUE
-100,1,black_low,0,Warmup,0,Asian,46,TRUE,FALSE
-101,1,black_low,0,Warmup,0,White,35,FALSE,FALSE
-102,2,black_high,0,Warmup,0,White,45,FALSE,FALSE
-103,4,white_high,0,Warmup,1,White,22,TRUE,FALSE
-104,1,black_low,0,Warmup,1,Multiracial,30,FALSE,FALSE
-105,4,white_high,0,Warmup,0,White,41,FALSE,FALSE
-106,4,white_high,0,Warmup,0,Multiracial,35,TRUE,FALSE
-107,4,white_high,0,Warmup,1,Black or African American,35,FALSE,FALSE
-108,1,black_low,0,Warmup,1,Native Hawaiian,43,FALSE,FALSE
-109,2,black_high,0,Warmup,0,White,43,FALSE,FALSE
-110,1,black_low,0,Warmup,1,Asian,41,FALSE,FALSE
-111,3,white_low,0,Warmup,0,White,40,TRUE,FALSE
-112,4,white_high,0,Warmup,1,White,29,FALSE,FALSE
-113,1,black_low,0,Warmup,0,White,41,TRUE,FALSE
-114,4,white_high,0,Warmup,1,White,50,TRUE,FALSE
-115,1,black_low,0,Warmup,1,White,60,TRUE,FALSE
-116,4,white_high,0,Warmup,0,White,22,FALSE,FALSE
-117,1,black_low,0,Warmup,0,White,37,FALSE,FALSE
-118,2,black_high,0,Warmup,1,White,55,TRUE,FALSE
-119,1,black_low,0,Warmup,1,White,45,TRUE,FALSE
-120,2,black_high,0,Warmup,0,Multiracial,27,TRUE,FALSE
-121,1,black_low,0,Warmup,1,White,51,TRUE,FALSE
-122,1,black_low,0,Warmup,0,White,48,FALSE,FALSE
-123,2,black_high,0,Warmup,1,Black or African American,45,FALSE,FALSE
-124,2,black_high,0,Warmup,0,Multiracial,34,TRUE,FALSE
-125,1,black_low,0,Warmup,0,White,37,TRUE,FALSE
-126,4,white_high,0,Warmup,0,White,36,FALSE,FALSE
-127,4,white_high,0,Warmup,0,Asian,29,TRUE,FALSE
-128,1,black_low,0,Warmup,1,Black or African American,40,TRUE,TRUE
-129,1,black_low,0,Warmup,0,Asian,25,TRUE,FALSE
-130,4,white_high,0,Warmup,0,White,35,TRUE,FALSE
-131,4,white_high,0,Warmup,0,White,36,TRUE,FALSE
-132,4,white_high,0,Warmup,0,White,35,TRUE,FALSE
-133,4,white_high,0,Warmup,0,White,41,FALSE,FALSE
-134,4,white_high,0,Warmup,1,White,67,FALSE,FALSE
-135,2,black_high,0,Warmup,0,White,34,TRUE,TRUE
-136,1,black_low,0,Warmup,1,White,41,FALSE,FALSE
-137,1,black_low,0,Warmup,1,Black or African American,53,FALSE,TRUE
-138,2,black_high,0,Warmup,1,White,35,TRUE,FALSE
-139,2,black_high,0,Warmup,1,White,31,FALSE,FALSE
-140,2,black_high,0,Warmup,0,White,28,FALSE,FALSE
-141,2,black_high,0,Warmup,0,White,36,FALSE,FALSE
-142,4,white_high,0,Warmup,0,Multiracial,34,FALSE,TRUE
-143,3,white_low,0,Warmup,0,Asian,25,TRUE,FALSE
-144,3,white_low,0,Warmup,1,White,45,FALSE,FALSE
-145,3,white_low,0,Warmup,1,White,44,FALSE,FALSE
-146,1,black_low,0,Warmup,0,Asian,46,TRUE,FALSE
-147,3,white_low,0,Warmup,1,White,30,FALSE,TRUE
-148,4,white_high,0,Warmup,0,White,54,TRUE,FALSE
-149,4,white_high,0,Warmup,1,White,60,TRUE,FALSE
-150,3,white_low,0,Warmup,1,White,28,TRUE,FALSE
-151,1,black_low,0,Warmup,0,Black or African American,48,FALSE,FALSE
-152,3,white_low,0,Warmup,0,Asian,27,TRUE,FALSE
-153,1,black_low,0,Warmup,1,Black or African American,28,TRUE,FALSE
-154,3,white_low,0,Warmup,1,White,62,FALSE,FALSE
-155,3,white_low,1,Iterative Batch Phase: Max,1,Black or African American,25,TRUE,FALSE
-156,1,black_low,1,Iterative Batch Phase: Max,1,White,31,TRUE,FALSE
-157,3,white_low,1,Iterative Batch Phase: Max,1,White,32,TRUE,FALSE
-158,3,white_low,1,Iterative Batch Phase: Max,0,White,54,FALSE,FALSE
-159,3,white_low,1,Iterative Batch Phase: Max,1,White,58,FALSE,FALSE
-160,1,black_low,1,Iterative Batch Phase: Max,1,White,60,TRUE,FALSE
-161,4,white_high,1,Iterative Batch Phase: Max,0,White,55,TRUE,FALSE
-162,3,white_low,1,Iterative Batch Phase: Max,0,Multiracial,36,FALSE,TRUE
-163,1,black_low,1,Iterative Batch Phase: Max,0,White,49,TRUE,FALSE
-164,3,white_low,1,Iterative Batch Phase: Max,0,White,29,TRUE,FALSE
-165,3,white_low,1,Iterative Batch Phase: Max,0,White,36,FALSE,TRUE
-166,4,white_high,1,Iterative Batch Phase: Max,0,Asian,40,TRUE,FALSE
-167,1,black_low,1,Iterative Batch Phase: Max,0,White,48,FALSE,FALSE
-168,4,white_high,1,Iterative Batch Phase: Max,1,White,44,TRUE,FALSE
-169,1,black_low,1,Iterative Batch Phase: Max,1,Asian,34,TRUE,FALSE
-170,3,white_low,1,Iterative Batch Phase: Max,1,White,65,FALSE,FALSE
-171,3,white_low,1,Iterative Batch Phase: Max,1,Black or African American,46,TRUE,FALSE
-172,4,white_high,1,Iterative Batch Phase: Max,0,Black or African American,50,FALSE,FALSE
-173,3,white_low,1,Iterative Batch Phase: Max,1,White,43,TRUE,FALSE
-174,4,white_high,1,Iterative Batch Phase: Max,1,Black or African American,28,TRUE,FALSE
-175,1,black_low,1,Iterative Batch Phase: Max,0,White,35,FALSE,FALSE
-176,3,white_low,1,Iterative Batch Phase: Max,1,White,39,FALSE,FALSE
-177,2,black_high,1,Iterative Batch Phase: Max,0,White,44,FALSE,FALSE
-178,1,black_low,1,Iterative Batch Phase: Max,1,Multiracial,45,TRUE,FALSE
-179,1,black_low,1,Iterative Batch Phase: Max,0,American Indian or Alaskan Native,33,TRUE,FALSE
-180,3,white_low,1,Iterative Batch Phase: Max,1,White,67,FALSE,FALSE
-181,3,white_low,1,Iterative Batch Phase: Max,0,Black or African American,26,TRUE,TRUE
-182,3,white_low,1,Iterative Batch Phase: Max,0,Asian,24,FALSE,FALSE
-183,3,white_low,1,Iterative Batch Phase: Max,1,Black or African American,23,TRUE,FALSE
-184,3,white_low,1,Iterative Batch Phase: Max,1,White,34,TRUE,FALSE
-185,3,white_low,1,Iterative Batch Phase: Max,1,White,31,FALSE,FALSE
-186,1,black_low,1,Iterative Batch Phase: Max,0,White,26,TRUE,FALSE
-187,3,white_low,1,Iterative Batch Phase: Max,0,White,22,TRUE,FALSE
-188,3,white_low,1,Iterative Batch Phase: Max,0,White,53,FALSE,FALSE
-189,3,white_low,1,Iterative Batch Phase: Max,0,White,35,FALSE,FALSE
-190,1,black_low,1,Iterative Batch Phase: Max,0,White,41,FALSE,TRUE
-191,1,black_low,1,Iterative Batch Phase: Max,0,White,65,FALSE,FALSE
-192,3,white_low,1,Iterative Batch Phase: Max,1,White,46,FALSE,FALSE
-193,1,black_low,1,Iterative Batch Phase: Max,1,White,60,FALSE,FALSE
-194,1,black_low,1,Iterative Batch Phase: Max,1,White,41,FALSE,FALSE
-195,1,black_low,1,Iterative Batch Phase: Max,1,White,45,TRUE,FALSE
-196,3,white_low,1,Iterative Batch Phase: Max,1,White,45,TRUE,FALSE
-197,3,white_low,1,Iterative Batch Phase: Max,0,White,34,FALSE,FALSE
-198,1,black_low,1,Iterative Batch Phase: Max,1,Black or African American,64,TRUE,FALSE
-199,1,black_low,1,Iterative Batch Phase: Max,0,White,38,FALSE,FALSE
-200,1,black_low,1,Iterative Batch Phase: Max,1,Asian,47,FALSE,FALSE
-201,1,black_low,1,Iterative Batch Phase: Max,0,White,44,FALSE,FALSE
-202,1,black_low,1,Iterative Batch Phase: Max,1,White,26,FALSE,FALSE
-203,3,white_low,1,Iterative Batch Phase: Max,0,White,40,TRUE,FALSE
-204,3,white_low,1,Iterative Batch Phase: Max,1,White,22,FALSE,FALSE
-205,3,white_low,1,Iterative Batch Phase: Max,1,White,49,FALSE,FALSE
-206,1,black_low,1,Iterative Batch Phase: Max,1,White,24,TRUE,FALSE
-207,4,white_high,1,Iterative Batch Phase: Max,1,White,52,TRUE,FALSE
-208,3,white_low,1,Iterative Batch Phase: Max,0,White,38,FALSE,FALSE
-209,3,white_low,1,Iterative Batch Phase: Max,1,White,53,FALSE,FALSE
-210,3,white_low,1,Iterative Batch Phase: Max,1,White,29,FALSE,FALSE
-211,1,black_low,1,Iterative Batch Phase: Max,1,Asian,37,FALSE,FALSE
-212,3,white_low,1,Iterative Batch Phase: Max,1,White,56,TRUE,FALSE
-213,3,white_low,1,Iterative Batch Phase: Max,0,Black or African American,56,TRUE,FALSE
-214,1,black_low,1,Iterative Batch Phase: Max,1,White,29,FALSE,FALSE
-215,2,black_high,1,Iterative Batch Phase: Max,0,White,37,FALSE,FALSE
+10,3,white_low,0,Warmup,0,Asian,38,FALSE,FALSE
+11,2,black_high,0,Warmup,1,White,45,FALSE,FALSE
+12,2,black_high,0,Warmup,0,White,58,FALSE,FALSE
+13,2,black_high,0,Warmup,0,White,32,FALSE,FALSE
+14,4,white_high,0,Warmup,1,White,60,FALSE,FALSE
+15,2,black_high,0,Warmup,1,White,49,FALSE,FALSE
+16,1,black_low,0,Warmup,0,White,50,TRUE,FALSE
+17,2,black_high,0,Warmup,1,White,59,TRUE,FALSE
+18,3,white_low,0,Warmup,0,White,51,FALSE,TRUE
+19,3,white_low,0,Warmup,0,Multiracial,34,TRUE,FALSE
+20,2,black_high,0,Warmup,0,Multiracial,34,TRUE,FALSE
+21,4,white_high,0,Warmup,0,White,41,FALSE,FALSE
+22,2,black_high,0,Warmup,1,White,46,FALSE,FALSE
+23,4,white_high,0,Warmup,1,White,22,FALSE,FALSE
+24,2,black_high,0,Warmup,0,Asian,28,TRUE,FALSE
+25,3,white_low,0,Warmup,0,White,59,TRUE,FALSE
+26,2,black_high,0,Warmup,1,White,31,FALSE,FALSE
+27,3,white_low,0,Warmup,1,Black or African American,51,FALSE,FALSE
+28,4,white_high,0,Warmup,1,Multiracial,38,FALSE,FALSE
+29,1,black_low,0,Warmup,0,Multiracial,35,TRUE,TRUE
+30,4,white_high,0,Warmup,1,White,50,TRUE,FALSE
+31,1,black_low,0,Warmup,1,Black or African American,28,TRUE,FALSE
+32,1,black_low,0,Warmup,0,Asian,25,TRUE,FALSE
+33,3,white_low,0,Warmup,1,White,37,FALSE,FALSE
+34,2,black_high,0,Warmup,0,White,45,FALSE,FALSE
+35,4,white_high,0,Warmup,0,White,56,TRUE,FALSE
+36,1,black_low,0,Warmup,0,White,35,FALSE,FALSE
+37,3,white_low,0,Warmup,0,White,54,TRUE,FALSE
+38,4,white_high,0,Warmup,0,White,31,FALSE,FALSE
+39,1,black_low,0,Warmup,1,Black or African American,53,FALSE,TRUE
+40,2,black_high,0,Warmup,0,White,37,FALSE,FALSE
+41,4,white_high,0,Warmup,1,Black or African American,78,TRUE,TRUE
+42,1,black_low,0,Warmup,1,Multiracial,30,FALSE,FALSE
+43,2,black_high,0,Warmup,0,White,36,FALSE,FALSE
+44,1,black_low,0,Warmup,0,White,41,TRUE,FALSE
+45,1,black_low,0,Warmup,1,White,41,FALSE,FALSE
+46,4,white_high,0,Warmup,1,Black or African American,35,FALSE,FALSE
+47,4,white_high,0,Warmup,0,White,25,TRUE,FALSE
+48,3,white_low,0,Warmup,1,White,53,FALSE,FALSE
+49,2,black_high,0,Warmup,1,Black or African American,29,FALSE,FALSE
+50,1,black_low,0,Warmup,1,American Indian or Alaskan Native,31,FALSE,TRUE
+51,2,black_high,0,Warmup,0,White,48,FALSE,FALSE
+52,4,white_high,0,Warmup,0,White,59,TRUE,FALSE
+53,1,black_low,0,Warmup,0,White,62,TRUE,FALSE
+54,3,white_low,0,Warmup,1,White,37,TRUE,FALSE
+55,1,black_low,0,Warmup,1,White,51,TRUE,FALSE
+56,3,white_low,0,Warmup,1,White,61,TRUE,FALSE
+57,3,white_low,0,Warmup,0,White,39,TRUE,FALSE
+58,4,white_high,0,Warmup,1,White,44,TRUE,FALSE
+59,3,white_low,0,Warmup,0,White,25,TRUE,FALSE
+60,1,black_low,0,Warmup,0,White,37,FALSE,FALSE
+61,4,white_high,0,Warmup,1,White,44,TRUE,FALSE
+62,1,black_low,0,Warmup,0,White,48,FALSE,FALSE
+63,1,black_low,0,Warmup,1,White,60,TRUE,FALSE
+64,1,black_low,0,Warmup,0,Asian,46,TRUE,FALSE
+65,1,black_low,0,Warmup,1,Multiracial,27,TRUE,TRUE
+66,1,black_low,0,Warmup,0,White,55,FALSE,FALSE
+67,4,white_high,0,Warmup,1,White,29,FALSE,FALSE
+68,4,white_high,0,Warmup,1,Asian,53,TRUE,FALSE
+69,2,black_high,0,Warmup,0,White,28,FALSE,FALSE
+70,3,white_low,0,Warmup,1,White,44,FALSE,FALSE
+71,3,white_low,0,Warmup,1,White,30,TRUE,FALSE
+72,2,black_high,0,Warmup,0,White,40,FALSE,FALSE
+73,2,black_high,0,Warmup,1,White,35,TRUE,FALSE
+74,2,black_high,0,Warmup,1,White,42,TRUE,FALSE
+75,2,black_high,0,Warmup,0,Multiracial,27,TRUE,FALSE
+76,2,black_high,0,Warmup,0,White,53,TRUE,FALSE
+77,2,black_high,0,Warmup,0,Multiracial,26,TRUE,FALSE
+78,4,white_high,0,Warmup,1,White,36,FALSE,FALSE
+79,3,white_low,0,Warmup,1,White,30,FALSE,TRUE
+80,3,white_low,0,Warmup,0,White,40,TRUE,FALSE
+81,1,black_low,0,Warmup,0,White,37,TRUE,FALSE
+82,2,black_high,0,Warmup,0,White,31,FALSE,FALSE
+83,2,black_high,0,Warmup,0,White,31,TRUE,FALSE
+84,3,white_low,0,Warmup,1,White,42,FALSE,FALSE
+85,4,white_high,0,Warmup,0,Asian,35,TRUE,FALSE
+86,1,black_low,0,Warmup,0,White,50,TRUE,FALSE
+87,1,black_low,0,Warmup,0,Black or African American,48,FALSE,FALSE
+88,4,white_high,0,Warmup,0,Multiracial,35,TRUE,FALSE
+89,4,white_high,0,Warmup,0,White,41,TRUE,FALSE
+90,4,white_high,0,Warmup,0,White,41,FALSE,FALSE
+91,1,black_low,0,Warmup,0,White,59,FALSE,FALSE
+92,4,white_high,0,Warmup,0,Black or African American,31,TRUE,FALSE
+93,4,white_high,0,Warmup,0,White,40,FALSE,FALSE
+94,3,white_low,0,Warmup,1,Asian,45,TRUE,TRUE
+95,1,black_low,0,Warmup,1,Native Hawaiian,43,FALSE,FALSE
+96,2,black_high,0,Warmup,1,White,55,TRUE,FALSE
+97,4,white_high,0,Warmup,1,White,28,TRUE,FALSE
+98,1,black_low,0,Warmup,0,White,43,FALSE,FALSE
+99,2,black_high,0,Warmup,0,White,34,TRUE,TRUE
+100,1,black_low,0,Warmup,1,White,40,FALSE,TRUE
+101,4,white_high,0,Warmup,0,White,36,TRUE,FALSE
+102,1,black_low,0,Warmup,1,Black or African American,54,FALSE,FALSE
+103,4,white_high,0,Warmup,0,Asian,29,TRUE,FALSE
+104,3,white_low,0,Warmup,1,White,48,TRUE,FALSE
+105,2,black_high,0,Warmup,1,White,63,FALSE,FALSE
+106,1,black_low,0,Warmup,1,Other,53,TRUE,TRUE
+107,2,black_high,0,Warmup,0,White,46,FALSE,FALSE
+108,4,white_high,0,Warmup,1,Asian,36,TRUE,TRUE
+109,3,white_low,0,Warmup,0,White,40,FALSE,FALSE
+110,4,white_high,0,Warmup,0,White,31,TRUE,FALSE
+111,4,white_high,0,Warmup,0,White,41,FALSE,FALSE
+112,4,white_high,0,Warmup,0,Multiracial,30,TRUE,FALSE
+113,1,black_low,0,Warmup,1,Black or African American,30,TRUE,FALSE
+114,4,white_high,0,Warmup,0,White,36,FALSE,FALSE
+115,4,white_high,0,Warmup,1,White,67,FALSE,FALSE
+116,4,white_high,0,Warmup,1,White,39,FALSE,FALSE
+117,2,black_high,0,Warmup,0,White,23,FALSE,TRUE
+118,4,white_high,0,Warmup,0,Black or African American,28,TRUE,FALSE
+119,1,black_low,0,Warmup,1,White,33,TRUE,FALSE
+120,1,black_low,0,Warmup,1,White,45,TRUE,FALSE
+121,2,black_high,0,Warmup,0,White,43,FALSE,FALSE
+122,1,black_low,0,Warmup,1,Black or African American,40,TRUE,TRUE
+123,3,white_low,0,Warmup,0,Multiracial,63,TRUE,TRUE
+124,1,black_low,0,Warmup,0,White,31,TRUE,FALSE
+125,2,black_high,0,Warmup,0,White,45,FALSE,FALSE
+126,4,white_high,0,Warmup,0,White,53,TRUE,FALSE
+127,4,white_high,0,Warmup,1,White,22,TRUE,FALSE
+128,2,black_high,0,Warmup,0,White,36,FALSE,FALSE
+129,4,white_high,0,Warmup,0,White,54,TRUE,FALSE
+130,2,black_high,0,Warmup,1,White,35,FALSE,FALSE
+131,1,black_low,0,Warmup,1,Other,31,FALSE,TRUE
+132,1,black_low,0,Warmup,0,White,59,TRUE,FALSE
+133,2,black_high,0,Warmup,1,White,51,TRUE,FALSE
+134,1,black_low,0,Warmup,0,Asian,46,TRUE,FALSE
+135,4,white_high,0,Warmup,0,White,22,FALSE,FALSE
+136,1,black_low,0,Warmup,0,White,40,FALSE,FALSE
+137,2,black_high,0,Warmup,0,White,70,FALSE,FALSE
+138,4,white_high,0,Warmup,0,Asian,34,TRUE,FALSE
+139,1,black_low,0,Warmup,1,White,30,FALSE,FALSE
+140,2,black_high,0,Warmup,1,Black or African American,24,TRUE,FALSE
+141,1,black_low,0,Warmup,0,White,37,FALSE,FALSE
+142,4,white_high,0,Warmup,0,White,36,FALSE,FALSE
+143,2,black_high,0,Warmup,0,White,36,TRUE,FALSE
+144,1,black_low,0,Warmup,0,White,46,TRUE,FALSE
+145,3,white_low,0,Warmup,0,Asian,27,TRUE,FALSE
+146,3,white_low,0,Warmup,1,White,28,TRUE,FALSE
+147,3,white_low,0,Warmup,1,White,62,FALSE,FALSE
+148,4,white_high,0,Warmup,0,White,35,TRUE,FALSE
+149,2,black_high,0,Warmup,1,Black or African American,45,FALSE,FALSE
+150,4,white_high,0,Warmup,0,White,33,FALSE,FALSE
+151,2,black_high,0,Warmup,1,White,72,TRUE,FALSE
+152,2,black_high,0,Warmup,0,White,45,FALSE,TRUE
+153,4,white_high,0,Warmup,0,Multiracial,34,FALSE,TRUE
+154,4,white_high,0,Warmup,1,White,60,TRUE,FALSE
+155,3,white_low,1,Iterative Batch Phase: Max,1,White,60,TRUE,FALSE
+156,1,black_low,1,Iterative Batch Phase: Max,0,White,65,FALSE,FALSE
+157,3,white_low,1,Iterative Batch Phase: Max,0,White,36,FALSE,TRUE
+158,3,white_low,1,Iterative Batch Phase: Max,0,Asian,24,FALSE,FALSE
+159,3,white_low,1,Iterative Batch Phase: Max,0,White,26,FALSE,FALSE
+160,2,black_high,1,Iterative Batch Phase: Max,1,White,58,FALSE,FALSE
+161,3,white_low,1,Iterative Batch Phase: Max,1,Black or African American,46,TRUE,FALSE
+162,3,white_low,1,Iterative Batch Phase: Max,0,Black or African American,56,TRUE,FALSE
+163,3,white_low,1,Iterative Batch Phase: Max,1,White,49,FALSE,FALSE
+164,3,white_low,1,Iterative Batch Phase: Max,1,White,31,FALSE,FALSE
+165,3,white_low,1,Iterative Batch Phase: Max,1,White,58,FALSE,FALSE
+166,4,white_high,1,Iterative Batch Phase: Max,1,White,60,TRUE,FALSE
+167,3,white_low,1,Iterative Batch Phase: Max,0,Black or African American,26,TRUE,TRUE
+168,1,black_low,1,Iterative Batch Phase: Max,1,White,29,FALSE,FALSE
+169,4,white_high,1,Iterative Batch Phase: Max,0,Asian,40,TRUE,FALSE
+170,3,white_low,1,Iterative Batch Phase: Max,0,White,34,FALSE,FALSE
+171,3,white_low,1,Iterative Batch Phase: Max,1,White,32,TRUE,FALSE
+172,3,white_low,1,Iterative Batch Phase: Max,0,Black or African American,66,TRUE,FALSE
+173,3,white_low,1,Iterative Batch Phase: Max,1,White,67,FALSE,FALSE
+174,1,black_low,1,Iterative Batch Phase: Max,1,White,52,FALSE,FALSE
+175,3,white_low,1,Iterative Batch Phase: Max,1,White,43,TRUE,FALSE
+176,1,black_low,1,Iterative Batch Phase: Max,1,Black or African American,64,TRUE,FALSE
+177,3,white_low,1,Iterative Batch Phase: Max,0,White,54,FALSE,FALSE
+178,3,white_low,1,Iterative Batch Phase: Max,0,White,70,FALSE,FALSE
+179,1,black_low,1,Iterative Batch Phase: Max,1,Asian,47,FALSE,FALSE
+180,3,white_low,1,Iterative Batch Phase: Max,0,White,35,FALSE,FALSE
+181,3,white_low,1,Iterative Batch Phase: Max,1,White,72,FALSE,FALSE
+182,3,white_low,1,Iterative Batch Phase: Max,1,White,49,FALSE,FALSE
+183,3,white_low,1,Iterative Batch Phase: Max,1,White,60,TRUE,FALSE
+184,4,white_high,1,Iterative Batch Phase: Max,1,White,52,TRUE,FALSE
+185,3,white_low,1,Iterative Batch Phase: Max,1,White,56,TRUE,FALSE
+186,3,white_low,1,Iterative Batch Phase: Max,0,Black or African American,38,TRUE,FALSE
+187,1,black_low,1,Iterative Batch Phase: Max,1,Multiracial,45,TRUE,FALSE
+188,3,white_low,1,Iterative Batch Phase: Max,1,White,45,TRUE,FALSE
+189,1,black_low,1,Iterative Batch Phase: Max,0,White,35,FALSE,FALSE
+190,3,white_low,1,Iterative Batch Phase: Max,1,White,53,FALSE,FALSE
+191,3,white_low,1,Iterative Batch Phase: Max,0,White,53,FALSE,FALSE
+192,1,black_low,1,Iterative Batch Phase: Max,0,American Indian or Alaskan Native,33,TRUE,FALSE
+193,3,white_low,1,Iterative Batch Phase: Max,1,White,49,TRUE,FALSE
+194,3,white_low,1,Iterative Batch Phase: Max,1,White,34,TRUE,FALSE
+195,3,white_low,1,Iterative Batch Phase: Max,1,White,46,FALSE,FALSE
+196,3,white_low,1,Iterative Batch Phase: Max,1,White,65,FALSE,FALSE
+197,1,black_low,1,Iterative Batch Phase: Max,0,White,44,FALSE,FALSE
+198,1,black_low,1,Iterative Batch Phase: Max,1,White,60,FALSE,FALSE
+199,3,white_low,1,Iterative Batch Phase: Max,1,White,51,TRUE,FALSE
+200,3,white_low,1,Iterative Batch Phase: Max,0,Asian,38,TRUE,FALSE
+201,4,white_high,1,Iterative Batch Phase: Max,0,Black or African American,50,FALSE,FALSE
+202,3,white_low,1,Iterative Batch Phase: Max,1,White,32,TRUE,FALSE
+203,1,black_low,1,Iterative Batch Phase: Max,1,White,26,FALSE,FALSE
+204,3,white_low,1,Iterative Batch Phase: Max,0,White,38,FALSE,FALSE
+205,1,black_low,1,Iterative Batch Phase: Max,0,White,38,FALSE,FALSE
+206,3,white_low,1,Iterative Batch Phase: Max,1,White,33,TRUE,FALSE
+207,1,black_low,1,Iterative Batch Phase: Max,1,White,45,TRUE,FALSE
+208,1,black_low,1,Iterative Batch Phase: Max,0,White,35,FALSE,FALSE
+209,3,white_low,1,Iterative Batch Phase: Max,1,White,29,FALSE,FALSE
+210,3,white_low,1,Iterative Batch Phase: Max,0,White,34,TRUE,FALSE
+211,3,white_low,1,Iterative Batch Phase: Max,0,White,47,TRUE,FALSE
+212,3,white_low,1,Iterative Batch Phase: Max,0,White,40,TRUE,FALSE
+213,3,white_low,1,Iterative Batch Phase: Max,1,Asian,35,FALSE,FALSE
+214,1,black_low,1,Iterative Batch Phase: Max,0,White,60,FALSE,FALSE
+215,3,white_low,1,Iterative Batch Phase: Max,1,White,39,FALSE,FALSE
 216,3,white_low,1,Iterative Batch Phase: Max,0,White,62,TRUE,FALSE
-217,3,white_low,1,Iterative Batch Phase: Max,0,White,47,TRUE,FALSE
-218,1,black_low,1,Iterative Batch Phase: Max,1,White,60,TRUE,FALSE
-219,3,white_low,1,Iterative Batch Phase: Max,1,White,49,TRUE,FALSE
-220,3,white_low,1,Iterative Batch Phase: Max,0,Black or African American,66,TRUE,FALSE
+217,1,black_low,1,Iterative Batch Phase: Max,1,White,46,FALSE,FALSE
+218,3,white_low,1,Iterative Batch Phase: Max,1,Black or African American,25,TRUE,FALSE
+219,1,black_low,1,Iterative Batch Phase: Max,0,White,69,TRUE,FALSE
+220,1,black_low,1,Iterative Batch Phase: Max,1,White,60,TRUE,FALSE
 221,3,white_low,1,Iterative Batch Phase: Max,0,White,37,FALSE,FALSE
-222,1,black_low,1,Iterative Batch Phase: Max,0,White,67,TRUE,FALSE
-223,3,white_low,1,Iterative Batch Phase: Max,0,Black or African American,51,FALSE,FALSE
-224,1,black_low,1,Iterative Batch Phase: Max,0,Black or African American,46,TRUE,FALSE
-225,1,black_low,1,Iterative Batch Phase: Max,0,White,60,FALSE,FALSE
-226,1,black_low,1,Iterative Batch Phase: Max,1,White,69,FALSE,FALSE
-227,1,black_low,1,Iterative Batch Phase: Max,0,White,35,FALSE,FALSE
-228,4,white_high,1,Iterative Batch Phase: Max,1,White,60,TRUE,FALSE
-229,3,white_low,1,Iterative Batch Phase: Max,1,Asian,40,FALSE,FALSE
-230,1,black_low,1,Iterative Batch Phase: Max,1,White,52,FALSE,FALSE
-231,1,black_low,1,Iterative Batch Phase: Max,1,Other,46,FALSE,TRUE
-232,1,black_low,1,Iterative Batch Phase: Max,0,White,69,TRUE,FALSE
-233,2,black_high,1,Iterative Batch Phase: Max,1,White,58,FALSE,FALSE
-234,3,white_low,1,Iterative Batch Phase: Max,1,White,60,TRUE,FALSE
-235,3,white_low,1,Iterative Batch Phase: Max,1,White,33,TRUE,FALSE
-236,3,white_low,1,Iterative Batch Phase: Max,1,White,72,FALSE,FALSE
-237,3,white_low,1,Iterative Batch Phase: Max,0,White,34,TRUE,FALSE
-238,3,white_low,1,Iterative Batch Phase: Max,0,White,70,FALSE,FALSE
-239,3,white_low,1,Iterative Batch Phase: Max,1,Multiracial,32,FALSE,FALSE
-240,3,white_low,1,Iterative Batch Phase: Max,0,Black or African American,38,TRUE,FALSE
-241,3,white_low,1,Iterative Batch Phase: Max,1,White,60,TRUE,FALSE
-242,3,white_low,1,Iterative Batch Phase: Max,1,Asian,35,FALSE,FALSE
-243,3,white_low,1,Iterative Batch Phase: Max,0,Multiracial,44,TRUE,TRUE
-244,3,white_low,1,Iterative Batch Phase: Max,1,White,51,TRUE,FALSE
-245,3,white_low,1,Iterative Batch Phase: Max,0,White,26,FALSE,FALSE
-246,3,white_low,1,Iterative Batch Phase: Max,1,White,49,FALSE,FALSE
-247,1,black_low,1,Iterative Batch Phase: Max,1,White,46,FALSE,FALSE
-248,3,white_low,1,Iterative Batch Phase: Max,1,White,32,TRUE,FALSE
-249,2,black_high,1,Iterative Batch Phase: Max,0,White,54,FALSE,FALSE
-250,3,white_low,1,Iterative Batch Phase: Max,0,Asian,38,TRUE,FALSE
-251,3,white_low,1,Iterative Batch Phase: Max,0,White,34,FALSE,FALSE
-252,3,white_low,1,Iterative Batch Phase: Max,0,White,51,TRUE,FALSE
-253,3,white_low,1,Iterative Batch Phase: Max,1,White,43,FALSE,FALSE
-254,4,white_high,2,Iterative Batch Phase: Max,0,White,69,FALSE,FALSE
-255,1,black_low,2,Iterative Batch Phase: Max,1,White,63,TRUE,FALSE
-256,3,white_low,2,Iterative Batch Phase: Max,0,White,53,TRUE,FALSE
+222,1,black_low,1,Iterative Batch Phase: Max,1,Asian,34,TRUE,FALSE
+223,1,black_low,1,Iterative Batch Phase: Max,1,White,24,TRUE,FALSE
+224,3,white_low,1,Iterative Batch Phase: Max,0,White,51,TRUE,FALSE
+225,3,white_low,1,Iterative Batch Phase: Max,0,White,34,FALSE,FALSE
+226,3,white_low,1,Iterative Batch Phase: Max,0,Multiracial,44,TRUE,TRUE
+227,3,white_low,1,Iterative Batch Phase: Max,0,White,29,TRUE,FALSE
+228,2,black_high,1,Iterative Batch Phase: Max,0,White,44,FALSE,FALSE
+229,1,black_low,1,Iterative Batch Phase: Max,1,White,60,TRUE,FALSE
+230,3,white_low,1,Iterative Batch Phase: Max,1,White,22,FALSE,FALSE
+231,1,black_low,1,Iterative Batch Phase: Max,0,White,41,FALSE,TRUE
+232,1,black_low,1,Iterative Batch Phase: Max,1,White,41,FALSE,FALSE
+233,1,black_low,1,Iterative Batch Phase: Max,0,White,26,TRUE,FALSE
+234,4,white_high,1,Iterative Batch Phase: Max,1,White,44,TRUE,FALSE
+235,2,black_high,1,Iterative Batch Phase: Max,0,White,37,FALSE,FALSE
+236,1,black_low,1,Iterative Batch Phase: Max,1,White,69,FALSE,FALSE
+237,1,black_low,1,Iterative Batch Phase: Max,0,White,48,FALSE,FALSE
+238,1,black_low,1,Iterative Batch Phase: Max,1,Other,46,FALSE,TRUE
+239,4,white_high,1,Iterative Batch Phase: Max,1,Black or African American,28,TRUE,FALSE
+240,3,white_low,1,Iterative Batch Phase: Max,0,White,22,TRUE,FALSE
+241,2,black_high,1,Iterative Batch Phase: Max,0,White,54,FALSE,FALSE
+242,1,black_low,1,Iterative Batch Phase: Max,1,White,31,TRUE,FALSE
+243,3,white_low,1,Iterative Batch Phase: Max,1,White,43,FALSE,FALSE
+244,1,black_low,1,Iterative Batch Phase: Max,0,White,49,TRUE,FALSE
+245,4,white_high,1,Iterative Batch Phase: Max,0,White,55,TRUE,FALSE
+246,1,black_low,1,Iterative Batch Phase: Max,0,White,67,TRUE,FALSE
+247,3,white_low,1,Iterative Batch Phase: Max,1,Multiracial,32,FALSE,FALSE
+248,3,white_low,1,Iterative Batch Phase: Max,1,Asian,40,FALSE,FALSE
+249,3,white_low,1,Iterative Batch Phase: Max,0,Multiracial,36,FALSE,TRUE
+250,3,white_low,1,Iterative Batch Phase: Max,1,Black or African American,23,TRUE,FALSE
+251,1,black_low,1,Iterative Batch Phase: Max,1,Asian,37,FALSE,FALSE
+252,1,black_low,1,Iterative Batch Phase: Max,0,Black or African American,46,TRUE,FALSE
+253,3,white_low,1,Iterative Batch Phase: Max,0,Black or African American,51,FALSE,FALSE
+254,3,white_low,2,Iterative Batch Phase: Max,1,White,21,FALSE,FALSE
+255,1,black_low,2,Iterative Batch Phase: Max,0,White,61,FALSE,FALSE
+256,3,white_low,2,Iterative Batch Phase: Max,0,White,28,FALSE,FALSE
 257,3,white_low,2,Iterative Batch Phase: Max,0,White,48,TRUE,FALSE
-258,3,white_low,2,Iterative Batch Phase: Max,1,Black or African American,51,TRUE,FALSE
-259,3,white_low,2,Iterative Batch Phase: Max,1,White,28,FALSE,FALSE
-260,3,white_low,2,Iterative Batch Phase: Max,1,White,41,TRUE,FALSE
-261,3,white_low,2,Iterative Batch Phase: Max,1,White,36,FALSE,FALSE
-262,1,black_low,2,Iterative Batch Phase: Max,0,Black or African American,36,TRUE,FALSE
-263,1,black_low,2,Iterative Batch Phase: Max,0,White,30,FALSE,FALSE
-264,3,white_low,2,Iterative Batch Phase: Max,1,White,38,FALSE,TRUE
-265,4,white_high,2,Iterative Batch Phase: Max,0,Black or African American,30,TRUE,FALSE
-266,1,black_low,2,Iterative Batch Phase: Max,1,Asian,34,TRUE,FALSE
-267,3,white_low,2,Iterative Batch Phase: Max,0,White,32,FALSE,FALSE
-268,3,white_low,2,Iterative Batch Phase: Max,0,Black or African American,56,TRUE,FALSE
-269,1,black_low,2,Iterative Batch Phase: Max,1,White,45,FALSE,FALSE
-270,1,black_low,2,Iterative Batch Phase: Max,1,Black or African American,59,FALSE,FALSE
-271,3,white_low,2,Iterative Batch Phase: Max,1,Black or African American,51,FALSE,FALSE
-272,4,white_high,2,Iterative Batch Phase: Max,1,White,39,FALSE,FALSE
-273,3,white_low,2,Iterative Batch Phase: Max,1,White,26,TRUE,FALSE
-274,4,white_high,2,Iterative Batch Phase: Max,0,Black or African American,49,FALSE,FALSE
-275,1,black_low,2,Iterative Batch Phase: Max,1,White,62,TRUE,FALSE
-276,1,black_low,2,Iterative Batch Phase: Max,1,Asian,35,FALSE,FALSE
-277,1,black_low,2,Iterative Batch Phase: Max,1,American Indian or Alaskan Native,54,TRUE,FALSE
-278,3,white_low,2,Iterative Batch Phase: Max,1,White,62,FALSE,FALSE
-279,3,white_low,2,Iterative Batch Phase: Max,0,White,57,TRUE,FALSE
-280,3,white_low,2,Iterative Batch Phase: Max,0,Asian,32,FALSE,FALSE
-281,4,white_high,2,Iterative Batch Phase: Max,0,White,34,FALSE,FALSE
-282,3,white_low,2,Iterative Batch Phase: Max,1,Multiracial,42,TRUE,FALSE
-283,1,black_low,2,Iterative Batch Phase: Max,0,White,29,FALSE,FALSE
-284,1,black_low,2,Iterative Batch Phase: Max,0,White,31,TRUE,FALSE
-285,1,black_low,2,Iterative Batch Phase: Max,0,White,63,TRUE,FALSE
-286,1,black_low,2,Iterative Batch Phase: Max,1,White,33,TRUE,FALSE
-287,1,black_low,2,Iterative Batch Phase: Max,1,White,61,FALSE,FALSE
-288,4,white_high,2,Iterative Batch Phase: Max,1,White,42,TRUE,FALSE
-289,3,white_low,2,Iterative Batch Phase: Max,1,Asian,31,FALSE,FALSE
-290,1,black_low,2,Iterative Batch Phase: Max,1,Black or African American,51,FALSE,FALSE
-291,4,white_high,2,Iterative Batch Phase: Max,0,White,31,TRUE,FALSE
-292,1,black_low,2,Iterative Batch Phase: Max,1,White,59,FALSE,FALSE
-293,3,white_low,2,Iterative Batch Phase: Max,0,White,47,FALSE,FALSE
-294,1,black_low,2,Iterative Batch Phase: Max,0,White,38,TRUE,FALSE
-295,3,white_low,2,Iterative Batch Phase: Max,1,White,46,TRUE,FALSE
-296,3,white_low,2,Iterative Batch Phase: Max,0,White,58,FALSE,FALSE
-297,3,white_low,2,Iterative Batch Phase: Max,0,Asian,31,FALSE,FALSE
-298,3,white_low,2,Iterative Batch Phase: Max,0,White,43,FALSE,FALSE
-299,2,black_high,2,Iterative Batch Phase: Max,0,White,62,TRUE,FALSE
+258,4,white_high,2,Iterative Batch Phase: Max,0,Black or African American,49,FALSE,FALSE
+259,4,white_high,2,Iterative Batch Phase: Max,1,White,62,FALSE,FALSE
+260,1,black_low,2,Iterative Batch Phase: Max,0,White,31,TRUE,FALSE
+261,3,white_low,2,Iterative Batch Phase: Max,1,Multiracial,42,TRUE,FALSE
+262,3,white_low,2,Iterative Batch Phase: Max,0,White,32,FALSE,FALSE
+263,3,white_low,2,Iterative Batch Phase: Max,1,White,52,TRUE,FALSE
+264,1,black_low,2,Iterative Batch Phase: Max,1,White,63,TRUE,FALSE
+265,4,white_high,2,Iterative Batch Phase: Max,0,White,69,FALSE,FALSE
+266,3,white_low,2,Iterative Batch Phase: Max,1,White,62,FALSE,FALSE
+267,1,black_low,2,Iterative Batch Phase: Max,1,White,43,TRUE,FALSE
+268,1,black_low,2,Iterative Batch Phase: Max,1,White,33,FALSE,FALSE
+269,3,white_low,2,Iterative Batch Phase: Max,0,Black or African American,56,TRUE,FALSE
+270,4,white_high,2,Iterative Batch Phase: Max,1,Black or African American,49,FALSE,FALSE
+271,3,white_low,2,Iterative Batch Phase: Max,0,White,57,TRUE,FALSE
+272,1,black_low,2,Iterative Batch Phase: Max,1,Other,44,FALSE,TRUE
+273,1,black_low,2,Iterative Batch Phase: Max,1,Asian,35,FALSE,FALSE
+274,3,white_low,2,Iterative Batch Phase: Max,0,White,58,FALSE,FALSE
+275,3,white_low,2,Iterative Batch Phase: Max,1,White,36,FALSE,FALSE
+276,3,white_low,2,Iterative Batch Phase: Max,0,Asian,28,FALSE,FALSE
+277,3,white_low,2,Iterative Batch Phase: Max,0,Asian,36,FALSE,FALSE
+278,3,white_low,2,Iterative Batch Phase: Max,0,White,33,FALSE,FALSE
+279,3,white_low,2,Iterative Batch Phase: Max,0,White,37,TRUE,FALSE
+280,1,black_low,2,Iterative Batch Phase: Max,1,White,61,FALSE,FALSE
+281,2,black_high,2,Iterative Batch Phase: Max,0,White,62,TRUE,FALSE
+282,1,black_low,2,Iterative Batch Phase: Max,0,White,46,TRUE,FALSE
+283,1,black_low,2,Iterative Batch Phase: Max,1,White,45,FALSE,FALSE
+284,1,black_low,2,Iterative Batch Phase: Max,1,White,41,FALSE,FALSE
+285,3,white_low,2,Iterative Batch Phase: Max,0,Asian,31,FALSE,FALSE
+286,4,white_high,2,Iterative Batch Phase: Max,0,White,33,TRUE,FALSE
+287,3,white_low,2,Iterative Batch Phase: Max,0,Asian,32,FALSE,FALSE
+288,3,white_low,2,Iterative Batch Phase: Max,1,Black or African American,51,TRUE,FALSE
+289,1,black_low,2,Iterative Batch Phase: Max,0,Black or African American,36,TRUE,FALSE
+290,1,black_low,2,Iterative Batch Phase: Max,1,Multiracial,32,TRUE,TRUE
+291,4,white_high,2,Iterative Batch Phase: Max,0,White,34,FALSE,FALSE
+292,3,white_low,2,Iterative Batch Phase: Max,0,White,47,FALSE,FALSE
+293,1,black_low,2,Iterative Batch Phase: Max,1,American Indian or Alaskan Native,27,FALSE,TRUE
+294,3,white_low,2,Iterative Batch Phase: Max,0,White,44,FALSE,FALSE
+295,1,black_low,2,Iterative Batch Phase: Max,1,White,50,FALSE,FALSE
+296,3,white_low,2,Iterative Batch Phase: Max,1,White,33,TRUE,TRUE
+297,3,white_low,2,Iterative Batch Phase: Max,1,White,38,TRUE,FALSE
+298,1,black_low,2,Iterative Batch Phase: Max,1,Multiracial,69,TRUE,FALSE
+299,1,black_low,2,Iterative Batch Phase: Max,0,White,38,TRUE,FALSE
 300,3,white_low,2,Iterative Batch Phase: Max,1,White,64,TRUE,FALSE
-301,3,white_low,2,Iterative Batch Phase: Max,1,White,43,FALSE,FALSE
-302,4,white_high,2,Iterative Batch Phase: Max,0,White,33,TRUE,FALSE
-303,3,white_low,2,Iterative Batch Phase: Max,0,White,34,FALSE,FALSE
-304,3,white_low,2,Iterative Batch Phase: Max,0,White,34,FALSE,FALSE
-305,3,white_low,2,Iterative Batch Phase: Max,0,White,44,FALSE,FALSE
-306,1,black_low,2,Iterative Batch Phase: Max,0,White,26,TRUE,FALSE
-307,1,black_low,2,Iterative Batch Phase: Max,0,White,33,FALSE,TRUE
-308,3,white_low,2,Iterative Batch Phase: Max,0,White,47,FALSE,TRUE
-309,3,white_low,2,Iterative Batch Phase: Max,0,White,28,FALSE,FALSE
-310,1,black_low,2,Iterative Batch Phase: Max,1,White,50,FALSE,FALSE
-311,1,black_low,2,Iterative Batch Phase: Max,1,White,33,FALSE,FALSE
-312,1,black_low,2,Iterative Batch Phase: Max,0,White,46,TRUE,FALSE
-313,1,black_low,2,Iterative Batch Phase: Max,0,White,36,FALSE,FALSE
-314,3,white_low,2,Iterative Batch Phase: Max,0,White,33,FALSE,FALSE
-315,3,white_low,2,Iterative Batch Phase: Max,1,White,59,FALSE,FALSE
-316,3,white_low,2,Iterative Batch Phase: Max,1,White,38,TRUE,FALSE
-317,3,white_low,2,Iterative Batch Phase: Max,1,White,52,TRUE,FALSE
-318,3,white_low,2,Iterative Batch Phase: Max,1,White,43,FALSE,TRUE
-319,3,white_low,2,Iterative Batch Phase: Max,1,White,33,TRUE,FALSE
-320,1,black_low,2,Iterative Batch Phase: Max,1,White,43,TRUE,FALSE
-321,4,white_high,2,Iterative Batch Phase: Max,1,White,62,FALSE,FALSE
-322,3,white_low,2,Iterative Batch Phase: Max,1,White,45,TRUE,FALSE
-323,1,black_low,2,Iterative Batch Phase: Max,1,American Indian or Alaskan Native,27,FALSE,TRUE
-324,3,white_low,2,Iterative Batch Phase: Max,0,Asian,28,FALSE,FALSE
-325,3,white_low,2,Iterative Batch Phase: Max,1,White,31,TRUE,TRUE
-326,3,white_low,2,Iterative Batch Phase: Max,0,White,64,TRUE,FALSE
-327,1,black_low,2,Iterative Batch Phase: Max,1,Multiracial,69,TRUE,FALSE
-328,3,white_low,2,Iterative Batch Phase: Max,0,White,58,TRUE,FALSE
-329,3,white_low,2,Iterative Batch Phase: Max,0,Black or African American,49,TRUE,FALSE
-330,1,black_low,2,Iterative Batch Phase: Max,0,White,53,FALSE,FALSE
-331,1,black_low,2,Iterative Batch Phase: Max,0,Black or African American,51,TRUE,FALSE
-332,3,white_low,2,Iterative Batch Phase: Max,1,White,61,TRUE,FALSE
-333,1,black_low,2,Iterative Batch Phase: Max,0,White,61,FALSE,FALSE
-334,1,black_low,2,Iterative Batch Phase: Max,1,Multiracial,52,TRUE,TRUE
-335,3,white_low,2,Iterative Batch Phase: Max,0,White,37,TRUE,FALSE
-336,3,white_low,2,Iterative Batch Phase: Max,1,White,21,FALSE,FALSE
-337,3,white_low,2,Iterative Batch Phase: Max,1,White,32,FALSE,FALSE
-338,3,white_low,2,Iterative Batch Phase: Max,1,Multiracial,52,FALSE,FALSE
-339,3,white_low,2,Iterative Batch Phase: Max,1,White,33,TRUE,TRUE
-340,1,black_low,2,Iterative Batch Phase: Max,1,Multiracial,32,TRUE,TRUE
-341,4,white_high,2,Iterative Batch Phase: Max,1,Black or African American,49,FALSE,FALSE
-342,1,black_low,2,Iterative Batch Phase: Max,1,White,50,FALSE,FALSE
-343,1,black_low,2,Iterative Batch Phase: Max,1,Other,44,FALSE,TRUE
-344,1,black_low,2,Iterative Batch Phase: Max,1,White,34,FALSE,FALSE
-345,1,black_low,2,Iterative Batch Phase: Max,0,White,52,FALSE,FALSE
-346,1,black_low,2,Iterative Batch Phase: Max,1,White,41,FALSE,FALSE
-347,3,white_low,2,Iterative Batch Phase: Max,0,Asian,36,FALSE,FALSE
-348,3,white_low,2,Iterative Batch Phase: Max,0,White,72,TRUE,FALSE
-349,3,white_low,2,Iterative Batch Phase: Max,0,White,41,FALSE,FALSE
-350,1,black_low,2,Iterative Batch Phase: Max,0,White,40,FALSE,FALSE
-351,3,white_low,2,Iterative Batch Phase: Max,0,White,39,TRUE,FALSE
-352,3,white_low,2,Iterative Batch Phase: Max,1,White,31,FALSE,FALSE
-353,1,black_low,3,Iterative Batch Phase: Max,0,Black or African American,38,FALSE,FALSE
-354,3,white_low,3,Iterative Batch Phase: Max,0,Black or African American,40,FALSE,FALSE
-355,1,black_low,3,Iterative Batch Phase: Max,1,White,52,TRUE,FALSE
-356,1,black_low,3,Iterative Batch Phase: Max,0,Asian,32,FALSE,FALSE
-357,3,white_low,3,Iterative Batch Phase: Max,0,White,63,TRUE,FALSE
-358,2,black_high,3,Iterative Batch Phase: Max,1,Asian,29,FALSE,FALSE
-359,3,white_low,3,Iterative Batch Phase: Max,1,Black or African American,61,TRUE,FALSE
-360,1,black_low,3,Iterative Batch Phase: Max,0,White,36,TRUE,FALSE
-361,3,white_low,3,Iterative Batch Phase: Max,0,White,62,TRUE,FALSE
-362,3,white_low,3,Iterative Batch Phase: Max,0,White,38,TRUE,FALSE
-363,3,white_low,3,Iterative Batch Phase: Max,0,White,47,TRUE,FALSE
-364,1,black_low,3,Iterative Batch Phase: Max,1,White,62,FALSE,FALSE
-365,1,black_low,3,Iterative Batch Phase: Max,0,Black or African American,42,TRUE,FALSE
-366,1,black_low,3,Iterative Batch Phase: Max,1,Multiracial,32,TRUE,FALSE
-367,3,white_low,3,Iterative Batch Phase: Max,0,White,45,FALSE,FALSE
-368,1,black_low,3,Iterative Batch Phase: Max,1,White,24,TRUE,FALSE
-369,1,black_low,3,Iterative Batch Phase: Max,1,Asian,49,FALSE,FALSE
-370,3,white_low,3,Iterative Batch Phase: Max,0,Black or African American,37,TRUE,FALSE
-371,1,black_low,3,Iterative Batch Phase: Max,0,White,32,FALSE,FALSE
-372,4,white_high,3,Iterative Batch Phase: Max,1,White,45,FALSE,FALSE
-373,1,black_low,3,Iterative Batch Phase: Max,0,White,41,TRUE,FALSE
-374,1,black_low,3,Iterative Batch Phase: Max,1,White,37,TRUE,TRUE
-375,1,black_low,3,Iterative Batch Phase: Max,0,Asian,24,TRUE,FALSE
-376,3,white_low,3,Iterative Batch Phase: Max,1,White,30,TRUE,FALSE
-377,3,white_low,3,Iterative Batch Phase: Max,0,White,49,FALSE,FALSE
-378,3,white_low,3,Iterative Batch Phase: Max,1,Asian,23,TRUE,FALSE
-379,1,black_low,3,Iterative Batch Phase: Max,1,White,58,TRUE,FALSE
-380,3,white_low,3,Iterative Batch Phase: Max,0,Black or African American,41,FALSE,FALSE
-381,3,white_low,3,Iterative Batch Phase: Max,1,White,44,TRUE,FALSE
-382,1,black_low,3,Iterative Batch Phase: Max,1,Black or African American,49,FALSE,FALSE
-383,3,white_low,3,Iterative Batch Phase: Max,1,White,34,TRUE,FALSE
-384,1,black_low,3,Iterative Batch Phase: Max,0,White,35,TRUE,FALSE
-385,3,white_low,3,Iterative Batch Phase: Max,0,White,24,FALSE,TRUE
-386,1,black_low,3,Iterative Batch Phase: Max,0,American Indian or Alaskan Native,23,FALSE,FALSE
-387,1,black_low,3,Iterative Batch Phase: Max,0,White,59,FALSE,FALSE
-388,4,white_high,3,Iterative Batch Phase: Max,1,Asian,43,TRUE,FALSE
-389,4,white_high,3,Iterative Batch Phase: Max,1,Black or African American,38,FALSE,FALSE
-390,3,white_low,3,Iterative Batch Phase: Max,0,White,60,FALSE,FALSE
-391,3,white_low,3,Iterative Batch Phase: Max,1,Black or African American,67,TRUE,FALSE
-392,1,black_low,3,Iterative Batch Phase: Max,1,Black or African American,30,FALSE,FALSE
-393,1,black_low,3,Iterative Batch Phase: Max,0,White,43,FALSE,FALSE
-394,1,black_low,3,Iterative Batch Phase: Max,1,White,48,FALSE,FALSE
-395,1,black_low,3,Iterative Batch Phase: Max,0,White,36,TRUE,FALSE
-396,3,white_low,3,Iterative Batch Phase: Max,1,Black or African American,41,FALSE,FALSE
-397,1,black_low,3,Iterative Batch Phase: Max,0,White,37,FALSE,FALSE
-398,1,black_low,3,Iterative Batch Phase: Max,0,Asian,26,TRUE,FALSE
-399,1,black_low,3,Iterative Batch Phase: Max,0,Multiracial,57,FALSE,FALSE
-400,3,white_low,3,Iterative Batch Phase: Max,1,White,50,FALSE,FALSE
-401,3,white_low,3,Iterative Batch Phase: Max,1,White,45,TRUE,FALSE
-402,1,black_low,3,Iterative Batch Phase: Max,0,White,37,TRUE,FALSE
-403,3,white_low,3,Iterative Batch Phase: Max,1,White,48,FALSE,FALSE
-404,3,white_low,3,Iterative Batch Phase: Max,0,White,29,TRUE,FALSE
-405,1,black_low,3,Iterative Batch Phase: Max,1,Black or African American,38,FALSE,TRUE
-406,1,black_low,3,Iterative Batch Phase: Max,1,White,54,TRUE,FALSE
-407,4,white_high,3,Iterative Batch Phase: Max,1,White,75,FALSE,FALSE
-408,1,black_low,3,Iterative Batch Phase: Max,1,Black or African American,50,FALSE,FALSE
-409,1,black_low,3,Iterative Batch Phase: Max,1,White,57,TRUE,FALSE
-410,1,black_low,3,Iterative Batch Phase: Max,1,Asian,29,TRUE,FALSE
-411,3,white_low,3,Iterative Batch Phase: Max,0,White,64,FALSE,FALSE
-412,3,white_low,3,Iterative Batch Phase: Max,1,White,62,FALSE,FALSE
-413,1,black_low,3,Iterative Batch Phase: Max,1,White,45,TRUE,FALSE
-414,1,black_low,3,Iterative Batch Phase: Max,1,White,31,TRUE,FALSE
-415,1,black_low,3,Iterative Batch Phase: Max,0,White,29,FALSE,FALSE
-416,1,black_low,3,Iterative Batch Phase: Max,0,Black or African American,51,FALSE,FALSE
-417,4,white_high,3,Iterative Batch Phase: Max,0,Asian,40,TRUE,FALSE
-418,1,black_low,3,Iterative Batch Phase: Max,0,White,39,FALSE,FALSE
-419,3,white_low,3,Iterative Batch Phase: Max,1,White,67,FALSE,FALSE
-420,3,white_low,3,Iterative Batch Phase: Max,1,White,47,FALSE,FALSE
-421,2,black_high,3,Iterative Batch Phase: Max,1,White,48,FALSE,FALSE
-422,3,white_low,3,Iterative Batch Phase: Max,1,White,30,TRUE,FALSE
-423,1,black_low,3,Iterative Batch Phase: Max,0,White,36,TRUE,FALSE
-424,1,black_low,3,Iterative Batch Phase: Max,0,White,37,TRUE,FALSE
-425,3,white_low,3,Iterative Batch Phase: Max,1,Black or African American,62,TRUE,FALSE
-426,1,black_low,3,Iterative Batch Phase: Max,1,White,51,TRUE,FALSE
-427,3,white_low,3,Iterative Batch Phase: Max,1,Multiracial,28,FALSE,FALSE
-428,3,white_low,3,Iterative Batch Phase: Max,0,White,42,FALSE,FALSE
-429,1,black_low,3,Iterative Batch Phase: Max,0,White,39,FALSE,FALSE
-430,1,black_low,3,Iterative Batch Phase: Max,0,Black or African American,32,TRUE,FALSE
-431,1,black_low,3,Iterative Batch Phase: Max,0,White,61,TRUE,FALSE
-432,4,white_high,3,Iterative Batch Phase: Max,0,White,45,FALSE,FALSE
-433,3,white_low,3,Iterative Batch Phase: Max,0,White,40,FALSE,FALSE
-434,3,white_low,3,Iterative Batch Phase: Max,1,White,68,FALSE,FALSE
-435,1,black_low,3,Iterative Batch Phase: Max,0,Black or African American,51,TRUE,FALSE
-436,1,black_low,3,Iterative Batch Phase: Max,0,White,27,FALSE,FALSE
-437,1,black_low,3,Iterative Batch Phase: Max,0,White,31,FALSE,FALSE
-438,1,black_low,3,Iterative Batch Phase: Max,1,White,55,FALSE,FALSE
-439,3,white_low,3,Iterative Batch Phase: Max,0,White,35,TRUE,TRUE
-440,1,black_low,3,Iterative Batch Phase: Max,0,Black or African American,32,FALSE,FALSE
-441,2,black_high,3,Iterative Batch Phase: Max,1,White,56,FALSE,FALSE
-442,1,black_low,3,Iterative Batch Phase: Max,1,White,50,FALSE,FALSE
-443,3,white_low,3,Iterative Batch Phase: Max,1,White,67,TRUE,FALSE
-444,1,black_low,3,Iterative Batch Phase: Max,0,White,59,TRUE,FALSE
-445,3,white_low,3,Iterative Batch Phase: Max,0,Asian,53,FALSE,FALSE
-446,3,white_low,3,Iterative Batch Phase: Max,0,White,30,FALSE,FALSE
-447,3,white_low,4,Iterative Batch Phase: Max,1,White,25,TRUE,FALSE
-448,3,white_low,4,Iterative Batch Phase: Max,0,White,57,TRUE,FALSE
-449,3,white_low,4,Iterative Batch Phase: Max,0,White,36,FALSE,FALSE
-450,3,white_low,4,Iterative Batch Phase: Max,1,White,42,FALSE,FALSE
+301,1,black_low,2,Iterative Batch Phase: Max,1,White,33,TRUE,FALSE
+302,3,white_low,2,Iterative Batch Phase: Max,1,White,59,FALSE,FALSE
+303,3,white_low,2,Iterative Batch Phase: Max,1,White,32,FALSE,FALSE
+304,3,white_low,2,Iterative Batch Phase: Max,1,White,26,TRUE,FALSE
+305,1,black_low,2,Iterative Batch Phase: Max,0,White,36,FALSE,FALSE
+306,3,white_low,2,Iterative Batch Phase: Max,1,White,28,FALSE,FALSE
+307,1,black_low,2,Iterative Batch Phase: Max,1,White,50,FALSE,FALSE
+308,3,white_low,2,Iterative Batch Phase: Max,0,White,64,TRUE,FALSE
+309,1,black_low,2,Iterative Batch Phase: Max,0,Black or African American,51,TRUE,FALSE
+310,3,white_low,2,Iterative Batch Phase: Max,1,White,61,TRUE,FALSE
+311,1,black_low,2,Iterative Batch Phase: Max,0,White,53,FALSE,FALSE
+312,3,white_low,2,Iterative Batch Phase: Max,1,Asian,31,FALSE,FALSE
+313,4,white_high,2,Iterative Batch Phase: Max,1,White,42,TRUE,FALSE
+314,3,white_low,2,Iterative Batch Phase: Max,1,White,45,TRUE,FALSE
+315,1,black_low,2,Iterative Batch Phase: Max,0,White,33,FALSE,TRUE
+316,1,black_low,2,Iterative Batch Phase: Max,1,Black or African American,51,FALSE,FALSE
+317,3,white_low,2,Iterative Batch Phase: Max,0,White,34,FALSE,FALSE
+318,3,white_low,2,Iterative Batch Phase: Max,1,White,33,TRUE,FALSE
+319,1,black_low,2,Iterative Batch Phase: Max,0,White,52,FALSE,FALSE
+320,3,white_low,2,Iterative Batch Phase: Max,1,White,31,FALSE,FALSE
+321,3,white_low,2,Iterative Batch Phase: Max,1,Multiracial,52,FALSE,FALSE
+322,3,white_low,2,Iterative Batch Phase: Max,1,White,43,FALSE,TRUE
+323,1,black_low,2,Iterative Batch Phase: Max,1,Black or African American,59,FALSE,FALSE
+324,1,black_low,2,Iterative Batch Phase: Max,1,Asian,34,TRUE,FALSE
+325,3,white_low,2,Iterative Batch Phase: Max,1,White,43,FALSE,FALSE
+326,3,white_low,2,Iterative Batch Phase: Max,1,White,46,TRUE,FALSE
+327,3,white_low,2,Iterative Batch Phase: Max,0,Black or African American,49,TRUE,FALSE
+328,3,white_low,2,Iterative Batch Phase: Max,1,White,38,FALSE,TRUE
+329,3,white_low,2,Iterative Batch Phase: Max,1,Black or African American,51,FALSE,FALSE
+330,3,white_low,2,Iterative Batch Phase: Max,0,White,34,FALSE,FALSE
+331,4,white_high,2,Iterative Batch Phase: Max,1,White,39,FALSE,FALSE
+332,3,white_low,2,Iterative Batch Phase: Max,0,White,43,FALSE,FALSE
+333,1,black_low,2,Iterative Batch Phase: Max,1,White,34,FALSE,FALSE
+334,3,white_low,2,Iterative Batch Phase: Max,0,White,41,FALSE,FALSE
+335,3,white_low,2,Iterative Batch Phase: Max,1,White,31,TRUE,TRUE
+336,3,white_low,2,Iterative Batch Phase: Max,0,White,72,TRUE,FALSE
+337,3,white_low,2,Iterative Batch Phase: Max,0,White,39,TRUE,FALSE
+338,3,white_low,2,Iterative Batch Phase: Max,1,White,41,TRUE,FALSE
+339,1,black_low,2,Iterative Batch Phase: Max,1,Multiracial,52,TRUE,TRUE
+340,1,black_low,2,Iterative Batch Phase: Max,0,White,40,FALSE,FALSE
+341,1,black_low,2,Iterative Batch Phase: Max,1,White,59,FALSE,FALSE
+342,1,black_low,2,Iterative Batch Phase: Max,0,White,30,FALSE,FALSE
+343,1,black_low,2,Iterative Batch Phase: Max,0,White,29,FALSE,FALSE
+344,3,white_low,2,Iterative Batch Phase: Max,0,White,53,TRUE,FALSE
+345,1,black_low,2,Iterative Batch Phase: Max,0,White,26,TRUE,FALSE
+346,1,black_low,2,Iterative Batch Phase: Max,1,American Indian or Alaskan Native,54,TRUE,FALSE
+347,1,black_low,2,Iterative Batch Phase: Max,1,White,62,TRUE,FALSE
+348,4,white_high,2,Iterative Batch Phase: Max,0,White,31,TRUE,FALSE
+349,4,white_high,2,Iterative Batch Phase: Max,0,Black or African American,30,TRUE,FALSE
+350,1,black_low,2,Iterative Batch Phase: Max,0,White,63,TRUE,FALSE
+351,3,white_low,2,Iterative Batch Phase: Max,0,White,58,TRUE,FALSE
+352,3,white_low,2,Iterative Batch Phase: Max,0,White,47,FALSE,TRUE
+353,3,white_low,3,Iterative Batch Phase: Max,0,Asian,53,FALSE,FALSE
+354,1,black_low,3,Iterative Batch Phase: Max,1,Asian,49,FALSE,FALSE
+355,3,white_low,3,Iterative Batch Phase: Max,0,Black or African American,41,FALSE,FALSE
+356,1,black_low,3,Iterative Batch Phase: Max,1,Asian,29,TRUE,FALSE
+357,1,black_low,3,Iterative Batch Phase: Max,0,White,43,FALSE,FALSE
+358,1,black_low,3,Iterative Batch Phase: Max,1,White,45,TRUE,FALSE
+359,2,black_high,3,Iterative Batch Phase: Max,1,Asian,29,FALSE,FALSE
+360,3,white_low,3,Iterative Batch Phase: Max,0,White,63,TRUE,FALSE
+361,3,white_low,3,Iterative Batch Phase: Max,0,Black or African American,40,FALSE,FALSE
+362,3,white_low,3,Iterative Batch Phase: Max,1,White,34,TRUE,FALSE
+363,3,white_low,3,Iterative Batch Phase: Max,1,White,67,FALSE,FALSE
+364,1,black_low,3,Iterative Batch Phase: Max,0,White,41,TRUE,FALSE
+365,3,white_low,3,Iterative Batch Phase: Max,0,White,30,FALSE,FALSE
+366,4,white_high,3,Iterative Batch Phase: Max,0,Asian,40,TRUE,FALSE
+367,1,black_low,3,Iterative Batch Phase: Max,0,White,37,TRUE,FALSE
+368,1,black_low,3,Iterative Batch Phase: Max,0,White,35,TRUE,FALSE
+369,1,black_low,3,Iterative Batch Phase: Max,1,White,57,TRUE,FALSE
+370,1,black_low,3,Iterative Batch Phase: Max,0,Black or African American,51,FALSE,FALSE
+371,3,white_low,3,Iterative Batch Phase: Max,0,White,49,FALSE,FALSE
+372,3,white_low,3,Iterative Batch Phase: Max,1,Black or African American,41,FALSE,FALSE
+373,1,black_low,3,Iterative Batch Phase: Max,1,White,62,FALSE,FALSE
+374,1,black_low,3,Iterative Batch Phase: Max,0,Black or African American,38,FALSE,FALSE
+375,1,black_low,3,Iterative Batch Phase: Max,0,White,39,FALSE,FALSE
+376,1,black_low,3,Iterative Batch Phase: Max,0,Asian,24,TRUE,FALSE
+377,1,black_low,3,Iterative Batch Phase: Max,1,White,24,TRUE,FALSE
+378,1,black_low,3,Iterative Batch Phase: Max,0,Black or African American,32,FALSE,FALSE
+379,3,white_low,3,Iterative Batch Phase: Max,1,White,50,FALSE,FALSE
+380,3,white_low,3,Iterative Batch Phase: Max,0,White,38,TRUE,FALSE
+381,3,white_low,3,Iterative Batch Phase: Max,1,White,67,TRUE,FALSE
+382,3,white_low,3,Iterative Batch Phase: Max,1,Black or African American,67,TRUE,FALSE
+383,3,white_low,3,Iterative Batch Phase: Max,1,White,30,TRUE,FALSE
+384,3,white_low,3,Iterative Batch Phase: Max,0,White,64,FALSE,FALSE
+385,4,white_high,3,Iterative Batch Phase: Max,1,White,45,FALSE,FALSE
+386,1,black_low,3,Iterative Batch Phase: Max,0,White,36,TRUE,FALSE
+387,3,white_low,3,Iterative Batch Phase: Max,0,White,45,FALSE,FALSE
+388,4,white_high,3,Iterative Batch Phase: Max,1,White,75,FALSE,FALSE
+389,3,white_low,3,Iterative Batch Phase: Max,1,Black or African American,62,TRUE,FALSE
+390,4,white_high,3,Iterative Batch Phase: Max,1,Asian,43,TRUE,FALSE
+391,3,white_low,3,Iterative Batch Phase: Max,1,White,47,FALSE,FALSE
+392,3,white_low,3,Iterative Batch Phase: Max,1,White,30,TRUE,FALSE
+393,3,white_low,3,Iterative Batch Phase: Max,0,White,35,TRUE,TRUE
+394,1,black_low,3,Iterative Batch Phase: Max,0,White,27,FALSE,FALSE
+395,1,black_low,3,Iterative Batch Phase: Max,1,Black or African American,30,FALSE,FALSE
+396,1,black_low,3,Iterative Batch Phase: Max,0,White,32,FALSE,FALSE
+397,1,black_low,3,Iterative Batch Phase: Max,0,White,37,TRUE,FALSE
+398,1,black_low,3,Iterative Batch Phase: Max,1,White,55,FALSE,FALSE
+399,3,white_low,3,Iterative Batch Phase: Max,1,White,48,FALSE,FALSE
+400,1,black_low,3,Iterative Batch Phase: Max,0,White,36,TRUE,FALSE
+401,1,black_low,3,Iterative Batch Phase: Max,0,Asian,26,TRUE,FALSE
+402,1,black_low,3,Iterative Batch Phase: Max,0,American Indian or Alaskan Native,23,FALSE,FALSE
+403,1,black_low,3,Iterative Batch Phase: Max,0,Asian,32,FALSE,FALSE
+404,1,black_low,3,Iterative Batch Phase: Max,1,Multiracial,32,TRUE,FALSE
+405,1,black_low,3,Iterative Batch Phase: Max,1,White,51,TRUE,FALSE
+406,1,black_low,3,Iterative Batch Phase: Max,1,White,48,FALSE,FALSE
+407,3,white_low,3,Iterative Batch Phase: Max,0,White,62,TRUE,FALSE
+408,1,black_low,3,Iterative Batch Phase: Max,0,White,31,FALSE,FALSE
+409,1,black_low,3,Iterative Batch Phase: Max,0,White,61,TRUE,FALSE
+410,3,white_low,3,Iterative Batch Phase: Max,0,White,42,FALSE,FALSE
+411,2,black_high,3,Iterative Batch Phase: Max,1,White,48,FALSE,FALSE
+412,1,black_low,3,Iterative Batch Phase: Max,1,White,50,FALSE,FALSE
+413,3,white_low,3,Iterative Batch Phase: Max,1,Asian,23,TRUE,FALSE
+414,1,black_low,3,Iterative Batch Phase: Max,1,White,52,TRUE,FALSE
+415,1,black_low,3,Iterative Batch Phase: Max,1,Black or African American,49,FALSE,FALSE
+416,1,black_low,3,Iterative Batch Phase: Max,0,White,59,FALSE,FALSE
+417,3,white_low,3,Iterative Batch Phase: Max,0,White,47,TRUE,FALSE
+418,1,black_low,3,Iterative Batch Phase: Max,0,Black or African American,32,TRUE,FALSE
+419,1,black_low,3,Iterative Batch Phase: Max,1,White,54,TRUE,FALSE
+420,1,black_low,3,Iterative Batch Phase: Max,0,White,59,TRUE,FALSE
+421,1,black_low,3,Iterative Batch Phase: Max,0,White,37,FALSE,FALSE
+422,3,white_low,3,Iterative Batch Phase: Max,0,White,40,FALSE,FALSE
+423,3,white_low,3,Iterative Batch Phase: Max,1,Multiracial,28,FALSE,FALSE
+424,1,black_low,3,Iterative Batch Phase: Max,0,White,29,FALSE,FALSE
+425,1,black_low,3,Iterative Batch Phase: Max,0,Black or African American,51,TRUE,FALSE
+426,3,white_low,3,Iterative Batch Phase: Max,0,Black or African American,37,TRUE,FALSE
+427,1,black_low,3,Iterative Batch Phase: Max,0,Multiracial,57,FALSE,FALSE
+428,2,black_high,3,Iterative Batch Phase: Max,1,White,56,FALSE,FALSE
+429,3,white_low,3,Iterative Batch Phase: Max,1,Black or African American,61,TRUE,FALSE
+430,1,black_low,3,Iterative Batch Phase: Max,1,Black or African American,38,FALSE,TRUE
+431,3,white_low,3,Iterative Batch Phase: Max,0,White,60,FALSE,FALSE
+432,1,black_low,3,Iterative Batch Phase: Max,0,White,36,TRUE,FALSE
+433,3,white_low,3,Iterative Batch Phase: Max,0,White,29,TRUE,FALSE
+434,1,black_low,3,Iterative Batch Phase: Max,0,White,39,FALSE,FALSE
+435,1,black_low,3,Iterative Batch Phase: Max,1,White,37,TRUE,TRUE
+436,3,white_low,3,Iterative Batch Phase: Max,1,White,45,TRUE,FALSE
+437,4,white_high,3,Iterative Batch Phase: Max,0,White,45,FALSE,FALSE
+438,1,black_low,3,Iterative Batch Phase: Max,1,White,58,TRUE,FALSE
+439,3,white_low,3,Iterative Batch Phase: Max,1,White,68,FALSE,FALSE
+440,1,black_low,3,Iterative Batch Phase: Max,1,Black or African American,50,FALSE,FALSE
+441,3,white_low,3,Iterative Batch Phase: Max,1,White,44,TRUE,FALSE
+442,3,white_low,3,Iterative Batch Phase: Max,1,White,62,FALSE,FALSE
+443,4,white_high,3,Iterative Batch Phase: Max,1,Black or African American,38,FALSE,FALSE
+444,1,black_low,3,Iterative Batch Phase: Max,0,Black or African American,42,TRUE,FALSE
+445,1,black_low,3,Iterative Batch Phase: Max,1,White,31,TRUE,FALSE
+446,3,white_low,3,Iterative Batch Phase: Max,0,White,24,FALSE,TRUE
+447,3,white_low,4,Iterative Batch Phase: Max,0,White,55,FALSE,FALSE
+448,4,white_high,4,Iterative Batch Phase: Max,0,White,62,TRUE,FALSE
+449,3,white_low,4,Iterative Batch Phase: Max,0,White,22,TRUE,FALSE
+450,3,white_low,4,Iterative Batch Phase: Max,0,White,36,FALSE,FALSE
 451,2,black_high,4,Iterative Batch Phase: Max,0,Black or African American,33,TRUE,FALSE
-452,3,white_low,4,Iterative Batch Phase: Max,0,White,36,FALSE,FALSE
-453,3,white_low,4,Iterative Batch Phase: Max,0,White,54,FALSE,FALSE
-454,4,white_high,4,Iterative Batch Phase: Max,1,Black or African American,66,FALSE,FALSE
-455,1,black_low,4,Iterative Batch Phase: Max,0,White,48,TRUE,FALSE
-456,3,white_low,4,Iterative Batch Phase: Max,1,Black or African American,51,FALSE,FALSE
-457,1,black_low,4,Iterative Batch Phase: Max,1,White,48,FALSE,FALSE
-458,1,black_low,4,Iterative Batch Phase: Max,1,White,56,TRUE,FALSE
-459,3,white_low,4,Iterative Batch Phase: Max,0,White,36,TRUE,FALSE
-460,1,black_low,4,Iterative Batch Phase: Max,0,White,41,FALSE,FALSE
-461,3,white_low,4,Iterative Batch Phase: Max,1,White,49,FALSE,FALSE
-462,4,white_high,4,Iterative Batch Phase: Max,0,Asian,33,TRUE,FALSE
-463,3,white_low,4,Iterative Batch Phase: Max,0,White,63,TRUE,FALSE
-464,3,white_low,4,Iterative Batch Phase: Max,1,White,28,FALSE,FALSE
-465,2,black_high,4,Iterative Batch Phase: Max,1,Multiracial,32,FALSE,FALSE
-466,3,white_low,4,Iterative Batch Phase: Max,1,Black or African American,27,FALSE,FALSE
-467,3,white_low,4,Iterative Batch Phase: Max,1,White,51,FALSE,TRUE
-468,3,white_low,4,Iterative Batch Phase: Max,0,White,57,FALSE,FALSE
-469,1,black_low,4,Iterative Batch Phase: Max,0,White,58,TRUE,FALSE
-470,3,white_low,4,Iterative Batch Phase: Max,0,White,22,TRUE,FALSE
-471,1,black_low,4,Iterative Batch Phase: Max,0,White,27,TRUE,FALSE
-472,3,white_low,4,Iterative Batch Phase: Max,1,White,22,TRUE,FALSE
-473,3,white_low,4,Iterative Batch Phase: Max,0,White,34,TRUE,FALSE
-474,1,black_low,4,Iterative Batch Phase: Max,1,White,46,FALSE,FALSE
-475,1,black_low,4,Iterative Batch Phase: Max,1,White,68,TRUE,FALSE
-476,3,white_low,4,Iterative Batch Phase: Max,0,White,35,TRUE,FALSE
-477,1,black_low,4,Iterative Batch Phase: Max,0,White,43,FALSE,FALSE
-478,1,black_low,4,Iterative Batch Phase: Max,1,Black or African American,59,FALSE,FALSE
-479,3,white_low,4,Iterative Batch Phase: Max,0,White,35,FALSE,FALSE
-480,3,white_low,4,Iterative Batch Phase: Max,1,White,32,TRUE,FALSE
-481,4,white_high,4,Iterative Batch Phase: Max,1,White,28,TRUE,FALSE
-482,4,white_high,4,Iterative Batch Phase: Max,0,White,39,TRUE,TRUE
-483,1,black_low,4,Iterative Batch Phase: Max,1,Asian,27,TRUE,FALSE
-484,2,black_high,4,Iterative Batch Phase: Max,1,White,60,TRUE,FALSE
-485,1,black_low,4,Iterative Batch Phase: Max,0,White,42,FALSE,FALSE
-486,1,black_low,4,Iterative Batch Phase: Max,0,White,48,FALSE,FALSE
-487,3,white_low,4,Iterative Batch Phase: Max,1,Asian,31,TRUE,FALSE
-488,3,white_low,4,Iterative Batch Phase: Max,1,White,38,FALSE,FALSE
-489,4,white_high,4,Iterative Batch Phase: Max,0,White,48,TRUE,FALSE
-490,3,white_low,4,Iterative Batch Phase: Max,0,White,54,TRUE,FALSE
-491,3,white_low,4,Iterative Batch Phase: Max,0,Multiracial,60,TRUE,FALSE
-492,4,white_high,4,Iterative Batch Phase: Max,0,White,28,FALSE,FALSE
+452,4,white_high,4,Iterative Batch Phase: Max,0,White,28,FALSE,FALSE
+453,1,black_low,4,Iterative Batch Phase: Max,0,White,58,TRUE,FALSE
+454,1,black_low,4,Iterative Batch Phase: Max,1,White,59,TRUE,FALSE
+455,1,black_low,4,Iterative Batch Phase: Max,0,White,42,TRUE,FALSE
+456,3,white_low,4,Iterative Batch Phase: Max,0,White,54,TRUE,FALSE
+457,1,black_low,4,Iterative Batch Phase: Max,0,White,55,TRUE,FALSE
+458,4,white_high,4,Iterative Batch Phase: Max,0,White,39,TRUE,TRUE
+459,3,white_low,4,Iterative Batch Phase: Max,1,White,32,TRUE,FALSE
+460,1,black_low,4,Iterative Batch Phase: Max,0,White,43,FALSE,FALSE
+461,3,white_low,4,Iterative Batch Phase: Max,0,White,57,FALSE,FALSE
+462,1,black_low,4,Iterative Batch Phase: Max,1,White,48,FALSE,FALSE
+463,3,white_low,4,Iterative Batch Phase: Max,0,White,35,FALSE,FALSE
+464,1,black_low,4,Iterative Batch Phase: Max,0,White,57,TRUE,FALSE
+465,3,white_low,4,Iterative Batch Phase: Max,0,Black or African American,48,FALSE,FALSE
+466,3,white_low,4,Iterative Batch Phase: Max,0,American Indian or Alaskan Native,25,FALSE,FALSE
+467,1,black_low,4,Iterative Batch Phase: Max,0,White,24,FALSE,FALSE
+468,4,white_high,4,Iterative Batch Phase: Max,0,White,63,FALSE,FALSE
+469,3,white_low,4,Iterative Batch Phase: Max,0,Multiracial,37,FALSE,FALSE
+470,3,white_low,4,Iterative Batch Phase: Max,1,White,28,FALSE,FALSE
+471,3,white_low,4,Iterative Batch Phase: Max,0,Black or African American,32,TRUE,FALSE
+472,3,white_low,4,Iterative Batch Phase: Max,0,Black or African American,51,FALSE,FALSE
+473,3,white_low,4,Iterative Batch Phase: Max,1,White,38,FALSE,FALSE
+474,4,white_high,4,Iterative Batch Phase: Max,1,White,55,FALSE,FALSE
+475,1,black_low,4,Iterative Batch Phase: Max,1,White,46,FALSE,FALSE
+476,4,white_high,4,Iterative Batch Phase: Max,1,Black or African American,66,FALSE,FALSE
+477,3,white_low,4,Iterative Batch Phase: Max,1,White,22,TRUE,FALSE
+478,3,white_low,4,Iterative Batch Phase: Max,1,White,28,TRUE,FALSE
+479,3,white_low,4,Iterative Batch Phase: Max,1,White,51,FALSE,TRUE
+480,1,black_low,4,Iterative Batch Phase: Max,1,White,68,TRUE,FALSE
+481,4,white_high,4,Iterative Batch Phase: Max,0,White,32,FALSE,FALSE
+482,3,white_low,4,Iterative Batch Phase: Max,0,Black or African American,32,TRUE,FALSE
+483,1,black_low,4,Iterative Batch Phase: Max,0,Black or African American,51,FALSE,FALSE
+484,3,white_low,4,Iterative Batch Phase: Max,1,White,25,FALSE,FALSE
+485,2,black_high,4,Iterative Batch Phase: Max,1,Multiracial,55,TRUE,FALSE
+486,3,white_low,4,Iterative Batch Phase: Max,1,Black or African American,28,FALSE,FALSE
+487,3,white_low,4,Iterative Batch Phase: Max,1,White,30,TRUE,FALSE
+488,1,black_low,4,Iterative Batch Phase: Max,0,White,27,TRUE,FALSE
+489,1,black_low,4,Iterative Batch Phase: Max,1,White,56,TRUE,FALSE
+490,4,white_high,4,Iterative Batch Phase: Max,0,White,48,TRUE,FALSE
+491,4,white_high,4,Iterative Batch Phase: Max,0,White,51,TRUE,FALSE
+492,1,black_low,4,Iterative Batch Phase: Max,0,White,64,FALSE,TRUE
 493,3,white_low,4,Iterative Batch Phase: Max,0,White,36,FALSE,FALSE
-494,1,black_low,4,Iterative Batch Phase: Max,1,Black or African American,28,TRUE,FALSE
-495,1,black_low,4,Iterative Batch Phase: Max,1,White,43,TRUE,FALSE
-496,1,black_low,4,Iterative Batch Phase: Max,1,White,17,TRUE,FALSE
-497,1,black_low,4,Iterative Batch Phase: Max,1,White,59,TRUE,FALSE
-498,4,white_high,4,Iterative Batch Phase: Max,0,Asian,34,TRUE,FALSE
-499,3,white_low,4,Iterative Batch Phase: Max,1,Asian,23,TRUE,FALSE
-500,1,black_low,4,Iterative Batch Phase: Max,0,White,57,TRUE,FALSE
-501,4,white_high,4,Iterative Batch Phase: Max,1,White,63,TRUE,FALSE
-502,4,white_high,4,Iterative Batch Phase: Max,1,White,55,FALSE,FALSE
-503,3,white_low,4,Iterative Batch Phase: Max,1,White,39,TRUE,FALSE
-504,1,black_low,4,Iterative Batch Phase: Max,0,White,42,TRUE,FALSE
-505,1,black_low,4,Iterative Batch Phase: Max,0,White,24,FALSE,FALSE
-506,3,white_low,4,Iterative Batch Phase: Max,0,White,42,FALSE,FALSE
-507,3,white_low,4,Iterative Batch Phase: Max,0,Black or African American,23,FALSE,FALSE
-508,3,white_low,4,Iterative Batch Phase: Max,1,White,41,FALSE,FALSE
-509,4,white_high,4,Iterative Batch Phase: Max,1,White,59,FALSE,FALSE
-510,3,white_low,4,Iterative Batch Phase: Max,0,American Indian or Alaskan Native,25,FALSE,FALSE
-511,4,white_high,4,Iterative Batch Phase: Max,1,Black or African American,31,FALSE,FALSE
-512,2,black_high,4,Iterative Batch Phase: Max,1,Multiracial,55,TRUE,FALSE
-513,4,white_high,4,Iterative Batch Phase: Max,1,Asian,36,FALSE,FALSE
-514,4,white_high,4,Iterative Batch Phase: Max,0,White,51,TRUE,FALSE
-515,4,white_high,4,Iterative Batch Phase: Max,1,Asian,26,FALSE,TRUE
-516,3,white_low,4,Iterative Batch Phase: Max,1,White,30,TRUE,FALSE
-517,3,white_low,4,Iterative Batch Phase: Max,0,Black or African American,48,FALSE,FALSE
-518,3,white_low,4,Iterative Batch Phase: Max,0,White,25,TRUE,FALSE
-519,4,white_high,4,Iterative Batch Phase: Max,0,White,63,FALSE,FALSE
+494,3,white_low,4,Iterative Batch Phase: Max,0,White,57,TRUE,FALSE
+495,3,white_low,4,Iterative Batch Phase: Max,0,Multiracial,57,FALSE,FALSE
+496,3,white_low,4,Iterative Batch Phase: Max,1,White,49,FALSE,FALSE
+497,3,white_low,4,Iterative Batch Phase: Max,0,White,42,FALSE,FALSE
+498,1,black_low,4,Iterative Batch Phase: Max,0,White,49,TRUE,FALSE
+499,3,white_low,4,Iterative Batch Phase: Max,0,White,36,TRUE,FALSE
+500,3,white_low,4,Iterative Batch Phase: Max,1,White,39,TRUE,FALSE
+501,3,white_low,4,Iterative Batch Phase: Max,1,White,42,FALSE,FALSE
+502,4,white_high,4,Iterative Batch Phase: Max,1,Asian,36,FALSE,FALSE
+503,1,black_low,4,Iterative Batch Phase: Max,0,White,48,FALSE,FALSE
+504,1,black_low,4,Iterative Batch Phase: Max,1,Black or African American,28,TRUE,FALSE
+505,1,black_low,4,Iterative Batch Phase: Max,1,White,43,TRUE,FALSE
+506,1,black_low,4,Iterative Batch Phase: Max,1,Black or African American,59,FALSE,FALSE
+507,3,white_low,4,Iterative Batch Phase: Max,1,Black or African American,51,FALSE,FALSE
+508,4,white_high,4,Iterative Batch Phase: Max,1,White,28,TRUE,FALSE
+509,3,white_low,4,Iterative Batch Phase: Max,0,White,54,FALSE,FALSE
+510,3,white_low,4,Iterative Batch Phase: Max,1,White,25,TRUE,FALSE
+511,4,white_high,4,Iterative Batch Phase: Max,1,Black or African American,20,FALSE,FALSE
+512,1,black_low,4,Iterative Batch Phase: Max,1,Asian,27,TRUE,FALSE
+513,3,white_low,4,Iterative Batch Phase: Max,1,Asian,31,TRUE,FALSE
+514,3,white_low,4,Iterative Batch Phase: Max,0,White,39,FALSE,FALSE
+515,1,black_low,4,Iterative Batch Phase: Max,0,White,36,FALSE,TRUE
+516,4,white_high,4,Iterative Batch Phase: Max,0,Asian,34,TRUE,FALSE
+517,3,white_low,4,Iterative Batch Phase: Max,0,White,35,FALSE,FALSE
+518,1,black_low,4,Iterative Batch Phase: Max,1,White,17,TRUE,FALSE
+519,3,white_low,4,Iterative Batch Phase: Max,1,Black or African American,27,FALSE,FALSE
 520,3,white_low,4,Iterative Batch Phase: Max,0,Asian,22,TRUE,FALSE
-521,1,black_low,4,Iterative Batch Phase: Max,0,White,64,FALSE,TRUE
-522,3,white_low,4,Iterative Batch Phase: Max,0,White,55,FALSE,FALSE
-523,1,black_low,4,Iterative Batch Phase: Max,0,White,49,TRUE,FALSE
-524,3,white_low,4,Iterative Batch Phase: Max,1,White,25,FALSE,FALSE
-525,4,white_high,4,Iterative Batch Phase: Max,1,White,36,FALSE,FALSE
-526,3,white_low,4,Iterative Batch Phase: Max,0,Multiracial,57,FALSE,FALSE
-527,4,white_high,4,Iterative Batch Phase: Max,0,White,32,FALSE,FALSE
-528,1,black_low,4,Iterative Batch Phase: Max,0,White,38,FALSE,FALSE
-529,3,white_low,4,Iterative Batch Phase: Max,0,Black or African American,32,TRUE,FALSE
-530,3,white_low,4,Iterative Batch Phase: Max,0,White,45,TRUE,FALSE
-531,3,white_low,4,Iterative Batch Phase: Max,1,Black or African American,28,FALSE,FALSE
-532,3,white_low,4,Iterative Batch Phase: Max,0,Black or African American,51,FALSE,FALSE
-533,3,white_low,4,Iterative Batch Phase: Max,0,White,33,FALSE,FALSE
-534,1,black_low,4,Iterative Batch Phase: Max,0,White,36,FALSE,TRUE
-535,3,white_low,4,Iterative Batch Phase: Max,1,White,28,TRUE,FALSE
-536,4,white_high,4,Iterative Batch Phase: Max,1,Black or African American,20,FALSE,FALSE
-537,3,white_low,4,Iterative Batch Phase: Max,0,Black or African American,32,TRUE,FALSE
-538,3,white_low,4,Iterative Batch Phase: Max,0,White,39,FALSE,FALSE
-539,1,black_low,4,Iterative Batch Phase: Max,0,Black or African American,51,FALSE,FALSE
-540,3,white_low,4,Iterative Batch Phase: Max,0,White,35,FALSE,FALSE
-541,1,black_low,4,Iterative Batch Phase: Max,0,White,55,TRUE,FALSE
-542,4,white_high,4,Iterative Batch Phase: Max,0,White,62,TRUE,FALSE
-543,3,white_low,4,Iterative Batch Phase: Max,0,Multiracial,37,FALSE,FALSE
+521,3,white_low,4,Iterative Batch Phase: Max,0,White,63,TRUE,FALSE
+522,4,white_high,4,Iterative Batch Phase: Max,1,Asian,26,FALSE,TRUE
+523,3,white_low,4,Iterative Batch Phase: Max,0,Multiracial,60,TRUE,FALSE
+524,2,black_high,4,Iterative Batch Phase: Max,1,Multiracial,32,FALSE,FALSE
+525,1,black_low,4,Iterative Batch Phase: Max,0,White,42,FALSE,FALSE
+526,4,white_high,4,Iterative Batch Phase: Max,1,White,36,FALSE,FALSE
+527,4,white_high,4,Iterative Batch Phase: Max,0,Asian,33,TRUE,FALSE
+528,3,white_low,4,Iterative Batch Phase: Max,1,Asian,23,TRUE,FALSE
+529,3,white_low,4,Iterative Batch Phase: Max,0,White,45,TRUE,FALSE
+530,1,black_low,4,Iterative Batch Phase: Max,0,White,48,TRUE,FALSE
+531,3,white_low,4,Iterative Batch Phase: Max,0,White,25,TRUE,FALSE
+532,1,black_low,4,Iterative Batch Phase: Max,0,White,38,FALSE,FALSE
+533,4,white_high,4,Iterative Batch Phase: Max,1,White,63,TRUE,FALSE
+534,2,black_high,4,Iterative Batch Phase: Max,1,White,60,TRUE,FALSE
+535,4,white_high,4,Iterative Batch Phase: Max,1,Black or African American,31,FALSE,FALSE
+536,3,white_low,4,Iterative Batch Phase: Max,0,Black or African American,23,FALSE,FALSE
+537,3,white_low,4,Iterative Batch Phase: Max,0,White,36,FALSE,FALSE
+538,3,white_low,4,Iterative Batch Phase: Max,0,White,34,TRUE,FALSE
+539,3,white_low,4,Iterative Batch Phase: Max,0,White,33,FALSE,FALSE
+540,1,black_low,4,Iterative Batch Phase: Max,0,White,41,FALSE,FALSE
+541,3,white_low,4,Iterative Batch Phase: Max,0,White,35,TRUE,FALSE
+542,3,white_low,4,Iterative Batch Phase: Max,1,White,41,FALSE,FALSE
+543,4,white_high,4,Iterative Batch Phase: Max,1,White,59,FALSE,FALSE
+544,2,black_high,5,Iterative Batch Phase: Max,1,Black or African American,45,FALSE,FALSE
+545,4,white_high,5,Iterative Batch Phase: Max,0,White,51,TRUE,FALSE
+546,1,black_low,5,Iterative Batch Phase: Max,0,White,42,FALSE,FALSE
+547,1,black_low,5,Iterative Batch Phase: Max,1,White,59,FALSE,FALSE
+548,3,white_low,5,Iterative Batch Phase: Max,1,White,63,TRUE,FALSE
+549,3,white_low,5,Iterative Batch Phase: Max,0,White,52,TRUE,FALSE
+550,1,black_low,5,Iterative Batch Phase: Max,1,Multiracial,58,TRUE,FALSE
+551,3,white_low,5,Iterative Batch Phase: Max,1,White,46,FALSE,FALSE
+552,4,white_high,5,Iterative Batch Phase: Max,1,White,35,TRUE,FALSE
+553,4,white_high,5,Iterative Batch Phase: Max,0,White,62,TRUE,FALSE
+554,1,black_low,5,Iterative Batch Phase: Max,1,White,33,TRUE,FALSE
+555,4,white_high,5,Iterative Batch Phase: Max,1,White,61,FALSE,FALSE
+556,1,black_low,5,Iterative Batch Phase: Max,1,White,34,FALSE,FALSE
+557,1,black_low,5,Iterative Batch Phase: Max,1,White,34,FALSE,FALSE
+558,2,black_high,5,Iterative Batch Phase: Max,0,White,56,TRUE,FALSE
+559,2,black_high,5,Iterative Batch Phase: Max,1,Black or African American,30,TRUE,FALSE
+560,1,black_low,5,Iterative Batch Phase: Max,1,White,31,FALSE,FALSE
+561,1,black_low,5,Iterative Batch Phase: Max,0,White,25,TRUE,FALSE
+562,4,white_high,5,Iterative Batch Phase: Max,0,White,54,TRUE,FALSE
+563,2,black_high,5,Iterative Batch Phase: Max,1,White,58,TRUE,FALSE
+564,1,black_low,5,Iterative Batch Phase: Max,0,Black or African American,51,TRUE,FALSE
+565,4,white_high,5,Iterative Batch Phase: Max,1,White,42,FALSE,FALSE
+566,1,black_low,5,Iterative Batch Phase: Max,0,White,29,TRUE,TRUE
+567,4,white_high,5,Iterative Batch Phase: Max,0,Multiracial,28,TRUE,FALSE
+568,3,white_low,5,Iterative Batch Phase: Max,0,White,55,TRUE,FALSE
+569,3,white_low,5,Iterative Batch Phase: Max,0,White,58,FALSE,FALSE
+570,4,white_high,5,Iterative Batch Phase: Max,1,Black or African American,53,TRUE,FALSE
+571,2,black_high,5,Iterative Batch Phase: Max,0,White,61,TRUE,FALSE
+572,1,black_low,5,Iterative Batch Phase: Max,0,Multiracial,34,TRUE,FALSE
+573,4,white_high,5,Iterative Batch Phase: Max,0,Multiracial,39,FALSE,TRUE
+574,1,black_low,5,Iterative Batch Phase: Max,1,White,50,FALSE,FALSE
+575,2,black_high,5,Iterative Batch Phase: Max,1,White,39,FALSE,FALSE
+576,2,black_high,5,Iterative Batch Phase: Max,1,Asian,26,TRUE,FALSE
+577,3,white_low,5,Iterative Batch Phase: Max,1,White,59,FALSE,FALSE
+578,1,black_low,5,Iterative Batch Phase: Max,0,White,37,FALSE,FALSE
+579,4,white_high,5,Iterative Batch Phase: Max,1,White,62,TRUE,FALSE
+580,3,white_low,5,Iterative Batch Phase: Max,0,White,44,TRUE,FALSE
+581,2,black_high,5,Iterative Batch Phase: Max,1,White,44,FALSE,FALSE
+582,1,black_low,5,Iterative Batch Phase: Max,0,White,31,TRUE,FALSE
+583,4,white_high,5,Iterative Batch Phase: Max,0,Black or African American,51,TRUE,FALSE
+584,2,black_high,5,Iterative Batch Phase: Max,0,Asian,25,FALSE,FALSE
+585,3,white_low,5,Iterative Batch Phase: Max,1,White,54,TRUE,FALSE
+586,3,white_low,5,Iterative Batch Phase: Max,0,White,42,FALSE,FALSE
+587,3,white_low,5,Iterative Batch Phase: Max,0,Asian,26,TRUE,FALSE
+588,4,white_high,5,Iterative Batch Phase: Max,0,Black or African American,51,FALSE,FALSE
+589,4,white_high,5,Iterative Batch Phase: Max,0,Black or African American,33,TRUE,FALSE
+590,4,white_high,5,Iterative Batch Phase: Max,1,White,44,FALSE,FALSE
+591,4,white_high,5,Iterative Batch Phase: Max,1,Black or African American,51,FALSE,FALSE
+592,4,white_high,5,Iterative Batch Phase: Max,1,Asian,23,TRUE,FALSE
+593,4,white_high,5,Iterative Batch Phase: Max,0,White,36,TRUE,FALSE
+594,3,white_low,5,Iterative Batch Phase: Max,1,White,39,TRUE,FALSE
+595,4,white_high,5,Iterative Batch Phase: Max,0,White,61,TRUE,FALSE
+596,1,black_low,5,Iterative Batch Phase: Max,1,White,41,FALSE,FALSE
+597,3,white_low,5,Iterative Batch Phase: Max,0,White,49,FALSE,FALSE
+598,3,white_low,5,Iterative Batch Phase: Max,0,White,69,FALSE,FALSE
+599,1,black_low,5,Iterative Batch Phase: Max,1,Asian,25,FALSE,FALSE
+600,4,white_high,5,Iterative Batch Phase: Max,1,White,66,FALSE,FALSE
+601,1,black_low,5,Iterative Batch Phase: Max,0,White,46,TRUE,FALSE
+602,3,white_low,5,Iterative Batch Phase: Max,1,Black or African American,30,TRUE,FALSE
+603,3,white_low,5,Iterative Batch Phase: Max,1,White,25,TRUE,FALSE
+604,2,black_high,5,Iterative Batch Phase: Max,1,White,54,TRUE,FALSE
+605,1,black_low,5,Iterative Batch Phase: Max,0,Multiracial,34,TRUE,FALSE
+606,1,black_low,5,Iterative Batch Phase: Max,0,White,55,TRUE,FALSE
+607,3,white_low,5,Iterative Batch Phase: Max,0,White,58,FALSE,FALSE
+608,2,black_high,5,Iterative Batch Phase: Max,0,Asian,32,FALSE,FALSE
+609,4,white_high,5,Iterative Batch Phase: Max,1,White,51,TRUE,FALSE
+610,1,black_low,5,Iterative Batch Phase: Max,1,White,41,FALSE,FALSE
+611,4,white_high,5,Iterative Batch Phase: Max,0,Black or African American,51,TRUE,FALSE
+612,3,white_low,5,Iterative Batch Phase: Max,0,White,61,FALSE,FALSE
+613,3,white_low,5,Iterative Batch Phase: Max,0,White,60,FALSE,FALSE
+614,2,black_high,5,Iterative Batch Phase: Max,1,White,53,FALSE,FALSE
+615,4,white_high,5,Iterative Batch Phase: Max,0,White,31,FALSE,FALSE
+616,2,black_high,5,Iterative Batch Phase: Max,0,White,43,FALSE,FALSE
+617,1,black_low,5,Iterative Batch Phase: Max,1,Asian,34,FALSE,FALSE
+618,3,white_low,5,Iterative Batch Phase: Max,1,White,43,TRUE,FALSE
+619,1,black_low,5,Iterative Batch Phase: Max,1,White,42,TRUE,FALSE
+620,4,white_high,5,Iterative Batch Phase: Max,0,Asian,38,FALSE,FALSE
+621,4,white_high,5,Iterative Batch Phase: Max,0,White,39,TRUE,FALSE
+622,2,black_high,5,Iterative Batch Phase: Max,1,White,36,TRUE,FALSE
+623,4,white_high,5,Iterative Batch Phase: Max,1,White,30,FALSE,FALSE
+624,4,white_high,5,Iterative Batch Phase: Max,1,Black or African American,41,FALSE,FALSE
+625,4,white_high,5,Iterative Batch Phase: Max,1,White,47,FALSE,FALSE
+626,1,black_low,5,Iterative Batch Phase: Max,0,Black or African American,51,TRUE,FALSE
+627,4,white_high,5,Iterative Batch Phase: Max,1,Black or African American,49,FALSE,FALSE
+628,4,white_high,5,Iterative Batch Phase: Max,1,White,38,TRUE,FALSE
+629,1,black_low,5,Iterative Batch Phase: Max,0,Asian,31,FALSE,FALSE
+630,1,black_low,5,Iterative Batch Phase: Max,0,White,31,TRUE,FALSE
+631,4,white_high,5,Iterative Batch Phase: Max,0,White,46,FALSE,FALSE
+632,3,white_low,5,Iterative Batch Phase: Max,0,White,33,FALSE,FALSE
+633,3,white_low,5,Iterative Batch Phase: Max,1,White,24,FALSE,FALSE
+634,4,white_high,5,Iterative Batch Phase: Max,1,White,38,FALSE,FALSE
+635,1,black_low,5,Iterative Batch Phase: Max,0,White,48,TRUE,FALSE
+636,3,white_low,5,Iterative Batch Phase: Max,1,Asian,29,FALSE,FALSE
+637,4,white_high,5,Iterative Batch Phase: Max,1,Black or African American,51,FALSE,FALSE
+638,3,white_low,5,Iterative Batch Phase: Max,0,White,32,TRUE,FALSE
+639,1,black_low,5,Iterative Batch Phase: Max,0,Black or African American,33,FALSE,FALSE
+640,3,white_low,5,Iterative Batch Phase: Max,1,Black or African American,37,FALSE,FALSE
