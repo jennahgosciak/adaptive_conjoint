@@ -105,11 +105,12 @@ df <- df %>%
       StartDate_clean <= ymd_hms("2024-02-27-14-40-00") ~ 11,
       StartDate_clean <= ymd_hms("2024-02-27-15-30-00") ~ 12,
       StartDate_clean <= ymd_hms("2024-02-29-14-10-00") ~ 13,
+      StartDate_clean <= ymd_hms("2024-03-01-11-20-00") ~ 14,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
       batch_id == 0 ~ "Warmup",
-      StartDate_clean <= ymd_hms("2024-02-29-14-10-00") ~ "Iterative Batch Phase: Max",
+      StartDate_clean <= ymd_hms("2024-03-01-11-20-00") ~ "Iterative Batch Phase: Max",
       TRUE ~ NA_character_
     )
   ) %>%
@@ -212,7 +213,7 @@ if (length(unique(df$`Prolific ID Q`)) != nrow(df)) {
     mutate(n = n()) %>%
     arrange(desc(n), StartDate_clean) %>%
     ungroup() %>%
-    select(n, StartDate_clean, EndDate, flag_first_obs, `Duration (in seconds)`, Finished, batch_id, batch_type) %>%
+    select(PROLIFIC_PID, `Prolific ID Q`, n, StartDate_clean, EndDate, flag_first_obs, `Duration (in seconds)`, Finished, batch_id, batch_type) %>%
     print()
 
   df <- df %>%
