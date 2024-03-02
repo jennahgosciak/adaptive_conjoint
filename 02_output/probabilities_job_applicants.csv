@@ -62,6 +62,9 @@ Batch,Embedded data variable,CDF_Threshold,Batch Type
 20,pi1,0.595,Iterative Batch Phase: Max
 20,pi2,0.85,Iterative Batch Phase: Max
 20,pi3,0.94,Iterative Batch Phase: Max
+21,pi1,0.633,Iterative Batch Phase: Max
+21,pi2,0.838,Iterative Batch Phase: Max
+21,pi3,0.921,Iterative Batch Phase: Max
 1,pi1,0.11,Iterative Batch Phase: Min
 1,pi2,0.639,Iterative Batch Phase: Min
 1,pi3,0.709,Iterative Batch Phase: Min
