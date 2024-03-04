@@ -58,7 +58,7 @@ df %>%
   summarize(n = n()) %>%
   group_by(batch_type) %>%
   mutate(per = n / sum(n)) %>%
-  arrange(desc(age))
+  arrange(age)
 
 df %>%
   # remove outlier

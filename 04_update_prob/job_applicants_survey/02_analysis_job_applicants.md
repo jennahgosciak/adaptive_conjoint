@@ -11,7 +11,7 @@ data <- readRDS("../../02_output/job_applicants_data_clean.RDS")
 ``` r
 data %>%
   group_by(context, context_label) %>%
-  summarize(n = n()) %>% 
+  summarize(n = n()) %>%
   arrange(desc(n))
 ```
 
@@ -77,8 +77,10 @@ aggregated %>%
   geom_point() +
   geom_errorbar() +
   facet_wrap(~context_label) +
-  scale_x_continuous(breaks=c(0,1),
-                     labels=c(0,1))
+  scale_x_continuous(
+    breaks = c(0,5,10,15,20),
+    labels = c(0,5,10,15,20)
+  )
 ```
 
 ![](02_analysis_job_applicants_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
