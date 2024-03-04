@@ -1,5 +1,5 @@
 ---
-title: "Process Qualtrics Data and Treatment Assignment Updating for Political Candidates Survey"
+title: "Analysis: Job Applicants Survey Experiment"
 output: rmarkdown::github_document
 date: "2023-11-07"
 ---
@@ -7,11 +7,6 @@ date: "2023-11-07"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-# Setup Data Using Qualtrics API
-
-* Load data directly from Qualtrics
-* Can store API Key and credentials in `.renviron`
 
 ```{r, load packages, message=F, warning=F}
 library(tidyverse)
@@ -22,7 +17,8 @@ data <- readRDS("../../02_output/job_applicants_data_clean.RDS")
 ```{r}
 data %>%
   group_by(context, context_label) %>%
-  summarize(n = n())
+  summarize(n = n()) %>% 
+  arrange(desc(n))
 ```
 
 ```{r}
