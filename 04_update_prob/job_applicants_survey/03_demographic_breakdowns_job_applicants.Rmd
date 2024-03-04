@@ -57,12 +57,12 @@ df %>%
   group_by(batch_type, age) %>%
   summarize(n = n()) %>%
   group_by(batch_type) %>%
-  mutate(per = n / sum(n)) %>% 
+  mutate(per = n / sum(n)) %>%
   arrange(desc(age))
 
 df %>%
   # remove outlier
-  filter(age < 100) %>% 
+  filter(age < 100) %>%
   ggplot(aes(age, after_stat(density), fill = batch_type)) +
   geom_histogram() +
   facet_wrap(~batch_type)

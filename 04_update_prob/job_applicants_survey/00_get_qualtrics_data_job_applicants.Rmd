@@ -184,7 +184,7 @@ df <- df %>%
 df <- df %>%
   check_location_screen()
 
-df <- df %>% 
+df <- df %>%
   check_hiring_screen()
 ```
 
@@ -236,9 +236,9 @@ stopifnot(length(unique(df$`Prolific ID Q`)) == nrow(df))
 ```{r}
 # create context variable
 df <- df %>%
-  mutate(across(str_c("Q", 1:8), .fns = lst(orig = ~.))) %>% 
+  mutate(across(str_c("Q", 1:8), .fns = lst(orig = ~.))) %>%
   create_context_var_jobs() %>%
-  verify(!is.na(context))   %>%
+  verify(!is.na(context)) %>%
   verify(!is.na(context_label))
 
 df %>%
@@ -343,15 +343,15 @@ df %>%
 ```{r}
 # check randomness of question ordering
 # plot counts by question order
-df %>% 
-  select(str_c("Q", 1:8)) %>% 
+df %>%
+  select(str_c("Q", 1:8)) %>%
   pivot_longer(everything()) %>%
-  filter(value == 'Candidate 1' | value == 'Candidate 2') %>% 
-  mutate(order_val = as.numeric(str_replace_all(name, "Q", ""))) %>% 
+  filter(value == "Candidate 1" | value == "Candidate 2") %>%
+  mutate(order_val = as.numeric(str_replace_all(name, "Q", ""))) %>%
   ggplot() +
   geom_histogram(aes(order_val)) +
   theme_classic() +
-  labs(x = 'Order', y = 'Number of responses')
+  labs(x = "Order", y = "Number of responses")
 ```
 
 ## Clean Qualtrics Data
@@ -370,7 +370,7 @@ df_clean %>%
     n = n(),
     chose_mother_total = sum(chose_mother),
     chose_nonmother_total = sum(chose_mother == 0)
-  ) %>% 
+  ) %>%
   mutate(diff = abs(chose_mother_total - chose_nonmother_total))
 
 df_clean %>%
@@ -379,7 +379,7 @@ df_clean %>%
     n = n(),
     chose_mother_total = sum(chose_mother),
     chose_nonmother_total = sum(chose_mother == 0)
-  ) %>% 
+  ) %>%
   mutate(diff = abs(chose_mother_total - chose_nonmother_total))
 ```
 
@@ -400,44 +400,56 @@ df_attention_check <- df_clean %>%
     manipulation_check_missing = rowSums(select(., starts_with("Manipulation_Q1_")) %>%
       is.na())
   ) %>%
-  mutate(pass_attention_check = case_when(
-    (rnum_mother <= 0.5) &
-      (Manipulation_Q1_2 == "Candidate 2") &
-      # only when they've selected one response, i.e. missing = 2
-      (manipulation_check_missing == 2) ~ 1,
-    (rnum_mother > 0.5) &
-      (Manipulation_Q1_1 == "Candidate 1") &
-      # only when they've selected one response, i.e. missing = 2
-      (manipulation_check_missing == 2) ~ 1,
-    TRUE ~ 0),
+  mutate(
+    pass_attention_check = case_when(
+      (rnum_mother <= 0.5) &
+        (Manipulation_Q1_2 == "Candidate 2") &
+        # only when they've selected one response, i.e. missing = 2
+        (manipulation_check_missing == 2) ~ 1,
+      (rnum_mother > 0.5) &
+        (Manipulation_Q1_1 == "Candidate 1") &
+        # only when they've selected one response, i.e. missing = 2
+        (manipulation_check_missing == 2) ~ 1,
+      TRUE ~ 0
+    ),
     pass_attention_check_any = case_when(
-    (rnum_mother <= 0.5) &
-      (Manipulation_Q1_2 == "Candidate 2") ~ 1,
-    (rnum_mother > 0.5) &
-      (Manipulation_Q1_1 == "Candidate 1") ~ 1,
-    TRUE ~ 0),
-  unsure_attention_check = if_else(Manipulation_Q1_3 == "Not sure" & !is.na(Manipulation_Q1_3), 1, 0))
+      (rnum_mother <= 0.5) &
+        (Manipulation_Q1_2 == "Candidate 2") ~ 1,
+      (rnum_mother > 0.5) &
+        (Manipulation_Q1_1 == "Candidate 1") ~ 1,
+      TRUE ~ 0
+    ),
+    unsure_attention_check = if_else(Manipulation_Q1_3 == "Not sure" & !is.na(Manipulation_Q1_3), 1, 0)
+  )
 
 df_attention_check %>%
-  summarize(per_pass_attention_check = mean(pass_attention_check),
-            per_pass_attention_check_any = mean(pass_attention_check_any),
-            per_unsure = mean(unsure_attention_check))
+  summarize(
+    per_pass_attention_check = mean(pass_attention_check),
+    per_pass_attention_check_any = mean(pass_attention_check_any),
+    per_unsure = mean(unsure_attention_check)
+  )
 
 df_attention_check %>%
-  group_by(batch_id, batch_type) %>% 
-  summarize(per_pass_attention_check = mean(pass_attention_check),
-            per_pass_attention_check_any = mean(pass_attention_check_any),
-            per_unsure = mean(unsure_attention_check))
+  group_by(batch_id, batch_type) %>%
+  summarize(
+    per_pass_attention_check = mean(pass_attention_check),
+    per_pass_attention_check_any = mean(pass_attention_check_any),
+    per_unsure = mean(unsure_attention_check)
+  )
 
-df_attention_check %>% 
-  mutate(candidate_mother = if_else(rnum_mother <= 0.5, "Candidate 2", "Candidate 1")) %>% 
-  select(rnum_mother, candidate_mother, pass_attention_check, chose_mother, str_c("Q", 1:8, "_orig"),
-         starts_with("volunteer"), starts_with("Manipulation_Q1_"))
+df_attention_check %>%
+  mutate(candidate_mother = if_else(rnum_mother <= 0.5, "Candidate 2", "Candidate 1")) %>%
+  select(
+    rnum_mother, candidate_mother, pass_attention_check, chose_mother, str_c("Q", 1:8, "_orig"),
+    starts_with("volunteer"), starts_with("Manipulation_Q1_")
+  )
 
-df_attention_check %>% 
-  mutate(candidate_mother = if_else(rnum_mother <= 0.5, "Candidate 2", "Candidate 1")) %>% 
-  select(rnum_mother, candidate_mother, pass_attention_check, chose_mother, starts_with("Manipulation_Q1_"),
-         manipulation_check_missing, starts_with("volunteer"))
+df_attention_check %>%
+  mutate(candidate_mother = if_else(rnum_mother <= 0.5, "Candidate 2", "Candidate 1")) %>%
+  select(
+    rnum_mother, candidate_mother, pass_attention_check, chose_mother, starts_with("Manipulation_Q1_"),
+    manipulation_check_missing, starts_with("volunteer")
+  )
 ```
 
 ```{r, demog}
