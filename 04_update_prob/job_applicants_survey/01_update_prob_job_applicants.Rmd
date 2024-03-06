@@ -30,7 +30,7 @@ probabilities
 df_clean <- readRDS("../../02_output/job_applicants_data_clean.RDS")
 
 # current batch type that we want (whether min or max discriminatory context)
-current_batch_type <- "Iterative Batch Phase: Max"
+current_batch_type <- "Iterative Batch Phase: Min"
 survey_id <- config$job_applicants_survey_id
 
 # current batch num should just be the last batch number (if we are just updating sequentially)
