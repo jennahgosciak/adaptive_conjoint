@@ -189,19 +189,22 @@ check_commitment <- function(df) {
   }
 
   commitment_check2 <- df %>%
-    mutate(Commitment_Q2 = str_to_lower(Commitment_Q2)) %>%
+    mutate(Commitment_Q2 = str_to_lower(Commitment_Q2) %>% 
+             str_replace_all('\\.', '')) %>%
     select(Commitment_Q2) %>%
     equals("purple") %>%
     all()
 
   if (commitment_check2 != TRUE | is.na(commitment_check2)) {
     num_respondents <- df %>%
-      mutate(Commitment_Q2 = str_to_lower(Commitment_Q2)) %>%
+      mutate(Commitment_Q2 = str_to_lower(Commitment_Q2) %>% 
+               str_replace_all('\\.', '')) %>%
       filter(Commitment_Q2 != "purple") %>%
       nrow()
 
     df <- df %>%
-      filter(str_to_lower(Commitment_Q2) == "purple")
+      filter(str_to_lower(Commitment_Q2) %>% 
+               str_replace_all('\\.', '') == "purple")
 
     warning(str_glue("Dropping {num_respondents} survey respondents who did not pass commitment check 2"))
     warning(str_glue("{nrow(df)} respondents in the data"))

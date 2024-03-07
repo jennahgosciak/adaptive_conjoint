@@ -114,12 +114,13 @@ df <- df %>%
       StartDate_clean <= ymd_hms("2024-03-01-22-10-00") ~ 20,
       StartDate_clean <= ymd_hms("2024-03-06-11-30-00") ~ 1,
       StartDate_clean <= ymd_hms("2024-03-06-16-10-00") ~ 2,
+      StartDate_clean <= ymd_hms("2024-03-07-12-50-00") ~ 3,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
       batch_id == 0 ~ "Warmup",
       StartDate_clean <= ymd_hms("2024-03-01-22-10-00") ~ "Iterative Batch Phase: Max",
-      StartDate_clean <= ymd_hms("2024-03-06-16-10-00") ~ "Iterative Batch Phase: Min",
+      StartDate_clean <= ymd_hms("2024-03-07-12-50-00") ~ "Iterative Batch Phase: Min",
       TRUE ~ NA_character_
     )
   ) %>%
@@ -199,7 +200,8 @@ df %>%
 
 
 df %>%
-  filter(str_to_lower(Commitment_Q2) != "purple") %>%
+  filter(str_to_lower(Commitment_Q2) %>% 
+               str_replace_all('\\.', '') != "purple") %>%
   select(Commitment_Q1, Commitment_Q2, `Duration (in seconds)`, Finished, batch_id, batch_type)
 
 df <- df %>%

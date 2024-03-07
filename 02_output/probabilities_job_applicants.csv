@@ -74,3 +74,6 @@ Batch,Embedded data variable,CDF_Threshold,Batch Type
 3,pi1,0.232,Iterative Batch Phase: Min
 3,pi2,0.514,Iterative Batch Phase: Min
 3,pi3,0.606,Iterative Batch Phase: Min
+4,pi1,0.461,Iterative Batch Phase: Min
+4,pi2,0.751,Iterative Batch Phase: Min
+4,pi3,0.813,Iterative Batch Phase: Min
