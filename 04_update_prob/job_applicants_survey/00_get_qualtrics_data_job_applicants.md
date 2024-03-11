@@ -25,7 +25,7 @@ probabilities <- read_csv("../../02_output/probabilities_job_applicants.csv")
 probabilities
 ```
 
-    ## # A tibble: 78 × 4
+    ## # A tibble: 87 × 4
     ##    Batch `Embedded data variable` CDF_Threshold `Batch Type`              
     ##    <dbl> <chr>                            <dbl> <chr>                     
     ##  1     0 pi1                              0.25  Warmup                    
@@ -38,7 +38,7 @@ probabilities
     ##  8     2 pi2                              0.398 Iterative Batch Phase: Max
     ##  9     2 pi3                              0.91  Iterative Batch Phase: Max
     ## 10     3 pi1                              0.569 Iterative Batch Phase: Max
-    ## # ℹ 68 more rows
+    ## # ℹ 77 more rows
 
 ``` r
 url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
@@ -54,7 +54,7 @@ df <- load_qualtrics(survey_name)
 ```
 
     ## Loading survey data for Job Applicants
-    ##   |                                                                              |                                                                      |   0%  |                                                                              |==========                                                            |  14%  |                                                                              |===========================                                           |  39%  |                                                                              |==========================================                            |  60%  |                                                                              |==============================================================        |  88%  |                                                                              |===================================================================== |  99%  |                                                                              |======================================================================| 100%
+    ##   |                                                                              |                                                                      |   0%  |                                                                              |===========                                                           |  16%  |                                                                              |===========================                                           |  38%  |                                                                              |========================================                              |  57%  |                                                                              |=======================================================               |  79%  |                                                                              |===================================================================== |  98%  |                                                                              |======================================================================| 100%
 
     ## 
     ## ── Column specification ────────────────────────────────────────────────────────
@@ -66,7 +66,6 @@ df <- load_qualtrics(survey_name)
     ##   `Duration (in seconds)` = col_double(),
     ##   Finished = col_logical(),
     ##   RecordedDate = col_datetime(format = ""),
-    ##   QD2_1_TEXT = col_double(),
     ##   rnum = col_double(),
     ##   pi1 = col_double(),
     ##   pi2 = col_double(),
@@ -79,8 +78,8 @@ df <- load_qualtrics(survey_name)
     ##   EmbeddedDataQuestions_DO_Q4 = col_double(),
     ##   EmbeddedDataQuestions_DO_Introduction = col_double(),
     ##   EmbeddedDataQuestions_DO_Q3 = col_double(),
-    ##   EmbeddedDataQuestions_DO_Q2 = col_double()
-    ##   # ... with 1 more columns
+    ##   EmbeddedDataQuestions_DO_Q2 = col_double(),
+    ##   EmbeddedDataQuestions_DO_Q1 = col_double()
     ## )
     ## ℹ Use `spec()` for the full column specifications.
 
@@ -89,7 +88,7 @@ df %>%
   nrow()
 ```
 
-    ## [1] 2827
+    ## [1] 3166
 
 ``` r
 # drop test data
@@ -102,21 +101,21 @@ df %>%
   nrow()
 ```
 
-    ## [1] 2705
+    ## [1] 3044
 
 ``` r
 # average finished rate
 mean(df$Finished)
 ```
 
-    ## [1] 0.980037
+    ## [1] 0.9747043
 
 ``` r
 # average time to complete
 mean(df$`Duration (in seconds)`)
 ```
 
-    ## [1] 232.8658
+    ## [1] 238.065
 
 ``` r
 # compare amount of time spent
@@ -134,7 +133,7 @@ df %>%
     ## # A tibble: 1 × 4
     ##   `Duration (in seconds)_mean` Duration (in seconds)_mi…¹ Duration (in seconds…²
     ##                          <dbl>                      <dbl>                  <dbl>
-    ## 1                         3.88                        0.1                   41.2
+    ## 1                         3.97                        0.1                   133.
     ## # ℹ abbreviated names: ¹​`Duration (in seconds)_min`,
     ## #   ²​`Duration (in seconds)_max`
     ## # ℹ 1 more variable: `Duration (in seconds)_median` <dbl>
@@ -152,7 +151,7 @@ df %>%
   summarize(max_date_time = max(StartDate_clean))
 ```
 
-    ## # A tibble: 7 × 2
+    ## # A tibble: 8 × 2
     ##   date       max_date_time      
     ##   <date>     <dttm>             
     ## 1 2024-02-25 2024-02-25 23:30:35
@@ -161,7 +160,8 @@ df %>%
     ## 4 2024-02-29 2024-02-29 14:03:42
     ## 5 2024-03-01 2024-03-01 21:59:46
     ## 6 2024-03-06 2024-03-06 15:50:11
-    ## 7 2024-03-07 2024-03-07 17:06:07
+    ## 7 2024-03-07 2024-03-07 19:34:40
+    ## 8 2024-03-08 2024-03-08 16:54:44
 
 ``` r
 df <- df %>%
@@ -194,12 +194,15 @@ df <- df %>%
       StartDate_clean <= ymd_hms("2024-03-06-16-10-00") ~ 2,
       StartDate_clean <= ymd_hms("2024-03-07-12-50-00") ~ 3,
       StartDate_clean <= ymd_hms("2024-03-07-17-10-00") ~ 4,
+      StartDate_clean <= ymd_hms("2024-03-07-19-50-00") ~ 5,
+      StartDate_clean <= ymd_hms("2024-03-08-14-20-00") ~ 6,
+      StartDate_clean <= ymd_hms("2024-03-08-17-20-00") ~ 7,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
       batch_id == 0 ~ "Warmup",
       StartDate_clean <= ymd_hms("2024-03-01-22-10-00") ~ "Iterative Batch Phase: Max",
-      StartDate_clean <= ymd_hms("2024-03-07-17-10-00") ~ "Iterative Batch Phase: Min",
+      StartDate_clean <= ymd_hms("2024-03-08-17-20-00") ~ "Iterative Batch Phase: Min",
       TRUE ~ NA_character_
     )
   ) %>%
@@ -214,7 +217,7 @@ df %>%
     ## `summarise()` has grouped output by 'batch_type'. You can override using the
     ## `.groups` argument.
 
-    ## # A tibble: 25 × 3
+    ## # A tibble: 28 × 3
     ## # Groups:   batch_type [3]
     ##    batch_type                 batch_id     n
     ##    <chr>                         <dbl> <int>
@@ -228,7 +231,7 @@ df %>%
     ##  8 Iterative Batch Phase: Max        8   107
     ##  9 Iterative Batch Phase: Max        9   109
     ## 10 Iterative Batch Phase: Max       10   106
-    ## # ℹ 15 more rows
+    ## # ℹ 18 more rows
 
 ## Survey Validation
 
@@ -265,7 +268,7 @@ df %>%
   distinct()
 ```
 
-    ## # A tibble: 25 × 5
+    ## # A tibble: 28 × 5
     ##    batch_type                 batch_id   pi1   pi2   pi3
     ##    <chr>                         <dbl> <dbl> <dbl> <dbl>
     ##  1 Warmup                            0 0.25  0.5   0.75 
@@ -278,7 +281,7 @@ df %>%
     ##  8 Iterative Batch Phase: Max        7 0.237 0.696 0.873
     ##  9 Iterative Batch Phase: Max        8 0.215 0.795 0.96 
     ## 10 Iterative Batch Phase: Max        9 0.185 0.896 0.968
-    ## # ℹ 15 more rows
+    ## # ℹ 18 more rows
 
 ``` r
 # check consent means their responses are missing
@@ -303,7 +306,7 @@ df %>%
   select(StartDate_clean, EndDate, `Duration (in seconds)`, Finished, Consent, PreScreen_Q1:QD5)
 ```
 
-    ## # A tibble: 54 × 32
+    ## # A tibble: 77 × 32
     ##    StartDate_clean     EndDate             `Duration (in seconds)` Finished
     ##    <dttm>              <dttm>                                <dbl> <lgl>   
     ##  1 2024-02-25 19:00:10 2024-02-25 19:02:03                     113 FALSE   
@@ -316,12 +319,12 @@ df %>%
     ##  8 2024-02-25 19:34:51 2024-02-25 19:43:25                     513 FALSE   
     ##  9 2024-02-25 22:50:07 2024-02-25 22:50:20                      12 FALSE   
     ## 10 2024-02-25 22:56:14 2024-02-25 22:56:38                      23 FALSE   
-    ## # ℹ 44 more rows
+    ## # ℹ 67 more rows
     ## # ℹ 28 more variables: Consent <ord>, PreScreen_Q1 <ord>, Prescreen_Q2 <ord>,
     ## #   Manipulation_Q2_TEXT <chr>, Commitment_Q1 <ord>, Commitment_Q2 <chr>,
     ## #   Q1 <ord>, Q2 <ord>, Q3 <ord>, Q4 <ord>, Q5 <ord>, Q6 <ord>, Q7 <ord>,
     ## #   Q8 <ord>, Manipulation_Q1_1 <chr>, Manipulation_Q1_2 <chr>,
-    ## #   Manipulation_Q1_3 <chr>, QD2 <ord>, QD2_1_TEXT <dbl>, QD3_1 <chr>,
+    ## #   Manipulation_Q1_3 <chr>, QD2 <ord>, QD2_1_TEXT <chr>, QD3_1 <chr>,
     ## #   QD3_2 <chr>, QD3_3 <chr>, QD3_4 <chr>, QD3_5 <chr>, QD3_6 <chr>, …
 
 ``` r
@@ -329,10 +332,10 @@ df <- df %>%
   check_completion()
 ```
 
-    ## Warning in check_completion(.): Dropping 54 survey respondents who did not
+    ## Warning in check_completion(.): Dropping 77 survey respondents who did not
     ## finish
 
-    ## Warning in check_completion(.): 2651 respondents in the data
+    ## Warning in check_completion(.): 2967 respondents in the data
 
 ``` r
 df <- df %>%
@@ -342,13 +345,13 @@ df <- df %>%
   check_hiring_screen()
 ```
 
-    ## Warning in check_hiring_screen(.): Dropping 160 survey respondents who have not
+    ## Warning in check_hiring_screen(.): Dropping 180 survey respondents who have not
     ## been involved in hiring decisions
 
-    ## Warning in check_hiring_screen(.): 160 survey respondents who have not been
+    ## Warning in check_hiring_screen(.): 180 survey respondents who have not been
     ## involved in hiring decisions
 
-    ## # A tibble: 2,486 × 1
+    ## # A tibble: 2,781 × 1
     ##    Manipulation_Q2_TEXT                                                         
     ##    <chr>                                                                        
     ##  1 To hire my replacement for a job and hire other people on my team            
@@ -361,9 +364,9 @@ df <- df %>%
     ##  8 I reviewed applications to recommend to my boss.                             
     ##  9 Helping interview candidates                                                 
     ## 10 Interviewed a candidate, discussed said candidate with fellow management, ma…
-    ## # ℹ 2,476 more rows
+    ## # ℹ 2,771 more rows
 
-    ## Warning in check_hiring_screen(.): 2491 respondents in the data
+    ## Warning in check_hiring_screen(.): 2787 respondents in the data
 
 ``` r
 # visually assessing why these respondents failed the commitment check
@@ -404,12 +407,12 @@ df <- df %>%
     ## Warning in check_commitment(.): Dropping 1 survey respondents did not pass
     ## commitment check 1
 
-    ## Warning in check_commitment(.): 2490 respondents in the data
+    ## Warning in check_commitment(.): 2786 respondents in the data
 
     ## Warning in check_commitment(.): Dropping 4 survey respondents who did not pass
     ## commitment check 2
 
-    ## Warning in check_commitment(.): 2486 respondents in the data
+    ## Warning in check_commitment(.): 2782 respondents in the data
 
 ``` r
 # check ID is unique again
@@ -439,24 +442,24 @@ if (length(unique(df$`Prolific ID Q`)) != nrow(df)) {
 
     ## Warning: ID is not unique
 
-    ## Number of rows in data: 2486
-    ## # A tibble: 2,486 × 10
+    ## Number of rows in data: 2782
+    ## # A tibble: 2,782 × 10
     ##    PROLIFIC_PID    `Prolific ID Q`     n StartDate_clean     EndDate            
     ##    <chr>           <chr>           <int> <dttm>              <dttm>             
     ##  1 5e4b1627e778a8… 5e4b1627e778a8…     2 2024-02-27 11:08:13 2024-02-27 11:13:24
     ##  2 5e4b1627e778a8… 5e4b1627e778a8…     2 2024-02-27 11:14:01 2024-02-27 11:19:39
     ##  3 61505f46e94de4… 61505f46e94de4…     2 2024-02-29 13:52:48 2024-02-29 13:58:14
     ##  4 61505f46e94de4… 61505f46e94de4…     2 2024-02-29 13:58:26 2024-02-29 13:59:41
-    ##  5 5d946449f5241f… 5d946449f5241f…     1 2024-02-25 18:57:25 2024-02-25 19:00:58
-    ##  6 6101b96f85c3ee… 6101b96f85c3ee…     1 2024-02-25 18:57:43 2024-02-25 19:01:07
-    ##  7 63d3fa0d6c990b… 63d3fa0d6c990b…     1 2024-02-25 18:57:53 2024-02-25 19:01:28
-    ##  8 6599d721ff5909… 6599d721ff5909…     1 2024-02-25 18:57:54 2024-02-25 19:00:21
-    ##  9 6157369043ee96… 6157369043ee96…     1 2024-02-25 18:57:57 2024-02-25 19:00:32
-    ## 10 65be6694cd1fe9… 65be6694cd1fe9…     1 2024-02-25 18:58:00 2024-02-25 18:59:32
-    ## # ℹ 2,476 more rows
+    ##  5 6433027685899f… 6433027685899f…     2 2024-03-08 13:15:59 2024-03-08 13:27:27
+    ##  6 6433027685899f… 6433027685899f…     2 2024-03-08 13:21:58 2024-03-08 13:25:24
+    ##  7 5d946449f5241f… 5d946449f5241f…     1 2024-02-25 18:57:25 2024-02-25 19:00:58
+    ##  8 6101b96f85c3ee… 6101b96f85c3ee…     1 2024-02-25 18:57:43 2024-02-25 19:01:07
+    ##  9 63d3fa0d6c990b… 63d3fa0d6c990b…     1 2024-02-25 18:57:53 2024-02-25 19:01:28
+    ## 10 6599d721ff5909… 6599d721ff5909…     1 2024-02-25 18:57:54 2024-02-25 19:00:21
+    ## # ℹ 2,772 more rows
     ## # ℹ 5 more variables: flag_first_obs <dbl>, `Duration (in seconds)` <dbl>,
     ## #   Finished <lgl>, batch_id <dbl>, batch_type <chr>
-    ## Number of rows in data after dropping duplicate ID: 2484
+    ## Number of rows in data after dropping duplicate ID: 2779
 
 ``` r
 stopifnot(length(unique(df$`Prolific ID Q`)) == nrow(df))
@@ -488,10 +491,10 @@ df %>%
     ##  2 Iterative Batch Phase: Max 2       black_high      567
     ##  3 Iterative Batch Phase: Max 3       white_low       378
     ##  4 Iterative Batch Phase: Max 4       white_high      144
-    ##  5 Iterative Batch Phase: Min 1       black_low       101
-    ##  6 Iterative Batch Phase: Min 2       black_high      133
-    ##  7 Iterative Batch Phase: Min 3       white_low        28
-    ##  8 Iterative Batch Phase: Min 4       white_high      117
+    ##  5 Iterative Batch Phase: Min 1       black_low       222
+    ##  6 Iterative Batch Phase: Min 2       black_high      215
+    ##  7 Iterative Batch Phase: Min 3       white_low        59
+    ##  8 Iterative Batch Phase: Min 4       white_high      178
     ##  9 Warmup                     1       black_low        40
     ## 10 Warmup                     2       black_high       41
     ## 11 Warmup                     3       white_low        27
@@ -506,7 +509,7 @@ df %>%
     ## `summarise()` has grouped output by 'batch_type'. You can override using the
     ## `.groups` argument.
 
-    ## # A tibble: 25 × 3
+    ## # A tibble: 28 × 3
     ## # Groups:   batch_type [3]
     ##    batch_type                 batch_id     n
     ##    <chr>                         <dbl> <int>
@@ -520,7 +523,7 @@ df %>%
     ##  8 Iterative Batch Phase: Max        8    96
     ##  9 Iterative Batch Phase: Max        9    95
     ## 10 Iterative Batch Phase: Max       10    96
-    ## # ℹ 15 more rows
+    ## # ℹ 18 more rows
 
 ``` r
 df %>%
@@ -675,20 +678,20 @@ df_clean %>%
   verify(!is.na(chose_mother))
 ```
 
-    ## # A tibble: 2,484 × 10
+    ## # A tibble: 2,779 × 10
     ##    chose_mother    Q1    Q2    Q3    Q4    Q5    Q6    Q7    Q8 context
     ##           <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <ord>  
     ##  1            0    NA    NA    NA    NA    NA    NA     0    NA 1      
-    ##  2            0    NA    NA    NA     0    NA    NA    NA    NA 1      
-    ##  3            1    NA    NA     1    NA    NA    NA    NA    NA 1      
-    ##  4            1    NA    NA    NA     1    NA    NA    NA    NA 2      
-    ##  5            0    NA    NA    NA    NA    NA    NA     0    NA 1      
-    ##  6            0    NA    NA    NA    NA     0    NA    NA    NA 1      
+    ##  2            0    NA    NA     0    NA    NA    NA    NA    NA 4      
+    ##  3            0    NA    NA    NA     0    NA    NA    NA    NA 1      
+    ##  4            1    NA    NA     1    NA    NA    NA    NA    NA 1      
+    ##  5            1    NA    NA    NA     1    NA    NA    NA    NA 2      
+    ##  6            0    NA    NA    NA    NA    NA    NA     0    NA 4      
     ##  7            0    NA    NA    NA    NA    NA    NA     0    NA 1      
-    ##  8            1    NA    NA    NA    NA    NA    NA     1    NA 1      
-    ##  9            1    NA    NA    NA    NA    NA    NA    NA     1 3      
-    ## 10            0    NA    NA    NA    NA     0    NA    NA    NA 3      
-    ## # ℹ 2,474 more rows
+    ##  8            0    NA    NA    NA    NA     0    NA    NA    NA 1      
+    ##  9            0    NA    NA    NA    NA    NA    NA     0    NA 1      
+    ## 10            1    NA    NA    NA    NA    NA    NA     1    NA 1      
+    ## # ℹ 2,769 more rows
 
 ``` r
 df_clean %>%
@@ -708,10 +711,10 @@ df_clean %>%
     ## # Groups:   context [4]
     ##   context context_label     n chose_mother_total chose_nonmother_total  diff
     ##   <ord>   <chr>         <int>              <dbl>                 <int> <dbl>
-    ## 1 1       black_low      1003                502                   501     1
-    ## 2 2       black_high      741                364                   377    13
-    ## 3 3       white_low       433                206                   227    21
-    ## 4 4       white_high      307                150                   157     7
+    ## 1 1       black_low      1124                558                   566     8
+    ## 2 2       black_high      823                409                   414     5
+    ## 3 3       white_low       464                221                   243    22
+    ## 4 4       white_high      368                174                   194    20
 
 ``` r
 df_clean %>%
@@ -727,8 +730,8 @@ df_clean %>%
     ## `summarise()` has grouped output by 'batch_id', 'batch_type', 'context'. You
     ## can override using the `.groups` argument.
 
-    ## # A tibble: 98 × 8
-    ## # Groups:   batch_id, batch_type, context [98]
+    ## # A tibble: 110 × 8
+    ## # Groups:   batch_id, batch_type, context [110]
     ##    batch_id batch_type            context context_label     n chose_mother_total
     ##       <dbl> <chr>                 <ord>   <chr>         <int>              <dbl>
     ##  1        0 Warmup                1       black_low        40                 19
@@ -741,7 +744,7 @@ df_clean %>%
     ##  8        1 Iterative Batch Phas… 4       white_high        7                  4
     ##  9        1 Iterative Batch Phas… 1       black_low        11                  6
     ## 10        1 Iterative Batch Phas… 2       black_high       47                 25
-    ## # ℹ 88 more rows
+    ## # ℹ 100 more rows
     ## # ℹ 2 more variables: chose_nonmother_total <int>, diff <dbl>
 
 ``` r
@@ -802,7 +805,7 @@ df_attention_check %>%
     ## # A tibble: 1 × 3
     ##   per_pass_attention_check per_pass_attention_check_any per_unsure
     ##                      <dbl>                        <dbl>      <dbl>
-    ## 1                    0.709                        0.748      0.217
+    ## 1                    0.713                        0.752      0.215
 
 ``` r
 df_attention_check %>%
@@ -817,7 +820,7 @@ df_attention_check %>%
     ## `summarise()` has grouped output by 'batch_id'. You can override using the
     ## `.groups` argument.
 
-    ## # A tibble: 25 × 5
+    ## # A tibble: 28 × 5
     ## # Groups:   batch_id [21]
     ##    batch_id batch_type  per_pass_attention_c…¹ per_pass_attention_c…² per_unsure
     ##       <dbl> <chr>                        <dbl>                  <dbl>      <dbl>
@@ -831,7 +834,7 @@ df_attention_check %>%
     ##  8        4 Iterative …                  0.742                  0.763      0.216
     ##  9        4 Iterative …                  0.781                  0.812      0.167
     ## 10        5 Iterative …                  0.742                  0.773      0.186
-    ## # ℹ 15 more rows
+    ## # ℹ 18 more rows
     ## # ℹ abbreviated names: ¹​per_pass_attention_check, ²​per_pass_attention_check_any
 
 ``` r
@@ -843,20 +846,20 @@ df_attention_check %>%
   )
 ```
 
-    ## # A tibble: 2,484 × 17
+    ## # A tibble: 2,779 × 17
     ##    rnum_mother candidate_mother pass_attention_check chose_mother Q1_orig
     ##          <dbl> <chr>                           <dbl>        <dbl> <ord>  
-    ##  1      0.950  Candidate 1                         1            0 <NA>   
-    ##  2      0.254  Candidate 2                         0            0 <NA>   
-    ##  3      0.631  Candidate 1                         0            1 <NA>   
-    ##  4      0.862  Candidate 1                         1            1 <NA>   
-    ##  5      0.708  Candidate 1                         1            0 <NA>   
-    ##  6      0.504  Candidate 1                         1            0 <NA>   
-    ##  7      0.877  Candidate 1                         1            0 <NA>   
-    ##  8      0.729  Candidate 1                         0            1 <NA>   
-    ##  9      0.175  Candidate 2                         0            1 <NA>   
-    ## 10      0.0982 Candidate 2                         0            0 <NA>   
-    ## # ℹ 2,474 more rows
+    ##  1       0.950 Candidate 1                         1            0 <NA>   
+    ##  2       0.141 Candidate 2                         1            0 <NA>   
+    ##  3       0.254 Candidate 2                         0            0 <NA>   
+    ##  4       0.631 Candidate 1                         0            1 <NA>   
+    ##  5       0.862 Candidate 1                         1            1 <NA>   
+    ##  6       0.442 Candidate 2                         1            0 <NA>   
+    ##  7       0.708 Candidate 1                         1            0 <NA>   
+    ##  8       0.504 Candidate 1                         1            0 <NA>   
+    ##  9       0.877 Candidate 1                         1            0 <NA>   
+    ## 10       0.729 Candidate 1                         0            1 <NA>   
+    ## # ℹ 2,769 more rows
     ## # ℹ 12 more variables: Q2_orig <ord>, Q3_orig <ord>, Q4_orig <ord>,
     ## #   Q5_orig <ord>, Q6_orig <ord>, Q7_orig <ord>, Q8_orig <ord>,
     ## #   volunteer1 <chr>, volunteer2 <chr>, Manipulation_Q1_1 <chr>,
@@ -871,28 +874,49 @@ df_attention_check %>%
   )
 ```
 
-    ## # A tibble: 2,484 × 10
+    ## # A tibble: 2,779 × 10
     ##    rnum_mother candidate_mother pass_attention_check chose_mother
     ##          <dbl> <chr>                           <dbl>        <dbl>
-    ##  1      0.950  Candidate 1                         1            0
-    ##  2      0.254  Candidate 2                         0            0
-    ##  3      0.631  Candidate 1                         0            1
-    ##  4      0.862  Candidate 1                         1            1
-    ##  5      0.708  Candidate 1                         1            0
-    ##  6      0.504  Candidate 1                         1            0
-    ##  7      0.877  Candidate 1                         1            0
-    ##  8      0.729  Candidate 1                         0            1
-    ##  9      0.175  Candidate 2                         0            1
-    ## 10      0.0982 Candidate 2                         0            0
-    ## # ℹ 2,474 more rows
+    ##  1       0.950 Candidate 1                         1            0
+    ##  2       0.141 Candidate 2                         1            0
+    ##  3       0.254 Candidate 2                         0            0
+    ##  4       0.631 Candidate 1                         0            1
+    ##  5       0.862 Candidate 1                         1            1
+    ##  6       0.442 Candidate 2                         1            0
+    ##  7       0.708 Candidate 1                         1            0
+    ##  8       0.504 Candidate 1                         1            0
+    ##  9       0.877 Candidate 1                         1            0
+    ## 10       0.729 Candidate 1                         0            1
+    ## # ℹ 2,769 more rows
     ## # ℹ 6 more variables: Manipulation_Q1_1 <chr>, Manipulation_Q1_2 <chr>,
     ## #   Manipulation_Q1_3 <chr>, manipulation_check_missing <dbl>,
     ## #   volunteer1 <chr>, volunteer2 <chr>
 
 ``` r
+df_clean %>% 
+  # checking for alphabetic characters
+  filter(str_detect(QD2_1_TEXT, '[:alpha:]'))
+```
+
+    ## # A tibble: 2 × 106
+    ##   StartDate           EndDate             Status     IPAddress Progress
+    ##   <dttm>              <dttm>              <chr>      <chr>        <dbl>
+    ## 1 2024-03-01 13:06:54 2024-03-01 13:09:01 IP Address *******        100
+    ## 2 2024-03-07 18:59:44 2024-03-07 19:07:28 IP Address *******        100
+    ## # ℹ 101 more variables: `Duration (in seconds)` <dbl>, Finished <lgl>,
+    ## #   RecordedDate <dttm>, ResponseId <chr>, RecipientLastName <chr>,
+    ## #   RecipientFirstName <chr>, RecipientEmail <chr>, ExternalReference <chr>,
+    ## #   LocationLatitude <chr>, LocationLongitude <chr>, DistributionChannel <chr>,
+    ## #   UserLanguage <chr>, Consent <ord>, `Prolific ID Q` <chr>,
+    ## #   PreScreen_Q1 <ord>, Prescreen_Q2 <ord>, Manipulation_Q2_TEXT <chr>,
+    ## #   Commitment_Q1 <ord>, Commitment_Q2 <chr>, Q1 <dbl>, Q2 <dbl>, Q3 <dbl>, …
+
+``` r
 df_clean <- df_clean %>%
-  verify(is.numeric(QD2_1_TEXT)) %>%
-  rename(age = QD2_1_TEXT) %>%
+  mutate(QD2_1_TEXT = if_else(QD2_1_TEXT %in% c('3e6', '3p'), NA_character_, QD2_1_TEXT),
+         age = as.numeric(QD2_1_TEXT)) %>% 
+  verify(is.na(QD2_1_TEXT) == is.na(age)) %>%
+  #rename(age = QD2_1_TEXT) %>%
   mutate(
     hispanic = if_else(QD4 == "Yes", TRUE, FALSE),
     female = if_else(QD5 == "Female", TRUE, FALSE)
@@ -924,14 +948,14 @@ df_clean %>%
     ## # A tibble: 8 × 3
     ##   race                                  n      per
     ##   <chr>                             <int>    <dbl>
-    ## 1 White                              1797 0.723   
-    ## 2 Black or African American           319 0.128   
-    ## 3 Asian                               184 0.0741  
-    ## 4 Multiracial                         119 0.0479  
-    ## 5 Other                                44 0.0177  
-    ## 6 American Indian or Alaskan Native    12 0.00483 
-    ## 7 Prefer not to disclose                7 0.00282 
-    ## 8 Native Hawaiian                       2 0.000805
+    ## 1 White                              2005 0.721   
+    ## 2 Black or African American           353 0.127   
+    ## 3 Asian                               206 0.0741  
+    ## 4 Multiracial                         137 0.0493  
+    ## 5 Other                                51 0.0184  
+    ## 6 American Indian or Alaskan Native    15 0.00540 
+    ## 7 Prefer not to disclose               10 0.00360 
+    ## 8 Native Hawaiian                       2 0.000720
 
 ``` r
 df_clean %>%
@@ -941,7 +965,7 @@ df_clean %>%
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-    ## Warning: Removed 6 rows containing non-finite values (`stat_bin()`).
+    ## Warning: Removed 9 rows containing non-finite values (`stat_bin()`).
 
 ![](00_get_qualtrics_data_job_applicants_files/figure-gfm/demog-1.png)<!-- -->
 
@@ -954,8 +978,8 @@ df_clean %>%
     ## # A tibble: 2 × 2
     ##   female count
     ##   <lgl>  <int>
-    ## 1 FALSE   1189
-    ## 2 TRUE    1295
+    ## 1 FALSE   1314
+    ## 2 TRUE    1465
 
 ``` r
 df_clean %>%
@@ -968,7 +992,7 @@ df_clean %>%
     ## # A tibble: 1 × 2
     ##   count_hispanic per_hispanic
     ##            <int>        <dbl>
-    ## 1            192       0.0773
+    ## 1            216       0.0777
 
 ## Clean Data Validation
 

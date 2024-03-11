@@ -116,12 +116,15 @@ df <- df %>%
       StartDate_clean <= ymd_hms("2024-03-06-16-10-00") ~ 2,
       StartDate_clean <= ymd_hms("2024-03-07-12-50-00") ~ 3,
       StartDate_clean <= ymd_hms("2024-03-07-17-10-00") ~ 4,
+      StartDate_clean <= ymd_hms("2024-03-07-19-50-00") ~ 5,
+      StartDate_clean <= ymd_hms("2024-03-08-14-20-00") ~ 6,
+      StartDate_clean <= ymd_hms("2024-03-08-17-20-00") ~ 7,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
       batch_id == 0 ~ "Warmup",
       StartDate_clean <= ymd_hms("2024-03-01-22-10-00") ~ "Iterative Batch Phase: Max",
-      StartDate_clean <= ymd_hms("2024-03-07-17-10-00") ~ "Iterative Batch Phase: Min",
+      StartDate_clean <= ymd_hms("2024-03-08-17-20-00") ~ "Iterative Batch Phase: Min",
       TRUE ~ NA_character_
     )
   ) %>%
@@ -361,7 +364,7 @@ df %>%
 ```
 
 ## Clean Qualtrics Data
-
+ 
 ```{r}
 df_clean <- create_outcome_var_jobs(df)
 
@@ -459,9 +462,15 @@ df_attention_check %>%
 ```
 
 ```{r, demog}
+df_clean %>% 
+  # checking for alphabetic characters
+  filter(str_detect(QD2_1_TEXT, '[:alpha:]'))
+
 df_clean <- df_clean %>%
-  verify(is.numeric(QD2_1_TEXT)) %>%
-  rename(age = QD2_1_TEXT) %>%
+  mutate(QD2_1_TEXT = if_else(QD2_1_TEXT %in% c('3e6', '3p'), NA_character_, QD2_1_TEXT),
+         age = as.numeric(QD2_1_TEXT)) %>% 
+  verify(is.na(QD2_1_TEXT) == is.na(age)) %>%
+  #rename(age = QD2_1_TEXT) %>%
   mutate(
     hispanic = if_else(QD4 == "Yes", TRUE, FALSE),
     female = if_else(QD5 == "Female", TRUE, FALSE)
