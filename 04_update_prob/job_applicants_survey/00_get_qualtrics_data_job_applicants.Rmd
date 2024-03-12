@@ -122,12 +122,13 @@ df <- df %>%
       StartDate_clean <= ymd_hms("2024-03-11-11-20-00") ~ 8,
       StartDate_clean <= ymd_hms("2024-03-11-13-20-00") ~ 9,
       StartDate_clean <= ymd_hms("2024-03-11-17-40-00") ~ 10,
+      StartDate_clean <= ymd_hms("2024-03-11-20-10-00") ~ 11,
       TRUE ~ NA_integer_
     ),
     batch_type = case_when(
       batch_id == 0 ~ "Warmup",
       StartDate_clean <= ymd_hms("2024-03-01-22-10-00") ~ "Iterative Batch Phase: Max",
-      StartDate_clean <= ymd_hms("2024-03-11-17-40-00") ~ "Iterative Batch Phase: Min",
+      StartDate_clean <= ymd_hms("2024-03-11-20-10-00") ~ "Iterative Batch Phase: Min",
       TRUE ~ NA_character_
     )
   ) %>%
