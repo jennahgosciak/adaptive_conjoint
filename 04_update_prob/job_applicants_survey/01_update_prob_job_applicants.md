@@ -66,7 +66,7 @@ num_outcome0 <- integer(num_contexts)
 print(str_glue("Number of rows in data: {nrow(df_clean)}"))
 ```
 
-    ## Number of rows in data: 3956
+    ## Number of rows in data: 4053
 
 ``` r
 # filter for correct batch types (whether max discriminatory or min)
@@ -83,13 +83,13 @@ if (current_batch_num != max(df_clean$batch_id)) {
 print(str_glue("Current batch ID: {current_batch_num}"))
 ```
 
-    ## Current batch ID: 19
+    ## Current batch ID: 20
 
 ``` r
 print(str_glue("Number of rows left in data: {nrow(df_clean)}"))
 ```
 
-    ## Number of rows left in data: 2005
+    ## Number of rows left in data: 2102
 
 ``` r
 print(str_glue("Only batch type in data: {str_c(unique(df_clean$batch_type), collapse=', ')}"))
@@ -102,7 +102,7 @@ set.seed(2023)
 nrow(df_clean)
 ```
 
-    ## [1] 2005
+    ## [1] 2102
 
 ``` r
 # generate prob of most (or least) discriminatory context
@@ -115,21 +115,21 @@ output <- update_ts(df_clean, "chose_mother", num_sim, num_contexts, num_outcome
 
     ## [1] 1e+06
     ## [1] "Predicting the least discriminatory context: taking the argmin"
-    ## [1] "PDF: 0.590237,0.070319,0.042984,0.29646"
-    ## [1] "CDF: 0.590237,0.660556,0.70354,1"
+    ## [1] "PDF: 0.571564,0.076013,0.053581,0.298842"
+    ## [1] "CDF: 0.571564,0.647577,0.701158,1"
 
 ``` r
 output
 ```
 
     ## $pi
-    ## [1] 0.590237 0.660556 0.703540 1.000000
+    ## [1] 0.571564 0.647577 0.701158 1.000000
     ## 
     ## $num_outcome1
-    ## [1] 310 169 105 417
+    ## [1] 333 173 106 438
     ## 
     ## $num_outcome0
-    ## [1] 333 154  88 429
+    ## [1] 355 158  90 449
 
 ``` r
 # check total is equal to number of observations in data
@@ -160,9 +160,9 @@ modified_flow_data <- update_flow_with_probabilities(
 )
 ```
 
-    ## For pi1, replacing old probability 0.59 with new probability 0.59
-    ## For pi2, replacing old probability 0.661 with new probability 0.661
-    ## For pi3, replacing old probability 0.704 with new probability 0.704
+    ## For pi1, replacing old probability 0.59 with new probability 0.572
+    ## For pi2, replacing old probability 0.661 with new probability 0.648
+    ## For pi3, replacing old probability 0.704 with new probability 0.701
 
 ``` r
 # Reconstruct the full survey configuration with the modified flow part
@@ -187,7 +187,7 @@ print(update_response)
     ## [1] "200 - OK"
     ## 
     ## $meta$requestId
-    ## [1] "6438e474-d48d-4baf-a390-e7177a253dee"
+    ## [1] "4a5bc3d0-b039-4505-9a66-4953b3af6dc1"
 
 ``` r
 tibble(
