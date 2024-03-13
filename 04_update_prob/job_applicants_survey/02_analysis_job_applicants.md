@@ -5,7 +5,8 @@ Analysis: Job Applicants Survey Experiment
 ``` r
 library(tidyverse)
 
-data <- readRDS("../../02_output/job_applicants_data_clean.RDS")
+data <- readRDS("../../02_output/job_applicants_data_clean.RDS") %>% 
+  filter(batch_type == 'Iterative Batch Phase: Min')
 ```
 
 ``` r
@@ -22,10 +23,10 @@ data %>%
     ## # Groups:   context [4]
     ##   context context_label     n
     ##   <ord>   <chr>         <int>
-    ## 1 1       black_low       902
-    ## 2 2       black_high      608
-    ## 3 3       white_low       405
-    ## 4 4       white_high      190
+    ## 1 4       white_high      841
+    ## 2 1       black_low       648
+    ## 3 2       black_high      290
+    ## 4 3       white_low       169
 
 ``` r
 # Create an aggregated dataset with the estimate using all data up to the end
@@ -49,21 +50,21 @@ aggregated <- data %>%
 aggregated
 ```
 
-    ## # A tibble: 82 × 15
-    ## # Groups:   context_label, batch_id [82]
+    ## # A tibble: 80 × 15
+    ## # Groups:   context_label, batch_id [80]
     ##    unique_id context context_label batch_id batch_type  chose_mother race    age
     ##        <int> <ord>   <chr>            <dbl> <chr>              <dbl> <chr> <dbl>
-    ##  1       152 2       black_high           0 Warmup                 0 White    36
-    ##  2       227 2       black_high           1 Iterative …            0 White    54
-    ##  3       334 2       black_high           2 Iterative …            0 White    62
-    ##  4       425 2       black_high           3 Iterative …            1 Asian    29
-    ##  5       538 2       black_high           4 Iterative …            0 Blac…    33
-    ##  6       622 2       black_high           5 Iterative …            0 White    56
-    ##  7       736 2       black_high           6 Iterative …            1 White    67
-    ##  8       834 2       black_high           7 Iterative …            0 White    34
-    ##  9       931 2       black_high           8 Iterative …            0 White    36
-    ## 10      1026 2       black_high           9 Iterative …            1 White    44
-    ## # ℹ 72 more rows
+    ##  1       347 2       black_high           1 Iterative …            1 White    73
+    ##  2       534 2       black_high           2 Iterative …            1 White    64
+    ##  3       717 2       black_high           3 Iterative …            0 White    30
+    ##  4       916 2       black_high           4 Iterative …            0 White    28
+    ##  5      1115 2       black_high           5 Iterative …            1 Mult…    27
+    ##  6      1307 2       black_high           6 Iterative …            0 Mult…    35
+    ##  7      1494 2       black_high           7 Iterative …            1 White    40
+    ##  8      1695 2       black_high           8 Iterative …            1 White    46
+    ##  9      1863 2       black_high           9 Iterative …            1 White    28
+    ## 10      2031 2       black_high          10 Iterative …            1 White    43
+    ## # ℹ 70 more rows
     ## # ℹ 7 more variables: female <lgl>, hispanic <lgl>, index <int>,
     ## #   estimate <dbl>, se <dbl>, ci.min <dbl>, ci.max <dbl>
 

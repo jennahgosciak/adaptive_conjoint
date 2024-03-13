@@ -11,7 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r, load packages, message=F, warning=F}
 library(tidyverse)
 
-data <- readRDS("../../02_output/job_applicants_data_clean.RDS")
+data <- readRDS("../../02_output/job_applicants_data_clean.RDS") %>% 
+  filter(batch_type == 'Iterative Batch Phase: Min')
 ```
 
 ```{r}
