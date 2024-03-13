@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 
 data <- readRDS("../../02_output/job_applicants_data_clean.RDS") %>% 
-  filter(batch_type == 'Iterative Batch Phase: Min')
+  filter(batch_type %in% c('Warmup', 'Iterative Batch Phase: Min'))
 ```
 
 ```{r}
