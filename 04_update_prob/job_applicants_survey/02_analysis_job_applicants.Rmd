@@ -12,20 +12,55 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 
 data <- readRDS("../../02_output/job_applicants_data_clean.RDS") %>% 
-  filter(batch_type %in% c('Warmup', 'Iterative Batch Phase: Min'))
+  mutate(batch_type = factor(batch_type, levels = c("Warmup", "Iterative Batch Phase: Max",
+                                                    "Iterative Batch Phase: Min"), ordered=TRUE))
+```
+
+```{r, message=F}
+# look at empirical proportions over time and by batch
+data %>%
+  group_by(context, batch_type, batch_id) %>%
+  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Max")) %>%
+  summarize(n = n()) %>%
+  group_by(batch_type, batch_id) %>%
+  mutate(n = n / sum(n)) %>%
+  ggplot(aes(context, n)) +
+  geom_col() +
+  theme_classic() +
+  facet_wrap(~batch_id) +
+  labs(
+    title = "Sample Sizes in Iterative Batch Phase: Max",
+    y = "Share of total"
+  )
+
+data %>%
+  group_by(context, batch_type, batch_id) %>%
+  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>%
+  summarize(n = n()) %>%
+  group_by(batch_type, batch_id) %>%
+  mutate(n = n / sum(n)) %>%
+  ggplot(aes(context, n)) +
+  geom_col() +
+  theme_classic() +
+  facet_wrap(~batch_id) +
+  labs(
+    title = "Sample Sizes in Iterative Batch Phase: Min",
+    y = "Share of total"
+  )
 ```
 
 ```{r}
 data %>%
-  group_by(context, context_label) %>%
+  group_by(batch_type, context, context_label) %>%
   summarize(n = n()) %>%
-  arrange(desc(n))
+  arrange(batch_type, desc(n))
 ```
 
 ```{r}
 # Create an aggregated dataset with the estimate using all data up to the end
 # of each batch.
-aggregated <- data %>%
+aggregated_max <- data %>%
+  filter(batch_type %in% c('Warmup', 'Iterative Batch Phase: Max')) %>% 
   arrange(context_label, batch_id) %>%
   group_by(context_label) %>%
   mutate(
@@ -41,10 +76,10 @@ aggregated <- data %>%
   group_by(context_label, batch_id) %>%
   filter(index == max(index))
 
-aggregated
+aggregated_max
 
 # Visualize the estimates by the end of each batch
-aggregated %>%
+aggregated_max %>%
   ggplot(aes(
     x = batch_id, y = estimate,
     ymin = ci.min, ymax = ci.max
@@ -55,13 +90,14 @@ aggregated %>%
   scale_x_continuous(
     breaks = c(0,5,10,15,20),
     labels = c(0,5,10,15,20)
-  )
+  ) +
+  labs(title = 'Estimates by batch (Max)')
 ggsave("../02_output/_figures/all_data_estimates_job_applicants.png",
   height = 5, width = 5, dpi = 300
 )
 
 # Visualize estimates using all data
-aggregated %>%
+aggregated_max %>%
   ungroup() %>%
   filter(batch_id == max(batch_id)) %>%
   mutate(context_label = fct_reorder(context_label, estimate)) %>%
@@ -72,10 +108,69 @@ aggregated %>%
   # geom_vline(xintercept = 1, linetype = "dashed") +
   geom_errorbar(width = .5) +
   geom_label(aes(label = format(round(estimate, 2), nsmall = 2))) +
-  xlab("Proportion Choosing the Mother") +
+  xlab("Proportion Choosing the Mother (Max)") +
   ylab("Profile Context")
 ggsave("../02_output/_figures/all_data_estimates_job_applicants.png",
   height = 3, width = 4, dpi = 300
 )
 ```
+```{r}
+# Create an aggregated dataset with the estimate using all data up to the end
+# of each batch.
+aggregated_min <- data %>%
+  filter(batch_type %in% c('Warmup', 'Iterative Batch Phase: Min')) %>% 
+  arrange(context_label, batch_id) %>%
+  group_by(context_label) %>%
+  mutate(
+    index = 1:n(),
+    # Make the estimate using all observations up to this point:
+    # cumulative sum of choosing younger
+    # divided by number of observations
+    estimate = cumsum(chose_mother) / index,
+    se = sqrt(estimate * (1 - estimate) / index),
+    ci.min = estimate - qnorm(.975) * se,
+    ci.max = estimate + qnorm(.975) * se
+  ) %>%
+  group_by(context_label, batch_id) %>%
+  filter(index == max(index))
+
+aggregated_min
+
+# Visualize the estimates by the end of each batch
+aggregated_min %>%
+  ggplot(aes(
+    x = batch_id, y = estimate,
+    ymin = ci.min, ymax = ci.max
+  )) +
+  geom_point() +
+  geom_errorbar() +
+  facet_wrap(~context_label) +
+  scale_x_continuous(
+    breaks = c(0,5,10,15,20),
+    labels = c(0,5,10,15,20)
+  ) +
+  labs(title = 'Estimates by batch (Min)')
+ggsave("../02_output/_figures/all_data_estimates_job_applicants_min.png",
+  height = 5, width = 5, dpi = 300
+)
+
+# Visualize estimates using all data
+aggregated_min %>%
+  ungroup() %>%
+  filter(batch_id == max(batch_id)) %>%
+  mutate(context_label = fct_reorder(context_label, estimate)) %>%
+  ggplot(aes(
+    y = context_label, x = estimate,
+    xmin = ci.min, xmax = ci.max
+  )) +
+  # geom_vline(xintercept = 1, linetype = "dashed") +
+  geom_errorbar(width = .5) +
+  geom_label(aes(label = format(round(estimate, 2), nsmall = 2))) +
+  xlab("Proportion Choosing the Mother (Min)") +
+  ylab("Profile Context")
+ggsave("../02_output/_figures/all_data_estimates_job_applicants_min.png",
+  height = 3, width = 4, dpi = 300
+)
+```
+
 
