@@ -173,4 +173,14 @@ ggsave("../02_output/_figures/all_data_estimates_job_applicants_min.png",
 )
 ```
 
+```{r}
+fit <- lm(chose_mother ~ -1 + context_label, data=data %>% 
+     mutate(chose_mother = chose_mother - 0.5))
+
+summary(fit)
+
+confint(fit)
+```  
+
+
 
