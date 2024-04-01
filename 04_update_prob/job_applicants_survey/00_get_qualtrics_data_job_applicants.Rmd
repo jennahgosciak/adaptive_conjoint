@@ -58,6 +58,24 @@ df %>%
 ```
 
 ```{r}
+# calculate average per minute
+df %>% 
+  mutate(min = minute(StartDate_clean),
+         hr = hour(StartDate_clean),
+         date = date(StartDate_clean),
+         min_10 = cut(min, breaks=c(0,10, 20, 30, 40, 50, 60))) %>% 
+  group_by(min_10, hr, date) %>% 
+  summarize(total = n()) %>% 
+  ungroup() %>% 
+  #filter(total >= 3) %>% 
+  summarize(avg_per_10min = mean(total),
+            med_per_10min = quantile(total, 0.5),
+            min_per_10min = min(total),
+            max_per_10min = max(total))
+```
+
+
+```{r}
 # average finished rate
 mean(df$Finished)
 

@@ -22,11 +22,11 @@ library(RColorBrewer)
 
 knitr::opts_chunk$set(cache.extra = 2023)
 
-source("./_functions/data_cleaning.R")
+source("../_functions/data_cleaning.R")
 config <- config::get()
 
 # load log of probabilities
-probabilities <- read_csv("../02_output/probabilities.csv")
+probabilities <- read_csv("../../02_output/probabilities_political_candidates.csv")
 probabilities
 ```
 
@@ -56,6 +56,23 @@ df <- df %>%
 df %>%
   nrow()
 ```
+```{r}
+# calculate average per minute
+df %>% 
+  mutate(min = minute(StartDate_clean),
+         hr = hour(StartDate_clean),
+         date = date(StartDate_clean),
+         min_10 = cut(min, breaks=c(0,10, 20, 30, 40, 50, 60))) %>% 
+  group_by(min_10, hr, date) %>% 
+  summarize(total = n()) %>% 
+  ungroup() %>% 
+  #filter(total >= 3) %>% 
+  summarize(avg_per_10min = mean(total),
+            med_per_10min = quantile(total, 0.5),
+            min_per_10min = min(total),
+            max_per_10min = max(total))
+```
+
 
 ```{r}
 # average finished rate
