@@ -1,0 +1,132 @@
+---
+title: "Process Qualtrics Data and Treatment Assignment Updating for Political Candidates Survey"
+output: rmarkdown::github_document
+date: "2023-11-07"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Setup Data Using Qualtrics API
+
+* Load data directly from Qualtrics
+* Can store API Key and credentials in `.renviron`
+
+```{r, load packages, message=F, warning=F}
+library(tidyverse)
+library(qualtRics)
+library(magrittr)
+library(assertr)
+library(RColorBrewer)
+
+knitr::opts_chunk$set(cache.extra = 2023)
+
+source("../_functions/data_cleaning.R")
+config <- config::get()
+```
+
+```{r, setup qualtrics}
+url <- str_glue("https://{config$datacenter_id}.qualtrics.com")
+survey_name <- "Pretest Adaptive Conjoint Questions"
+
+# can comment out after running once
+# qualtrics_api_credentials(api_key = config$api_key,
+#                           base_url = url,
+#                           install = TRUE,
+#                           overwrite=T)
+
+df <- load_qualtrics(survey_name)
+
+df %>%
+  nrow()
+```
+
+```{r}
+df <- df %>% 
+  # filter out test responses
+  filter(StartDate >= mdy('05-07-2024'))
+
+mean(df$Finished)
+
+df %>% 
+  distinct(Commitment_Q1, Commitment_Q2)
+```
+
+```{r}
+nrow(df)
+df <- df %>% 
+  filter(Commitment_Q1 == 'Yes, I will') %>% 
+  filter(str_to_lower(Commitment_Q2) == 'purple')
+
+nrow(df)
+```
+
+```{r}
+df_discrim <- df %>% 
+  mutate(Q1_discrim = if_else(rnum_treatment <= 0.5, 'Immigrant 1', 'Immigrant 2'),
+         Q2_discrim = if_else(rnum_treatment <= 0.5, 'Applicant 2', 'Applicant 1'),
+         Q3_discrim = if_else(rnum_treatment <= 0.5, 'Option 1', 'Option 2'),
+         Q5_discrim = if_else(rnum_treatment <= 0.5, 'Community 2', 'Community 1'),
+         Q6_discrim = if_else(rnum_treatment <= 0.5, 'Applicant 2', 'Applicant 1'),
+         Q7_discrim = if_else(rnum_treatment <= 0.5, 'Applicant 2', 'Applicant 1'),
+         Q8_discrim = if_else(rnum_treatment <= 0.5, 'Group 1', 'Group 2'),
+         Q9_discrim = if_else(rnum_treatment <= 0.5, 'Option 1', 'Option 2'),
+         Q10_discrim = if_else(rnum_treatment <= 0.5, 'Option 1', 'Option 2'),
+         Q11_discrim = if_else(rnum_treatment <= 0.5, 'Proposal 2', 'Proposal 1'),
+         Q12_discrim = if_else(rnum_treatment <= 0.5, 'Proposal 1', 'Proposal 2'),
+         Q4_discrim = if_else(rnum_treatment <= 0.5, 'Defendant 1', 'Defendant 2'))
+
+generate_dis_outcome <- function(df, x) {
+  return(as.numeric(df[[x]] == as.character(df[[str_c(x, '_discrim')]])))
+}
+
+varnames <- str_c('Q', 1:12)
+df_discrim[, str_c(varnames, '_outcome')] <- map(varnames, ~generate_dis_outcome(df_discrim, .))
+
+df_discrim %>% 
+  summarize(across(str_c(varnames, '_outcome'), ~mean(.))) %>% 
+  pivot_longer(everything()) %>% 
+  rename(per_discriminated = value)
+```
+
+```{r}
+# checking labels
+df_discrim %>% 
+  select(Q1, Q1_discrim, Q1_outcome, rnum_treatment, q1_condition1, q1_condition2)
+
+df_discrim %>% 
+  select(Q2, Q2_discrim, Q2_outcome, rnum_treatment, q2_condition1, q2_condition2)
+
+df_discrim %>% 
+  select(Q3, Q3_discrim, Q3_outcome, rnum_treatment, q3_condition1, q3_condition2)
+
+df_discrim %>% 
+  select(Q4, Q4_discrim, Q4_outcome, rnum_treatment, q4_condition1, q4_condition2)
+
+df_discrim %>% 
+  select(Q5, Q5_discrim, Q5_outcome, rnum_treatment, q5_condition1, q5_condition2)
+
+df_discrim %>% 
+  select(Q6, Q6_discrim, Q6_outcome, rnum_treatment, q6_condition1, q6_condition2)
+
+df_discrim %>% 
+  select(Q7, Q7_discrim, Q7_outcome, rnum_treatment, q7_condition1, q7_condition2)
+
+df_discrim %>% 
+  select(Q8, Q8_discrim, Q8_outcome, rnum_treatment, q8_condition1, q8_condition2)
+
+df_discrim %>% 
+  select(Q9, Q9_discrim, Q9_outcome, rnum_treatment, q9_condition1, q9_condition2)
+
+df_discrim %>% 
+  select(Q10, Q10_discrim, Q10_outcome, rnum_treatment, q10_condition1, q10_condition2)
+
+df_discrim %>% 
+  select(Q11, Q11_discrim, Q11_outcome, rnum_treatment, q11_condition1, q11_condition2)
+
+df_discrim %>% 
+  select(Q12, Q12_discrim, Q12_outcome, rnum_treatment, q12_condition1, q12_condition2)
+```
+
+

@@ -269,7 +269,7 @@ df <- df %>%
   verify(!is.na(context_label))
 
 df %>%
-  group_by(batch_type, context) %>%
+  group_by(batch_type) %>%
   summarize(n = n())
 
 df %>%
@@ -280,6 +280,8 @@ df %>%
   filter(batch_id == 100) %>%
   group_by(context) %>%
   summarize(n = n())
+
+nrow(df)
 ```
 
 ```{r}
@@ -297,8 +299,12 @@ df %>%
     title = "Sample Sizes in Iterative Batch Phase: Max",
     y = "Share of total"
   )
+ggsave("../02_output/_figures/sample_sizes_iterativebatch_max.pdf",
+  height = 7, width = 10, dpi = 300
+)
 
 df %>%
+  filter(batch_id > 0) %>% 
   group_by(context, batch_type, batch_id) %>%
   filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>%
   summarize(n = n()) %>%
@@ -312,6 +318,9 @@ df %>%
     title = "Sample Sizes in Iterative Batch Phase: Min",
     y = "Share of total"
   )
+ggsave("../02_output/_figures/sample_sizes_iterativebatch_min.pdf",
+  height = 7, width = 14, dpi = 300
+)
 ```
 
 ```{r}

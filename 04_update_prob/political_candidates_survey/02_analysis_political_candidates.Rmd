@@ -16,10 +16,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r, load packages, message=F, warning=F}
 library(tidyverse)
 
-data <- readRDS("../02_output/political_candidates_data_clean.RDS") %>%
-  filter(batch_type != "Iterative Batch Phase: Max")
+data <- readRDS("../02_output/political_candidates_data_clean.RDS")
 
-validation_data <- readRDS("../02_output/political_candidates_data_validation.RDS")
+data %>% 
+  distinct(batch_type)
+
+validation_data <- readRDS("../../02_output/political_candidates_data_validation.RDS")
 ```
 
 ```{r}
@@ -32,7 +34,7 @@ data %>%
 # Create an aggregated dataset with the estimate using all data up to the end
 # of each batch.
 aggregated <- data %>%
-  arrange(context_label, batch_id) %>%
+  arrange(context_label, batch_id, batch_type) %>%
   group_by(context_label) %>%
   mutate(
     index = 1:n(),
@@ -44,22 +46,27 @@ aggregated <- data %>%
     ci.min = estimate - qnorm(.975) * se,
     ci.max = estimate + qnorm(.975) * se
   ) %>%
-  group_by(context_label, batch_id) %>%
+  group_by(context_label, batch_id, batch_type) %>%
   filter(index == max(index))
 
 aggregated
 
 # Visualize the estimates by the end of each batch
 aggregated %>%
+  filter(batch_id > 0 & batch_id < 100) %>% 
   ggplot(aes(
     x = batch_id, y = estimate,
     ymin = ci.min, ymax = ci.max
   )) +
   geom_point() +
   geom_errorbar() +
-  facet_wrap(~context_label)
+  facet_grid(cols=vars(batch_type), rows=vars(context_label))  +
+  geom_errorbar(width = .5) +
+  #geom_label(aes(label = format(round(estimate, 2), nsmall = 2))) +
+  ylab("Proportion Choosing Younger") +
+  xlab("Batch")
 ggsave("../02_output/_figures/all_data_estimates.png",
-  height = 5, width = 5, dpi = 300
+  height = 10, width = 5, dpi = 300
 )
 
 # Visualize estimates using all data

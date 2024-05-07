@@ -281,6 +281,11 @@ df <- df %>%
   verify(!is.na(context)) %>%
   verify(!is.na(context_label))
 
+nrow(df)
+df %>%
+  group_by(batch_type) %>%
+  summarize(n = n())
+
 df %>%
   group_by(batch_type, context, context_label) %>%
   summarize(n = n())
