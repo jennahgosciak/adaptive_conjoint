@@ -1,0 +1,138 @@
+---
+title: "Power Simulation for MAB"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(purrr)
+library(magrittr)
+library(future)
+future::plan(multisession, workers = 4)
+
+source('_functions/experiment_functions.R')
+```
+
+```{r}
+## power simulation
+iter <- 1000
+n_warmup <- 300
+n_iterative <- 2000
+
+# in this, arm 1 is the best
+prob <- c(0.7, rep(0.6, 15))
+
+# starting pi values for assigning contexts
+pi_vals_cdf <- seq(0, 1, 0.0625)
+pi_vals_pdf <- rep(0.0625, 16)
+
+# vector of contexts
+contexts <- seq(1, 16, 1)
+contexts
+```
+
+```{r}
+# data generation process
+generate_data <- function(n, pdf, true_prob) {
+  context_assignment_matrix <- rmultinom(n=n, size=1, prob=pdf)
+  context_assignment <- future_map(1:n, ~which(context_assignment_matrix[,.] == 1),
+                                   .options = future_options(packages = "extraDistr")) %>% 
+    unlist()
+
+  return(tibble('context' = context_assignment,
+                'outcome' = rbinom(n = n,
+                                   size=1, prob=true_prob[context_assignment])))
+}
+```
+
+```{r, include=FALSE, message=FALSE}
+num_batches <- 10
+n_batch <- 100
+
+
+simulate_experiment <- function(n_warmup, n_batch, num_batches, init_pdf, true_prob, threshold) {
+  df <- generate_data(n_warmup, init_pdf, true_prob)
+
+  n_iterative_batch_total <- 0
+  for (i in 1:num_batches) {
+    results <- update_ts(df, "outcome", 1e3, 
+                         16, cdf=FALSE, type="Iterative Batch Phase: Max")
+    pdf <- results$pi
+    df <- bind_rows(df, generate_data(n_batch, pdf, true_prob))
+    
+    n_iterative_batch_total <- n_iterative_batch_total + n_batch
+    if (any(pdf > threshold)) {
+      break
+    }
+  }
+  
+  if (which.max(pdf) == 1) {
+    return(tibble('true_context' = TRUE,
+                  'total_n' = n_iterative_batch_total))
+  } else {
+    return(tibble('true_context' = FALSE,
+                  'total_n' = n_iterative_batch_total))
+  }
+}
+
+run_simulation <- function(n_sim, n_warmup, n_batch, num_batches, init_pdf, true_prob, threshold) {
+  res <- furrr::future_map_dfr(1:n_sim, ~simulate_experiment(n_warmup, n_batch, num_batches, init_pdf, true_prob, threshold),
+                               .options = future_options(packages = "extraDistr"))
+  
+  return(lst(mean(res$true_context), mean(res$n_iterative_batch_total)))
+}
+```
+
+```{r}
+# power = prob that we correctly reject the null
+# in our case: null = context 1 is not the max discriminatory context
+# we want to reject the null
+# alternative hypothesis = context 1 is the max discriminatory
+# there is a difference between context 1 and others
+
+sim_val5 <- run_simulation(1000, 320, 100, 5, pi_vals_pdf, prob, 0.8)
+sim_val5
+sim_val10 <- run_simulation(1000, 320, 100, 10, pi_vals_pdf, prob, 0.8)
+sim_val15 <- run_simulation(1000, 320, 100, 15, pi_vals_pdf, prob, 0.8)
+sim_val20 <- run_simulation(1000, 320, 100, 20, pi_vals_pdf, prob, 0.8)
+```
+
+```{r}
+# we want the proportion in which we identify context 1 as correct
+tibble(num_batches = c(5, 10, 15, 20),
+       power = c(sim_val5, sim_val10, sim_val15, sim_val20)
+       )
+
+# optimal stopping
+# it is optimal to stop when the difference in average outcomes between the treatments,
+# multiplied by the number of observations collected up to that point, exceeds a specific
+# threshold
+```
+```{r}
+# different warmup
+sim_val5_2 <- run_simulation(1000, 640, 100, 5, pi_vals_pdf, prob)
+sim_val10_2 <- run_simulation(1000, 640, 100, 10, pi_vals_pdf, prob)
+sim_val15_2 <- run_simulation(1000, 640, 100, 15, pi_vals_pdf, prob)
+sim_val20_2 <- run_simulation(1000, 640, 100, 20, pi_vals_pdf, prob)
+```
+
+```{r}
+tibble(total_n = (100*rep(c(5, 10, 15, 20), 2)) + c(rep(320, 4), rep(640, 4)),
+       n_warmup = c(rep(320, 4), rep(640, 4)),
+       power = c(sim_val5, sim_val10, sim_val15, sim_val20, sim_val5_2, sim_val10_2, sim_val15_2, sim_val20_2)
+       ) %>% 
+  ggplot(aes(total_n, power, color = as.factor(n_warmup))) +
+  geom_line() +
+  geom_hline(yintercept=0.8) +
+  theme_classic() +
+  labs(color = 'n_warmup')
+```
+
+
+```{r}
+# validation study power calculation
+prob <- c(0.7, 0.6)
+```
+
+
+

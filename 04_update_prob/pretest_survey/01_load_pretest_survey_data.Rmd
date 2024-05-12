@@ -87,7 +87,8 @@ df_discrim[, str_c(varnames, '_outcome')] <- map(varnames, ~generate_dis_outcome
 df_discrim %>% 
   summarize(across(str_c(varnames, '_outcome'), ~mean(.))) %>% 
   pivot_longer(everything()) %>% 
-  rename(per_discriminated = value)
+  rename(per_discriminated = value) %>% 
+  write_csv('../02_output/discrim_outcomes.csv')
 ```
 
 ```{r}

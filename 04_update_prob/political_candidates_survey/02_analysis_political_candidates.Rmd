@@ -26,7 +26,7 @@ validation_data <- readRDS("../../02_output/political_candidates_data_validation
 
 ```{r}
 data %>%
-  group_by(context, context_label) %>%
+  group_by(batch_type, batch_id) %>%
   summarize(n = n())
 ```
 
@@ -34,7 +34,8 @@ data %>%
 # Create an aggregated dataset with the estimate using all data up to the end
 # of each batch.
 aggregated <- data %>%
-  arrange(context_label, batch_id, batch_type) %>%
+  filter(batch_type %in% c("Iterative Batch Phase: Max", "Warmup")) %>% 
+  arrange(context_label, batch_id) %>%
   group_by(context_label) %>%
   mutate(
     index = 1:n(),
@@ -43,12 +44,12 @@ aggregated <- data %>%
     # divided by number of observations
     estimate = cumsum(chose_younger) / index,
     se = sqrt(estimate * (1 - estimate) / index),
+    se2 = sqrt(cumsum((chose_younger - estimate)^2) / index),
     ci.min = estimate - qnorm(.975) * se,
     ci.max = estimate + qnorm(.975) * se
   ) %>%
   group_by(context_label, batch_id, batch_type) %>%
   filter(index == max(index))
-
 aggregated
 
 # Visualize the estimates by the end of each batch
@@ -60,12 +61,12 @@ aggregated %>%
   )) +
   geom_point() +
   geom_errorbar() +
-  facet_grid(cols=vars(batch_type), rows=vars(context_label))  +
+  facet_wrap(~context_label)  +
   geom_errorbar(width = .5) +
   #geom_label(aes(label = format(round(estimate, 2), nsmall = 2))) +
   ylab("Proportion Choosing Younger") +
   xlab("Batch")
-ggsave("../02_output/_figures/all_data_estimates.png",
+ggsave("../02_output/_figures/all_data_estimates.pdf",
   height = 10, width = 5, dpi = 300
 )
 
@@ -78,7 +79,7 @@ aggregated %>%
     y = context_label, x = estimate,
     xmin = ci.min, xmax = ci.max
   )) +
-  # geom_vline(xintercept = 1, linetype = "dashed") +
+  geom_vline(xintercept = 0.8, linetype = "dashed") +
   geom_errorbar(width = .5) +
   geom_label(aes(label = format(round(estimate, 2), nsmall = 2))) +
   xlab("Proportion Choosing Younger") +
@@ -87,6 +88,47 @@ ggsave("../02_output/_figures/all_data_estimates.png",
   height = 3, width = 4, dpi = 300
 )
 ```
+```{r}
+aggregated_bayes <- data %>% 
+  filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>% 
+  arrange(context_label, batch_id) %>%
+  group_by(context_label) %>%
+  mutate(index=1:n(),
+         alpha = cumsum(chose_younger) + 10,
+         beta = cumsum(1 - chose_younger) + 10,
+         mean = cummean(chose_younger)) %>%
+  mutate(estimate = alpha / (alpha + beta),
+         ci.min = qbeta(.025, shape1 = alpha, shape2 = beta),
+         ci.max = qbeta(.975, shape1 = alpha, shape2 = beta)) %>%
+  group_by(context_label, batch_id, batch_type) %>% 
+  filter(index == max(index)) %>% 
+  ungroup() %>% 
+  separate(context_label, c("race", "gender", "experience")) %>% 
+  mutate(context_label_formatted = str_c('Race=',race, ',\n gender=', gender, ',\n experience = ', experience))
+
+aggregated_bayes
+
+# Visualize estimates using all data
+aggregated_bayes %>%
+  ggplot(aes(
+    x = batch_id, y = estimate,
+    ymin = ci.min, ymax = ci.max
+  )) +
+  geom_point() +
+  geom_errorbar() +
+  facet_wrap(~context_label_formatted, ncol=4)  +
+  geom_hline(yintercept = 0.8, linetype='dashed', color='red') +
+  geom_errorbar(width = .5) +
+  #geom_label(aes(label = format(round(estimate, 2), nsmall = 2))) +
+  ylab("Proportion Choosing Younger") +
+  xlab("Batch")
+
+ggsave("../02_output/_figures/all_data_estimates_bayes.pdf",
+  height = 7, width = 10, dpi = 300
+)
+```
+
+
 ```{r}
 # validation phase, estimate
 estimates_validation_data <- validation_data %>%

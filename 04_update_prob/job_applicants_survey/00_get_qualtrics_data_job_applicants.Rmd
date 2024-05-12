@@ -293,6 +293,8 @@ df %>%
 df %>%
   group_by(batch_type, batch_id) %>%
   summarize(n = n())
+
+1951+1948
 ```
 
 ```{r}
