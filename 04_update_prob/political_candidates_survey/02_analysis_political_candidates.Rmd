@@ -33,8 +33,10 @@ data %>%
 ```{r}
 # Create an aggregated dataset with the estimate using all data up to the end
 # of each batch.
+# Filter for batch type = "Iterative Batch Phase: Min" or "Iterative Batch Phase: Max",
+# as otherwise the batch IDs will get messed up 
 aggregated <- data %>%
-  filter(batch_type %in% c("Iterative Batch Phase: Max", "Warmup")) %>% 
+  filter(batch_type %in% c("Iterative Batch Phase: Min", "Warmup")) %>% 
   arrange(context_label, batch_id) %>%
   group_by(context_label) %>%
   mutate(
@@ -66,7 +68,7 @@ aggregated %>%
   #geom_label(aes(label = format(round(estimate, 2), nsmall = 2))) +
   ylab("Proportion Choosing Younger") +
   xlab("Batch")
-ggsave("../02_output/_figures/all_data_estimates.pdf",
+ggsave("../02_output/_figures/all_data_estimates_political_candidates_min.pdf",
   height = 10, width = 5, dpi = 300
 )
 
@@ -84,11 +86,12 @@ aggregated %>%
   geom_label(aes(label = format(round(estimate, 2), nsmall = 2))) +
   xlab("Proportion Choosing Younger") +
   ylab("Profile Context")
-ggsave("../02_output/_figures/all_data_estimates.png",
+ggsave("../02_output/_figures/all_data_estimates_political_candidates_min.png",
   height = 3, width = 4, dpi = 300
 )
 ```
 ```{r}
+# Same as above using credible intervals
 aggregated_bayes <- data %>% 
   filter(batch_type %in% c("Warmup", "Iterative Batch Phase: Min")) %>% 
   arrange(context_label, batch_id) %>%
@@ -117,20 +120,22 @@ aggregated_bayes %>%
   geom_point() +
   geom_errorbar() +
   facet_wrap(~context_label_formatted, ncol=4)  +
-  geom_hline(yintercept = 0.8, linetype='dashed', color='red') +
+  geom_hline(yintercept = 0.5, linetype='dashed', color='red') +
   geom_errorbar(width = .5) +
   #geom_label(aes(label = format(round(estimate, 2), nsmall = 2))) +
+  scale_y_continuous(lim=c(0,1)) +
   ylab("Proportion Choosing Younger") +
   xlab("Batch")
 
-ggsave("../02_output/_figures/all_data_estimates_bayes.pdf",
+ggsave("../02_output/_figures/all_data_estimates_political_candidates_min_bayes.pdf",
   height = 7, width = 10, dpi = 300
 )
 ```
 
 
 ```{r}
-# validation phase, estimate
+# validation phase, estimates
+# no batches here, so process is simpler
 estimates_validation_data <- validation_data %>%
   group_by(context, context_label) %>%
   summarize(
