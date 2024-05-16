@@ -1,13 +1,39 @@
----
-title: "Power Simulation for MAB"
-output: rmarkdown::github_document
-date: "2024-05-15"
----
+Power Simulation for MAB
+================
+2024-05-15
 
-```{r}
+``` r
 library(tidyverse)
+```
+
+    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ## ✔ dplyr     1.1.4     ✔ readr     2.1.4
+    ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+    ## ✔ ggplot2   3.4.4     ✔ tibble    3.2.1
+    ## ✔ lubridate 1.9.3     ✔ tidyr     1.3.0
+    ## ✔ purrr     1.0.2     
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ✖ dplyr::filter() masks stats::filter()
+    ## ✖ dplyr::lag()    masks stats::lag()
+    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
 library(purrr)
 library(magrittr)
+```
+
+    ## 
+    ## Attaching package: 'magrittr'
+    ## 
+    ## The following object is masked from 'package:purrr':
+    ## 
+    ##     set_names
+    ## 
+    ## The following object is masked from 'package:tidyr':
+    ## 
+    ##     extract
+
+``` r
 library(future)
 library(furrr)
 future::plan(multisession, workers = 4)
@@ -16,7 +42,7 @@ source('_functions/experiment_functions.R')
 set.seed(2023)
 ```
 
-```{r}
+``` r
 ## power simulation
 iter <- 1000
 n_warmup <- 300
@@ -34,7 +60,9 @@ contexts <- seq(1, 16, 1)
 contexts
 ```
 
-```{r}
+    ##  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
+
+``` r
 # data generation process
 generate_data <- function(n, pdf, true_prob) {
   context_assignment_matrix <- rmultinom(n=n, size=1, prob=pdf)
@@ -48,46 +76,7 @@ generate_data <- function(n, pdf, true_prob) {
 }
 ```
 
-```{r, include=FALSE, message=FALSE}
-num_batches <- 10
-n_batch <- 100
-
-
-simulate_experiment <- function(n_warmup, n_batch, num_batches, init_pdf, true_prob, threshold) {
-  df <- generate_data(n_warmup, init_pdf, true_prob)
-
-  n_iterative_batch_total <- 0
-  for (i in 1:num_batches) {
-    results <- update_ts(df, "outcome", 1e3, 
-                         16, cdf=FALSE, type="Iterative Batch Phase: Max")
-    pdf <- results$pi
-    df <- bind_rows(df, generate_data(n_batch, pdf, true_prob))
-    
-    n_iterative_batch_total <- n_iterative_batch_total + n_batch
-    if (any(pdf > threshold)) {
-      break
-    }
-  }
-  
-  if (which.max(pdf) == 1) {
-    return(tibble('true_context' = TRUE,
-                  'total_n' = n_iterative_batch_total))
-  } else {
-    return(tibble('true_context' = FALSE,
-                  'total_n' = n_iterative_batch_total))
-  }
-}
-
-run_simulation <- function(n_sim, n_warmup, n_batch, num_batches, init_pdf, true_prob, threshold) {
-  res <- furrr::future_map_dfr(1:n_sim, ~simulate_experiment(n_warmup, n_batch, num_batches, init_pdf, true_prob, threshold),
-                               .options = furrr_options(packages = "extraDistr"),
-                               future.seed=TRUE)
-  
-  return(lst(mean(res$true_context), mean(res$n_iterative_batch_total)))
-}
-```
-
-```{r, warning=FALSE}
+``` r
 # power = prob that we correctly reject the null
 # in our case: null = context 1 is not the max discriminatory context
 # we want to reject the null
@@ -99,19 +88,31 @@ sim_val10 <- run_simulation(100, 320, 100, 10, pi_vals_pdf, prob, 0.8)
 sim_val15 <- run_simulation(100, 320, 100, 15, pi_vals_pdf, prob, 0.8)
 sim_val20 <- run_simulation(100, 320, 100, 20, pi_vals_pdf, prob, 0.8)
 ```
-```{r}
+
+``` r
 # we want the proportion in which we identify context 1 as correct
 tibble(num_batches = c(5, 10, 15, 20),
        power = c(sim_val5$`mean(res$true_context)`, sim_val10$`mean(res$true_context)`, 
                  sim_val15$`mean(res$true_context)`, sim_val20$`mean(res$true_context)`)
        )
+```
 
+    ## # A tibble: 4 × 2
+    ##   num_batches power
+    ##         <dbl> <dbl>
+    ## 1           5  0.42
+    ## 2          10  0.81
+    ## 3          15  0.86
+    ## 4          20  0.88
+
+``` r
 # optimal stopping
 # it is optimal to stop when the difference in average outcomes between the treatments,
 # multiplied by the number of observations collected up to that point, exceeds a specific
 # threshold
 ```
-```{r, warning=FALSE}
+
+``` r
 # different warmup
 sim_val5_2 <- run_simulation(100, 640, 100, 5, pi_vals_pdf, prob, 0.8)
 sim_val10_2 <- run_simulation(100, 640, 100, 10, pi_vals_pdf, prob, 0.8)
@@ -119,7 +120,7 @@ sim_val15_2 <- run_simulation(100, 640, 100, 15, pi_vals_pdf, prob, 0.8)
 sim_val20_2 <- run_simulation(100, 640, 100, 20, pi_vals_pdf, prob, 0.8)
 ```
 
-```{r}
+``` r
 tibble(total_n = (100*rep(c(5, 10, 15, 20), 2)) + c(rep(320, 4), rep(640, 4)),
        n_warmup = c(rep(320, 4), rep(640, 4)),
        power = c(sim_val5$`mean(res$true_context)`, sim_val10$`mean(res$true_context)`, 
@@ -134,6 +135,4 @@ tibble(total_n = (100*rep(c(5, 10, 15, 20), 2)) + c(rep(320, 4), rep(640, 4)),
   labs(color = 'n_warmup')
 ```
 
-
-
-
+![](simulation_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
