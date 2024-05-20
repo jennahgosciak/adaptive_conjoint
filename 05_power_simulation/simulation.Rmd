@@ -58,7 +58,7 @@ simulate_experiment <- function(n_warmup, n_batch, num_batches, init_pdf, true_p
 
   n_iterative_batch_total <- 0
   for (i in 1:num_batches) {
-    results <- update_ts(df, "outcome", 1e3, 
+    results <- update_ts(df, "outcome", 1e2, 
                          16, cdf=FALSE, type="Iterative Batch Phase: Max")
     pdf <- results$pi
     df <- bind_rows(df, generate_data(n_batch, pdf, true_prob))
@@ -83,7 +83,7 @@ run_simulation <- function(n_sim, n_warmup, n_batch, num_batches, init_pdf, true
                                .options = furrr_options(packages = "extraDistr"),
                                future.seed=TRUE)
   
-  return(lst(mean(res$true_context), mean(res$n_iterative_batch_total)))
+  return(lst(mean(res$true_context), mean(res$total_n)))
 }
 ```
 
@@ -94,10 +94,14 @@ run_simulation <- function(n_sim, n_warmup, n_batch, num_batches, init_pdf, true
 # alternative hypothesis = context 1 is the max discriminatory
 # there is a difference between context 1 and others
 
-sim_val5 <- run_simulation(100, 320, 100, 5, pi_vals_pdf, prob, 0.8)
-sim_val10 <- run_simulation(100, 320, 100, 10, pi_vals_pdf, prob, 0.8)
-sim_val15 <- run_simulation(100, 320, 100, 15, pi_vals_pdf, prob, 0.8)
-sim_val20 <- run_simulation(100, 320, 100, 20, pi_vals_pdf, prob, 0.8)
+sim_val100 <- run_simulation(100, 320, 1, 100, pi_vals_pdf, prob, 0.8)
+sim_val100
+```
+
+```{r}
+sim_val300 <- run_simulation(1, 320, 1, 300, pi_vals_pdf, prob, 0.8)
+sim_val500 <- run_simulation(100, 320, 1, 500, pi_vals_pdf, prob, 0.8)
+sim_val700 <- run_simulation(100, 320, 1, 700, pi_vals_pdf, prob, 0.8)
 ```
 ```{r}
 # we want the proportion in which we identify context 1 as correct
