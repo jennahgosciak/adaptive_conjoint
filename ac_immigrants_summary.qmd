@@ -1,0 +1,201 @@
+---
+title: ""
+format: 
+  html:
+    embed-resources: true
+    page-layout: full
+  pdf: default
+format-links: false
+---
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+library(dplyr)
+library(ggplot2)
+library(gtsummary)
+library(here)
+library(readr)
+```
+
+# Summary statistics
+
+**Note:** Responses that failed our quality checks have been filtered out which
+is why the **N**s total to somewhat less than our full sample of 10,000.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+clean_ethnicity <- function(x) {
+  x |>
+    mutate(
+      ethnicity_cleaned = factor(
+        ethnicity,
+        levels = c("hisp_latin_spanish_no", "hisp_latin_spanish_yes"),
+        labels = c(
+          "Hispanic or Latino",
+          "Not Hispanic or Latino"
+        )
+      )
+    )
+}
+
+clean_race <- function(x) {
+  levs <- c(
+    "race_white",
+    "race_black",
+    "race_asian",
+    "race_aian",
+    "race_nhpi",
+    "race_other",
+    "race_multiracial"
+  )
+  labs <- c(
+    "White",
+    "Black or African American",
+    "Asian",
+    "American Indian or Alaskan Native",
+    "Native Hawaiian or Pacific Islander",
+    "Other",
+    "Multiracial"
+  )
+  x |>
+    mutate(
+      race_cleaned = case_when(
+        is.na(race) ~ NA,
+        race %in% levs ~ race,
+        TRUE ~ "race_multiracial"
+      ),
+      race_cleaned = factor(race_cleaned, levels = levs, labels = labs)
+    )
+}
+
+clean_sex <- function(x) {
+  x |>
+    mutate(
+      sex_cleaned = factor(
+        sex,
+        levels = c("female", "male"),
+        labels = c("Female", "Male")
+      )
+    )
+}
+
+clean_responses <- function(x) {
+  x |>
+    clean_ethnicity() |>
+    clean_race() |>
+    clean_sex()
+}
+
+# Import data
+responses <- read_csv(here("data/immigrants_main_response.csv"))
+responses_validation_max <- read_csv(here("data/immigrants_max_response.csv"))
+responses_validation_min <- read_csv(here("data/immigrants_min_response.csv"))
+
+# Clean data
+responses <- responses |>
+  clean_responses() |>
+  mutate(phase_cleaned = "Main")
+
+responses_validation_max <- responses_validation_max |>
+  clean_responses() |>
+  mutate(phase = "Max", phase_cleaned = phase)
+
+responses_validation_min <- responses_validation_min |>
+  clean_responses() |>
+  mutate(phase = "Min", phase_cleaned = phase)
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+responses |>
+  bind_rows(responses_validation_max) |>
+  bind_rows(responses_validation_min) |>
+  filter(!garbage) |>
+  select(phase_cleaned, ends_with("_cleaned")) |>
+  tbl_summary(
+    by = phase_cleaned,
+    label = list(
+      ethnicity_cleaned ~ "Ethnicity",
+      race_cleaned ~ "Race",
+      sex_cleaned ~ "Sex"
+    )
+  ) |>
+  bold_labels()
+```
+
+# Point Estimates (adaptive phase vs. validation phase)
+
+**Note:** The point estimates and intervals from the main phase are means and 
+95% Bayesian credible intervals estimated from the arms' posterior 
+distributions. The point estimates and intervals from the validation phase are 
+sample means and 95% confidence intervals calculated using t-distribution
+approximation.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+params_main <- read_csv(here("data/immigrants_main_parameters.csv")) |>
+  filter(batch_id == max(batch_id)) |>
+  arrange(desc(arm_id)) |>
+  filter(arm_id %in% c(10, 7)) |>
+  group_by(arm_id) |>
+  mutate(
+    mu = alpha/(alpha + beta),
+    lb = qbeta(0.025, alpha, beta),
+    ub = qbeta(0.975, alpha, beta),
+    phase = "Main"
+  ) |>
+  ungroup() |>
+  select(arm_id, mu, lb, ub, phase)
+
+params_validation <- responses_validation_max |> 
+  mutate(arm_id = 7) |>
+  bind_rows(
+    mutate(responses_validation_min, arm_id = 10)
+  ) |>
+  filter(!garbage) |> 
+  group_by(arm_id) |>
+  summarise(
+    mu = mean(discriminated),
+    sd = sd(discriminated), root_n = sqrt(n()),
+    df = n() - 1
+  ) |> 
+  ungroup() |>
+  group_by(arm_id) |>
+  mutate(
+    lb = mu - qt(0.975, df = df)*sd/root_n,
+    ub = mu - qt(0.025, df = df)*sd/root_n,
+    phase = "Validation"
+  ) |>
+  ungroup() |>
+  select(arm_id, mu, lb, ub, phase)
+
+params_comparison <- bind_rows(params_main, params_validation) |> arrange(arm_id)
+```
+
+```{r}
+#| echo: false
+#| layout-align: center
+#| message: false
+#| warning: false
+
+ggplot(
+    params_comparison,
+    aes(x = factor(arm_id), y = mu, ymin = lb, ymax = ub, color = phase)
+  ) +
+  geom_point(position = position_dodge(width = 0.3)) +
+  geom_errorbar(width = 0.1, position = position_dodge(width = 0.3)) +
+  theme_minimal() +
+  labs(x = "Arm", y = expression(mu ~ "(" %+-% " 95% CI)"), color = "")
+```
+
