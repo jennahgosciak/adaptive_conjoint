@@ -8,6 +8,8 @@ There were three phases of the study: the main phase (encapsulating warmup, adap
 - `immigrants_max_...csv`: These files correspond to the max validation phase
 - `immigrants_min_...csv`: These files correspond to the min validation phase
 
+The data for each of these three phases are also backed up in separate volumes in AWS.
+
 # Phase-level Data
 
 In each phase of the study, the following seven tables were collected:
