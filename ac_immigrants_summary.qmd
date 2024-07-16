@@ -38,8 +38,8 @@ clean_ethnicity <- function(x) {
         ethnicity,
         levels = c("hisp_latin_spanish_no", "hisp_latin_spanish_yes"),
         labels = c(
-          "Hispanic or Latino",
-          "Not Hispanic or Latino"
+          "Not Hispanic or Latino",
+          "Hispanic or Latino"
         )
       )
     )
@@ -121,10 +121,11 @@ responses |>
   bind_rows(responses_validation_max) |>
   bind_rows(responses_validation_min) |>
   filter(!garbage) |>
-  select(phase_cleaned, ends_with("_cleaned")) |>
+  select(phase_cleaned, age, ends_with("_cleaned")) |>
   tbl_summary(
     by = phase_cleaned,
     label = list(
+      age ~ "Age",
       ethnicity_cleaned ~ "Ethnicity",
       race_cleaned ~ "Race",
       sex_cleaned ~ "Sex"
@@ -352,7 +353,7 @@ params_comparison <- bind_rows(params_main, params_validation) |>
 
 ```{r}
 #| echo: false
-#| layout-align: center
+#| fig-align: center
 #| message: false
 #| warning: false
 
