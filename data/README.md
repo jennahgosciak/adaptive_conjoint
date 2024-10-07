@@ -42,3 +42,27 @@ responses <- responses_main |>
   bind_rows(responses_min) |>
   filter(!garbage)
 ```
+
+To plot posterior means and 95% credible intervals for the estimated probability of discrimination in each arm:
+```r
+library(dplyr)
+library(forcats)
+library(here)
+library(ggplot2)
+library(readr)
+
+params <- read_csv(here("data/immigrants_main_parameters.csv"))
+params_last <- params |>
+  filter(batch_id == max(batch_id)) |>
+  group_by(arm_id) |>
+  summarize(
+    mu = alpha/(alpha + beta),
+    ub = qbeta(0.975, alpha, beta),
+    lb = qbeta(0.025, alpha, beta)
+  )
+
+ggplot(params_last, aes(x = fct_reorder(factor(arm_id), desc(mu)), y = mu, ymin = lb, ymax = ub)) +
+  geom_errorbar(width = 0.2) +
+  geom_point() +
+  labs(x = "Arm ID", y = "Posterior probability of discrimination")
+```
