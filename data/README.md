@@ -66,3 +66,58 @@ ggplot(params_last, aes(x = fct_reorder(factor(arm_id), desc(mu)), y = mu, ymin 
   geom_point() +
   labs(x = "Arm ID", y = "Posterior probability of discrimination")
 ```
+
+To plot the main results figure:
+```r
+library(dplyr)
+library(forcats)
+library(here)
+library(ggplot2)
+library(readr)
+
+params <- read_csv(here("data/immigrants_main_parameters.csv"))
+params_main <- params |>
+  filter(batch_id == max(batch_id), arm_id %in% c(7, 10)) |>
+  group_by(arm_id) |>
+  summarize(
+    mu = alpha/(alpha + beta),
+    ub = qbeta(0.975, alpha, beta),
+    lb = qbeta(0.025, alpha, beta)
+  ) |>
+  mutate(phase = "Main")
+
+responses_max <- read_csv(here("data/immigrants_max_response.csv")) |>
+  filter(!garbage) |>
+  mutate(arm_id = 7)
+responses_min <- read_csv(here("data/immigrants_min_response.csv")) |>
+  filter(!garbage) |>
+  mutate(arm_id = 10)
+params_validation <- bind_rows(responses_max, responses_min) |>
+  group_by(arm_id) |>
+  summarise(
+    mu = mean(discriminated),
+    ub = t.test(discriminated, conf.level = 0.95)$conf.int[2],
+    lb = t.test(discriminated, conf.level = 0.95)$conf.int[1]
+  ) |>
+  mutate(phase = "Validation")
+
+params_main_valid <- bind_rows(params_main, params_validation)
+
+ggplot(
+  params_main_valid,
+  aes(
+    x = fct_reorder(factor(arm_id), desc(mu)),
+    y = mu,
+    ymin = lb,
+    ymax = ub,
+    color = phase
+  )
+) +
+  geom_errorbar(width = 0.1, position = position_dodge(width = 0.3)) +
+  geom_point(position = position_dodge(width = 0.3)) +
+  labs(x = "Arm ID", y = "Estimated probability of discrimination", color = "") +
+  theme_minimal() +
+  theme(
+    text = element_text(size = 12)
+  )
+```
