@@ -1,0 +1,6 @@
+./ts_tutorial_files
+./03_automate_profiles
+./04_update_prob/
+Dockerfile
+.dockerignore
+**/.DS_Store

@@ -1,10 +1,14 @@
 # R script to run poststratification analysis
 library(assertr)
 library(dplyr)
+library(forcats)
+library(ggplot2)
 library(here)
 library(modelr)
 library(purrr)
+library(readr)
 library(stringr)
+library(tidyr)
 
 set.seed(2023)
 
