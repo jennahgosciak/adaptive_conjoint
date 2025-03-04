@@ -267,10 +267,156 @@ params_main_final_batch <- params_main |>
     mu = alpha/(alpha + beta),
     lb = qbeta(0.025, alpha, beta),
     ub = qbeta(0.975, alpha, beta),
-    phase = "Warmup + Adaptive"
+    phase = "Warmup + Adaptive",
+    x_lab = case_when(
+      arm_id == 1 ~ paste0(
+        c(
+          "**European** country of origin",
+          "**Few** prior visits",
+          "Escaping **political/religious persecution**",
+          "**Lower-skilled** profession"
+        ),
+        collapse = "<br>"
+      ),
+      arm_id == 2 ~ paste0(
+        c(
+          "**European** country of origin",
+          "**Few** prior visits",
+          "Escaping **political/religious persecution**",
+          "**Higher-skilled** profession"
+        ),
+        collapse = "<br>"
+      ),
+      arm_id == 3 ~ paste0(
+        c(
+          "**African** country of origin",
+          "**Few** prior visits",
+          "Escaping **political/religious persecution**",
+          "**Lower-skilled** profession"
+        ),
+        collapse = "<br>"
+      ),
+      arm_id == 4 ~ paste0(
+        c(
+          "**African** country of origin",
+          "**Few** prior visits",
+          "Escaping **political/religious persecution**",
+          "**Higher-skilled** profession"
+        ),
+        collapse = "<br>"
+      ),
+      arm_id == 5 ~ paste0(
+        c(
+          "**European** country of origin",
+          "**Few** prior visits",
+          "Seeking **better employment**",
+          "**Lower-skilled** profession"
+        ),
+        collapse = "<br>"
+      ),
+      arm_id == 6 ~ paste0(
+        c(
+          "**European** country of origin",
+          "**Few** prior visits",
+          "Seeking **better employment**",
+          "**Higher-skilled** profession"
+        ),
+        collapse = "<br>"
+      ),
+      arm_id == 7 ~ paste0(
+        c(
+          "**African** country of origin",
+          "**Few** prior visits",
+          "Seeking **better employment**",
+          "**Lower-skilled** profession"
+        ),
+        collapse = "<br>"
+      ),
+      arm_id == 8 ~ paste0(
+        c(
+          "**African** country of origin",
+          "**Few** prior visits",
+          "Seeking **better employment**",
+          "**Higher-skilled** profession"
+        ),
+        collapse = "<br>"
+      ),
+      arm_id == 9 ~ paste0(
+        c(
+          "**European** country of origin",
+          "**Many** prior visits",
+          "Escaping **political/religious persecution**",
+          "**Lower-skilled** profession"
+        ),
+        collapse = "<br>"
+      ),
+      arm_id == 10 ~ paste0(
+        c(
+          "**European** country of origin",
+          "**Many** prior visits",
+          "Escaping **political/religious persecution**",
+          "**Higher-skilled** profession"
+        ),
+        collapse = "<br>"
+      ),
+      arm_id == 11 ~ paste0(
+        c(
+          "**African** country of origin",
+          "**Many** prior visits",
+          "Escaping **political/religious persecution**",
+          "**Lower-skilled** profession"
+        ),
+        collapse = "<br>"
+      ),
+      arm_id == 12 ~ paste0(
+        c(
+          "**African** country of origin",
+          "**Many** prior visits",
+          "Escaping **political/religious persecution**",
+          "**Higher-skilled** profession"
+        ),
+        collapse = "<br>"
+      ),
+      arm_id == 13 ~ paste0(
+        c(
+          "**European** country of origin",
+          "**Many** prior visits",
+          "Seeking **better employment**",
+          "**Lower-skilled** profession"
+        ),
+        collapse = "<br>"
+      ),
+      arm_id == 14 ~ paste0(
+        c(
+          "**European** country of origin",
+          "**Many** prior visits",
+          "Seeking **better employment**",
+          "**Higher-skilled** profession"
+        ),
+        collapse = "<br>"
+      ),
+      arm_id == 15 ~ paste0(
+        c(
+          "**African** country of origin",
+          "**Many** prior visits",
+          "Seeking **better employment**",
+          "**Lower-skilled** profession"
+        ),
+        collapse = "<br>"
+      ),
+      arm_id == 16 ~ paste0(
+        c(
+          "**African** country of origin",
+          "**Many** prior visits",
+          "Seeking **better employment**",
+          "**Higher-skilled** profession"
+        ),
+        collapse = "<br>"
+      )
+    )
   ) |>
   ungroup() |>
-  select(arm_id, mu, lb, ub, phase)
+  select(arm_id, mu, lb, ub, phase, x_lab)
 
 params_main_min_max <- params_main_final_batch |>
   filter(arm_id %in% c(10, 7))
@@ -301,71 +447,63 @@ params_validation <- responses_validation_max |>
 params_comparison <- bind_rows(params_main_min_max, params_validation) |>
   bind_rows(ps) |>
   arrange(arm_id) |>
+  group_by(arm_id) |>
+  fill(x_lab) |>
   mutate(
     phase = factor(
       phase,
       levels = c("Warmup + Adaptive", "Validation", "Poststratified"),
       ordered = TRUE
-    ),
-    x_lab = case_when(
-      arm_id == 7 ~ paste0(
-        c(
-          "**African** country of origin",
-          "**Few** prior visits",
-          "Seeking **better employment**",
-          "**Lower-skilled** profession"
-        ),
-        collapse = "<br>"
-      ),
-      arm_id == 10 ~ paste0(
-        c(
-          "**European** country of origin",
-          "**Many** prior visits",
-          "Escaping **political/religious persecution**",
-          "**Higher-skilled** profession"
-        ),
-        collapse = "<br>"
-      )
     )
   )
 
 ### Figure (2): Estimates of $theta_c$ for all contexts
 estimated_discrim_all_plot <- ggplot(
     params_main_final_batch,
-    aes(x = fct_reorder(factor(arm_id), desc(mu)), y = mu, ymin = lb, ymax = ub)
+    aes(x = fct_reorder(x_lab, mu), y = mu, ymin = lb, ymax = ub)
   ) +
   geom_point() +
   geom_errorbar(width = 0.1) +
+  coord_flip() +
   theme_minimal() +
-  labs(x = "Context ID", y = "Posterior expected probability")
+  theme(
+    axis.text.y = element_markdown(hjust = 0),
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
+  ) +
+  labs(x = "", y = "Probability of preferring the college-educated immigrant")
 
 ggsave(
   plot = estimated_discrim_all_plot,
   filename = here("figures", "estimated_discrimination_all.png"),
-  width = 5,
-  height = 3,
+  width = 10,
+  height = 10,
   dpi = 500
 )
 
 ### Figure (3): Estimates of $theta_c$ for the most/least discrim. contexts
 estimated_discrim_max_min_plot <- ggplot(
-    params_comparison,
+    params_comparison |>
+      filter(phase != "Poststratified") |>
+      mutate(phase = as.character(phase)),
     aes(x = x_lab, y = mu, ymin = lb, ymax = ub, color = phase)
   ) +
   geom_point(position = position_dodge(width = 0.3)) +
-  geom_errorbar(width = 0.1, position = position_dodge(width = 0.3)) +
+  geom_errorbar(width = 0.05, position = position_dodge(width = 0.3)) +
   theme_minimal() +
   theme(
     axis.text.x = element_markdown(hjust = 0, margin = margin(l = -40)),
-    legend.title = element_blank()
+    legend.title = element_blank(),
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
   ) +
-  labs(x = "", y = "Posterior expected probability")
+  labs(x = "", y = "Probability of preferring the college-educated immigrant")
 
 ggsave(
   plot = estimated_discrim_max_min_plot,
   filename = here("figures", "estimated_discrimination_max_min.png"),
-  width = 6,
-  height = 4,
+  width = 7,
+  height = 5,
   dpi = 500
 )
 
@@ -444,7 +582,7 @@ ci_width_max_min <- ci_max_min_df |>
   ) |>
   ggplot(aes(x = progress, y = mu, ymin = lb, ymax = ub)) +
   geom_ribbon(alpha = 0.2) +
-  geom_line(size = 0.5) +
+  geom_line(linewidth = 0.5) +
   facet_wrap(~ context, nrow = 1) +
   theme_minimal() +
   labs(x = "", y = "Posterior expected probability credible interval")
@@ -454,5 +592,30 @@ ggsave(
   filename = here("figures", "ci_width_max_min.png"),
   width = 6,
   height = 4,
+  dpi = 500
+)
+
+## Appendix figures
+estimated_discrim_max_min_appendix_plot <- ggplot(
+  params_comparison |>
+    mutate(phase = as.character(phase)),
+  aes(x = x_lab, y = mu, ymin = lb, ymax = ub, color = phase)
+) +
+geom_point(position = position_dodge(width = 0.3)) +
+geom_errorbar(width = 0.1, position = position_dodge(width = 0.3)) +
+theme_minimal() +
+theme(
+  axis.text.x = element_markdown(hjust = 0, margin = margin(l = -40)),
+  legend.title = element_blank(),
+  panel.background = element_rect(fill = "white", color = NA),
+  plot.background = element_rect(fill = "white", color = NA)
+) +
+labs(x = "", y = "Probability of preferring the college-educated immigrant")
+
+ggsave(
+  plot = estimated_discrim_max_min_appendix_plot,
+  filename = here("figures", "estimated_discrimination_max_min_appendix.png"),
+  width = 7,
+  height = 5,
   dpi = 500
 )
