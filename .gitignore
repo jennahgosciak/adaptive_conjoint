@@ -8,3 +8,5 @@ automate_candidates_files/
 .Rproj.user
 *.pdf
 .DS_Store
+.Rprofile
+renv/

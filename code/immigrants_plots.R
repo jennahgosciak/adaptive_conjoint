@@ -80,7 +80,10 @@ responses_validation_min <- read_csv(here("data/immigrants_min_response.csv"))
 # Clean data
 responses <- responses |>
   clean_responses() |>
-  mutate(phase_cleaned = "Main")
+  mutate(phase_cleaned = "Main") |>
+  group_by(arm_id) |>
+  mutate(n = n()) |>
+  ungroup()
 
 responses_validation_max <- responses_validation_max |>
   clean_responses() |>
@@ -261,9 +264,13 @@ ps <- bind_rows(ps_max, ps_min)
 params_main <- read_csv(here("data/immigrants_main_parameters.csv")) 
 params_main_final_batch <- params_main |>
   filter(batch_id == max(batch_id)) |>
+  left_join(
+    distinct(responses, arm_id, n), by = "arm_id"
+  ) |>
   arrange(desc(arm_id)) |>
   group_by(arm_id) |>
   mutate(
+    n = first(n),
     mu = alpha/(alpha + beta),
     lb = qbeta(0.025, alpha, beta),
     ub = qbeta(0.975, alpha, beta),
@@ -416,7 +423,8 @@ params_main_final_batch <- params_main |>
     )
   ) |>
   ungroup() |>
-  select(arm_id, mu, lb, ub, phase, x_lab)
+  select(arm_id, mu, lb, ub, phase, x_lab, n) |>
+  mutate(highlight = case_when(arm_id %in% c(7, 10) ~ TRUE, TRUE ~ FALSE))
 
 params_main_min_max <- params_main_final_batch |>
   filter(arm_id %in% c(10, 7))
@@ -460,10 +468,18 @@ params_comparison <- bind_rows(params_main_min_max, params_validation) |>
 ### Figure (2): Estimates of $theta_c$ for all contexts
 estimated_discrim_all_plot <- ggplot(
     params_main_final_batch,
-    aes(x = fct_reorder(x_lab, mu), y = mu, ymin = lb, ymax = ub)
+    aes(x = fct_reorder(x_lab, mu), y = mu, ymin = lb, ymax = ub, color = highlight)
   ) +
   geom_point() +
   geom_errorbar(width = 0.1) +
+  geom_label(
+    aes(
+      label = paste0("N = ", n),
+      y = 0.55
+    ),
+    hjust = 0.1
+    # vjust = 1
+  ) +
   coord_flip() +
   theme_minimal() +
   theme(
@@ -471,6 +487,8 @@ estimated_discrim_all_plot <- ggplot(
     panel.background = element_rect(fill = "white", color = NA),
     plot.background = element_rect(fill = "white", color = NA)
   ) +
+  scale_color_manual(values = c("FALSE" = "black", "TRUE" = "red")) +
+  theme(legend.position = "none") +
   labs(x = "", y = "Probability of preferring the college-educated immigrant")
 
 ggsave(
@@ -486,13 +504,15 @@ estimated_discrim_max_min_plot <- ggplot(
     params_comparison |>
       filter(phase != "Poststratified") |>
       mutate(phase = as.character(phase)),
-    aes(x = x_lab, y = mu, ymin = lb, ymax = ub, color = phase)
+    aes(x = fct_reorder(x_lab, mu), y = mu, ymin = lb, ymax = ub, color = phase)
   ) +
   geom_point(position = position_dodge(width = 0.3)) +
   geom_errorbar(width = 0.05, position = position_dodge(width = 0.3)) +
+  coord_flip() +
   theme_minimal() +
   theme(
-    axis.text.x = element_markdown(hjust = 0, margin = margin(l = -40)),
+    # axis.text.x = element_markdown(hjust = 0, margin = margin(l = -40)),
+    axis.text.y = element_markdown(hjust = 0),
     legend.title = element_blank(),
     panel.background = element_rect(fill = "white", color = NA),
     plot.background = element_rect(fill = "white", color = NA)
@@ -502,8 +522,8 @@ estimated_discrim_max_min_plot <- ggplot(
 ggsave(
   plot = estimated_discrim_max_min_plot,
   filename = here("figures", "estimated_discrimination_max_min.png"),
-  width = 7,
-  height = 5,
+  width = 8,
+  height = 3,
   dpi = 500
 )
 
@@ -603,19 +623,21 @@ estimated_discrim_max_min_appendix_plot <- ggplot(
 ) +
 geom_point(position = position_dodge(width = 0.3)) +
 geom_errorbar(width = 0.1, position = position_dodge(width = 0.3)) +
+coord_flip() +
 theme_minimal() +
 theme(
-  axis.text.x = element_markdown(hjust = 0, margin = margin(l = -40)),
+  # axis.text.x = element_markdown(hjust = 0, margin = margin(l = -40)),
   legend.title = element_blank(),
   panel.background = element_rect(fill = "white", color = NA),
-  plot.background = element_rect(fill = "white", color = NA)
+  plot.background = element_rect(fill = "white", color = NA),
+  axis.text.y = element_markdown(hjust = 0),
 ) +
 labs(x = "", y = "Probability of preferring the college-educated immigrant")
 
 ggsave(
   plot = estimated_discrim_max_min_appendix_plot,
   filename = here("figures", "estimated_discrimination_max_min_appendix.png"),
-  width = 7,
-  height = 5,
+  width = 8,
+  height = 3,
   dpi = 500
 )
