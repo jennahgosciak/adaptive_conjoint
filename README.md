@@ -22,14 +22,16 @@ install.packages(pkgs = c("here", "jetty"))
 jetty::run_script(
   file = here::here("code/immigrants_plots.R"),
   context = here::here(),
-  install_dependencies = TRUE
+  install_dependencies = TRUE,
+  r_profile = NULL
 )
 
 # Replicate results in ./code/job_applicants_plots.R
 jetty::run_script(
   file = here::here("code/job_applicants_plots.R"),
   context = here::here(),
-  install_dependencies = TRUE
+  install_dependencies = TRUE,
+  r_profile = NULL
 )
 ```
 
