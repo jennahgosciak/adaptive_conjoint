@@ -74,6 +74,6 @@ weights, the script takes the following steps:
 5. Create `hispanic` variable = `FALSE` if HISPAN is "Not Hispanic", = `TRUE` if HISPAN is either ("Mexican", "Other", "Puerto Rican", "Cuban")
 6. Create `female` = `TRUE` if SEX == "Female", else `FALSE`
 7. Grouping by race, female, hispanic, and age, create the following summarized variables:
-  - `weight sum(PERWT)`
-  - `num = n()`
-  - Then recompute `weight`, outside the summarize so that it is a fraction of the total weight =  `weight / sum(weight)`
+    - `weight sum(PERWT)`
+    - `num = n()`
+    - Then recompute `weight`, outside the summarize so that it is a fraction of the total weight =  `weight / sum(weight)`
