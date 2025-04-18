@@ -48,7 +48,7 @@ docker run --rm -v ./figures:/adaptive_conjoint/figures/ djmolitor/adaptive_conj
 ## Generating poststratification weights
 
 > [!NOTE]  
-> The post‑stratification weights used to generate all figures in this paper
+> The poststratification weights used to generate all figures in this paper
 > are stored at `data/ipums_strata_sizes.RDS`. You don’t need to regenerate
 > them to reproduce the figures, but if you’d like to, follow the steps below.
 
