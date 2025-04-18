@@ -1,4 +1,10 @@
-There are two levels to the data files in here.
+The data in this directory comprise all data collected from the experimental phases of our study.
+All files beginning with `immigrants_...` are collected from our primary example, the immigration
+study. There are two additional files: `job_app_clean_all_phases.csv` which contains the raw responses from our
+supplemental job applicant experiment, and `ipums_strata_sizes.RDS` which contains poststratification
+weights for poststratified causal effect estimates in the validation phase of the immigration study.
+
+The sections below describe how to interpret and work with the raw data from our immigration study.
 
 # Study Phase
 
