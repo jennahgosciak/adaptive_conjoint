@@ -1,6 +1,5 @@
-./ts_tutorial_files
-./03_automate_profiles
-./04_update_prob/
+/Users/dmolitor/Documents/code/adaptive_conjoint/data
+/Users/dmolitor/Documents/code/adaptive_conjoint/renv
 Dockerfile
 .dockerignore
 **/.DS_Store
