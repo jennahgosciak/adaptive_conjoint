@@ -1,4 +1,3 @@
-data/
 renv/
 .Rprofile
 Dockerfile
