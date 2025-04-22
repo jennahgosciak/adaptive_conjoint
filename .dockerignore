@@ -1,5 +1,6 @@
-/Users/dmolitor/Documents/code/adaptive_conjoint/data
-/Users/dmolitor/Documents/code/adaptive_conjoint/renv
+data/
+renv/
+.Rprofile
 Dockerfile
 .dockerignore
 **/.DS_Store
