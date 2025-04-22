@@ -91,7 +91,6 @@ df_race_form |>
 df_wgt <- df_race_form |>
   # create numeric age variable
   mutate(age = as.numeric(AGE)) |>
-  assertr::verify(!is.na(age)) |>
   filter(age >= 18) |>
   mutate_if(is.labelled, as_factor) |>
   # create hispanic or latino variable
@@ -102,7 +101,6 @@ df_wgt <- df_race_form |>
       "Puerto Rican", "Cuban"
     ) ~ TRUE
   )) |>
-  assertr::verify(!is.na(hispanic)) |>
   # create female variable from sex
   mutate(female = if_else(SEX == "Female", TRUE, FALSE)) |>
   group_by(race, female, hispanic, age) |>
