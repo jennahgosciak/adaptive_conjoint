@@ -1,15 +1,8 @@
----
-title: "sim-power-multiarm"
-output: github_document
-date: "`r Sys.Date()`"
----
+sim-power-multiarm
+================
+2025-07-28
 
-```{r setup, include=FALSE}
-library(tidyverse)
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r}
+``` r
 mde <- 0.75 - 0.64
 arms <- c(1:16)
 true_p <- c(c(0.64, 0.75), runif(length(arms)-2, 0.65, 0.74))
@@ -81,3 +74,7 @@ est_df %>%
        x = 'Total number of participants')
 ```
 
+    ## `summarise()` has grouped output by 'n_size'. You can override using the
+    ## `.groups` argument.
+
+![](sim-power-multiarm_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
