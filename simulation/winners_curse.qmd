@@ -1,0 +1,175 @@
+---
+title: "Winner's Curse Simulation"
+format: pdf
+---
+
+In a previous simulation, we considered 5 arms with fixedly-spaced true parameter values $\hat\theta = 0.3, 0.4, 0.5, 0.6, 0.7$. This document extends that simulation to a setting with 41 arms with fixedly-spaced true parameter values $\hat\theta = 0.3, 0.31, \dots, 0.69, 0.7$. The purpose of this simulation is to show the winner's curse: the arm with the highest estimate in the selection set is likely to overestimate the true maximum $\text{max}(\hat\theta)$.
+
+We carry out a simulation with $n = 410$ respondents.
+
+* For fixed randomization, we assign 10 respondents to each arm.
+* For adaptive randomization, we assign
+     * 5 respondents to each arm for a warmup phase
+     * adaptively assign the remaining 205 respondents
+
+The result of the simulation is that both approaches show a winner's curse: the highest estimate of $\hat\theta$ on average (and in nearly all cases) exceeds the true maximum of 0.7 in this simulation. This bias is apparent in both Bayes and frequentist estimates, though the bias is slightly smaller for Bayes estimates because they are regularized toward 0.5
+
+First, we load packages and prepare the environment.
+
+```{r, message = F, warning = F}
+library(tidyverse)
+library(foreach)
+library(doParallel)
+library(doRNG)
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+```
+
+Define true arm-specific parameters that define the probability that $Y = 1$.
+```{r}
+theta <- tibble(arm = 1:41, theta = seq(.3,.7,.01))
+```
+
+## Fixed randomization
+
+The function below carries out fixed randomization and returns the highest-valued estimate.
+
+```{r}
+simulate_fixed <- function() {
+  fixed_randomization_data <- foreach(i = 1:10, .combine = "rbind") %do% {
+    theta
+  } |>
+    mutate(y = rbinom(n(), 1, theta)) |>
+    group_by(arm) |>
+    summarize(y1 = sum(y == 1), y0 = sum(y == 0)) |>
+    arrange(-y1)
+  
+  fixed_randomization_selected <- fixed_randomization_data |>
+    slice_head(n = 1) |>
+    mutate(
+      bayes = (1 + y1) / (1 + y1 + 1 + y0),
+      frequentist = y1 / (y1 + y0)
+    )
+  return(fixed_randomization_selected)
+}
+```
+
+The code below applies that function for 100 simulations.
+```{r}
+result_fixed <- foreach(i = 1:100, .combine = "rbind") %do% {
+  simulate_fixed()
+}
+```
+
+## Adaptive randomization
+
+The function below carries out adaptive randomization and returns the highest-valued estimate.
+
+```{r}
+simulate_adaptive <- function() {
+  
+  # Begin with warm-up phase with 5 respondents per arm
+  adaptive_data <- foreach(i = 1:5, .combine = "rbind") %do% {
+    theta
+  } |>
+    mutate(y = rbinom(n(), 1, theta)) |>
+    group_by(arm) |>
+    summarize(theta = unique(theta), y1 = sum(y == 1), y0 = sum(y == 0))
+  
+  # Adaptive sampling for remainder of sample size
+  for (i in 1:205) {
+    updated_arm <- adaptive_data |>
+      mutate(theta_star = rbeta(n(), 1 + y1, 1 + y0)) |>
+      arrange(theta_star) |>
+      slice_tail(n = 1) |>
+      mutate(
+        y = rbinom(1, 1, theta),
+        y1 = ifelse(y == 1, y1 + 1, y1),
+        y0 = ifelse(y == 0, y0 + 1, y0)
+      ) |>
+      select(-theta_star, -y)
+    adaptive_data <- adaptive_data |>
+      anti_join(updated_arm, by = join_by(arm)) |>
+      bind_rows(updated_arm)
+  }
+  
+  # Repeatedly simulate theta_star for each arm and choose the highest
+  simulated_highest <- foreach(i = 1:100, .combine = "rbind") %do% {
+    adaptive_data |>
+      mutate(theta_star = rbeta(n(), y1 + 1, y0 + 1)) |>
+      arrange(theta_star) |>
+      slice_tail(n = 1)
+  }
+  
+  # Select the arm that is simulated to have the highest theta_star
+  # the most often
+  adaptive_selected <- simulated_highest |>
+    group_by(arm) |>
+    count() |>
+    ungroup() |>
+    arrange(n) |>
+    slice_tail(n = 1)
+  
+  # Report a Bayes and frequentist estimate for the selected arm
+  adaptive_selected |>
+    select(arm) |>
+    left_join(adaptive_data, by = join_by(arm)) |>
+    mutate(
+      bayes = (1 + y1) / (1 + y1 + 1 + y0),
+      frequentist = y1 / (y1 + y0)
+    ) |>
+    select(arm, y1, y0, bayes, frequentist)
+}
+```
+
+The code below applies the adaptive estimator over 100 simulations.
+
+```{r}
+result_adaptive <- foreach(i = 1:100, .combine = "rbind", .packages = c("tidyverse","foreach"), .export = "theta") %dorng% {
+  simulate_adaptive()
+}
+```
+
+## Visualize the result
+
+The code below combines the adaptive and fixed randomization results and then visualizes estimates.
+
+```{r, fig.height = 5.5}
+result_combined <- result_adaptive |> mutate(randomization = "Adaptive Randomization") |>
+  bind_rows(
+    result_fixed |> mutate(randomization = "Fixed Randomization")
+  )
+
+result_combined |>
+  pivot_longer(cols = c("bayes","frequentist"), names_to = "estimator", values_to = "estimate") |>
+  mutate(estimator = paste0(str_to_title(estimator)," Estimator")) |>
+  ggplot(aes(x = estimate)) +
+  geom_histogram(bins = 30) +
+  facet_grid(estimator ~ randomization) +
+  geom_vline(xintercept = max(theta$theta), linetype = "dashed") +
+  ggtitle(
+    "When you use the selection sample to select the highest\nestimate across many arms, this estimate is upwardly\nbiased for the true max due to the winner's curse.",
+    subtitle = "True highest value of theta is depicted with the vertical dashed line."
+  ) +
+  xlab("Estimated Max of Arm Parameter Theta") +
+  theme(
+    plot.title = element_text(size = 10),
+    plot.subtitle = element_text(size = 10)
+  )
+```
+
+The code below quantifies this bias. Because there are 41 arms, neither approach chooses the correct arm very often. But the adaptive randomization tends to choose an arm closer to the highest-valued arm. The equal randomization more often chooses a lower-true-valued arm that happens (by chance) to have a high estimated value in the selection set. Thus the upward bias is more severe for the fixed randomization than for the adaptive randomization.
+
+```{r}
+result_combined |>
+  left_join(theta, by = join_by(arm)) |>
+  mutate(
+    chose_correct_arm = arm == 41,
+    true_theta_of_chosen_arm = theta
+  ) |>
+  group_by(randomization) |>
+  select(randomization, bayes, frequentist, chose_correct_arm, true_theta_of_chosen_arm) |>
+  summarize_all(mean)
+```
+
+(When reading the table, recall that the true max arm parameter is 0.7.)
