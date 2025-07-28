@@ -1,0 +1,17 @@
+---
+title: "test_signals"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+```{r}
+# load data
+df_jobs = read_csv("../data/job_app_clean_all_phases.csv")
+df_jobs
+```
+
