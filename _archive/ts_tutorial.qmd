@@ -1,0 +1,432 @@
+---
+title: "A Tutorial on Thompson Sampling"
+editor: visual
+format:
+  revealjs:
+    chalkboard: true
+---
+
+## One-Armed Bandit
+
+-   Can think of it as a "slot machine"
+
+-   Each arm has a random payout independent of the past
+
+-   **Tradeoff:**
+
+    -   *Exploit* knowledge of arms that led to high payoffs *in the past*
+
+    -   *Explore* new arms that may lead to higher payoffs *in the future*
+
+## 
+
+::: {layout="[[-1], [1], [-1]]"}
+![](https://miro.medium.com/v2/resize:fit:1100/format:webp/1*QtG3PRxhrP-BkB6bO6aVgw.png){fig-align="center"}
+:::
+
+## A Simple Example: Bernoulli Bandit
+
+-   *K* actions $\Rightarrow$ 1 is a success, 0 is a failure
+
+-   $k\in K$ produces success with probability $\theta_k \in [0,1]$ and probabilities $(\theta_1, \ldots, \theta_k)$ are unknown
+
+-   **Goal:** maximize cumulative number of successes over $T$ periods where $T$ is relatively large compared to the number of arms $K$
+
+-   **Naive approach:** spend some fixed time exploring and in periods of exploration sample arms uniformly at random
+
+## News Website
+
+-   Choose articles to display to a user; goal is to maximize the number of clicks
+
+    -   **Action:** article to show the user
+
+    -   **Reward:** 1 if clicked
+
+    -   **Goal:** maximize total number of clicks
+
+## Dynamic Pricing
+
+-   Selling a product and want to choose a price
+
+    -   **Action:** price to show buyer
+
+    -   **Reward:** price if a sale
+
+    -   **Goal:** maximize total profit
+
+## Investment
+
+-   Choose stock to invest in each day
+
+    -   **Action:** stock to invest into
+
+    -   **Reward:** change in value
+
+    -   **Goal:** maximize total wealth
+
+## Thompson Sampling
+
+-   **Greedy Algorithms:** locally optimal, not globally (don't [explore!]{.underline})
+
+-   Consider the **Bernoulli Bandit:**
+
+    -   There are three actions with mean rewards $\theta$
+
+    -   At each time $t$, generate an estimate \$\hat{\theta_k}\$ of the mean reward for the $k$th action
+
+    -   Select $\text{argmax}_k \hat{\theta_k}$
+
+    -   When select an action $k$, a reward of 1 is generated with probability $\theta_k$. Reward is 0 otherwise.
+
+    -   Express beliefs about $\theta$ in terms of posterior distributions
+
+## Posterior Probability
+
+![](ts_tutorial_files/graph1.jpg){fig-align="center"}
+
+-   Represents beliefs conditional on the observed history $\mathbb{H}_{t-1}$
+
+-   Greater certainty about the mean reward for action 1 and action 2; less certain about the mean reward for action 3
+
+## Dithering
+
+-   The greedy algorithm will never try action 3
+
+-   $\epsilon$-greedy exploration: greedy action with probability $1 - \epsilon$, otherwise action selected uniformly at random
+
+-   **Issue:** $\epsilon$-greedy exploration will still try action 2, even though we are certain that it is not optimal
+
+## Beta-Bernoulli Bandit
+
+-   action $k$, reward with probability $\theta_k$ = mean reward of $k$th action, reward $r_i \in \{0,1\}$ for $i \in T$ where $T$ is the total number of time steps
+
+-   Use beta-distributed priors over each $\theta_k$:
+
+    -   $p(\theta_k) = \frac{\Gamma(\alpha_k + \beta_k)}{\Gamma(\alpha_k)\Gamma(\beta_k)})\theta_k^{\alpha_k - 1}(1 - \theta_k)^\beta_{k-1}$
+
+    -   Beta distribution is useful because we can calculate the posterior distribution exactly (conjugacy property)
+
+        -   There is a simple rule for updating the parameters after observing the reward at each timestep
+
+    -   Beta distribution is a more general case of the uniform distribution
+
+## Conjugate Priors
+
+-   Beta distribution often used as prior distribution for binomial
+
+![](ts_tutorial_files/beta_dist.jpg){fig-align="center"}
+
+## Greedy Algorithm vs. TS
+
+### Greedy
+
+1.  Estimate $\hat{\theta_k} = \frac{\alpha_k}{\alpha_k + \beta_k}$ (calculates expectation directly)
+2.  Selects the action with the largest estimate of $\hat{\theta_k}$
+3.  Observe reward $r_t$
+4.  Update parameters $\alpha_k$ and $\beta_k$
+
+## Greedy Algorithm vs. TS
+
+**TS**
+
+1.  Sample $\hat{\theta_k}$ from the posterior distribution (beta distribution with parameters $\alpha_k$ and $\beta_k$)
+2.  Selects the action with the largest estimate of $\hat{\theta_k}$
+3.  Observe reward $r_t$
+4.  Update parameters $\alpha_k$ and $\beta_k$
+
+## Advantages of TS
+
+![](ts_tutorial_files/comparison.jpg){fig-align="center"}
+
+-   Samples each action with the probability that the action is optimal conditional on the observed history
+
+-   Explores to reduce uncertainty, but does not explore when it would not be helpful
+
+-   Greedy algorithms can get stuck
+
+## Regret
+
+-   Metric to evaluate performance
+
+-   *Per-period regret:* $\text{regret}_t(\theta) = \max_k \theta_k - \theta_{xt}$
+
+    -   Difference between the mean reward of always playing the optimal action vs. the action selected
+
+    -   Goal is for *per-period regret* to decrease
+
+## General Thompson Sampling
+
+-   Beta-Bernoulli is a special case
+
+-   Can handle more complex examples (e.g., finding the shortest path on a graph)
+
+    -   Can even handle dependencies
+
+## Approximations
+
+-   In many cases, the posterior distribution is not possible to calculate exactly
+
+-   There are 4 suggested approximation methods:
+
+    -   Gibbs sampling, Langevin Monte Carlo, Laplace approxmation, Bootstrap
+
+-   Consider posterior distribution $f_{t-1}$ for $\theta$ conditional on the history $\mathbb{H}_{t-1}$
+
+-   Approximation methods generate $\hat{\theta}$. The distribution of $\hat{\theta}$ approximates the posterior $\hat{f}_{t-1}$
+
+## Gibbs Sampling
+
+-   general Markov Chain Monte Carlo (MCMC) algorithm
+
+-   has a stationary distribution $f_{t-1}$ and produces sampled values $\hat{\theta^n}$
+
+-   Works even when it's not possible to sample from $f_{t-1}$ directly
+
+-   Can be computationally intense
+
+## Laplace Approx.
+
+-   Approximates a complicated posterior distribution with a Gaussian distribution
+
+-   Computationally efficient when one can efficiently compute the posterior mode and can form the Hessian of the log-posterior density
+
+-   May not work well if distribution is not similar enough to a Gaussian
+
+## Langevin Monte Carlo
+
+-   Alternative MCMC algorithm
+
+-   Uses gradient information about the target distribution
+
+-   Based on the Langevin dynamics diffusion process
+
+-   To improve computation time: can use sampled minibatches (called *stochastic gradient* Langevin Monte Carlo) and/or a preconditioning materix
+
+## Bootstrapping
+
+-   Generate a hypothetical history made up of $t - 1$ action-observation pairs, each sampled uniformly with replacement from past action-observation pairs.
+
+-   Maximize the likelihood of $\theta$ under the hypothetical history
+
+-   Non-parametric
+
+-   Less theoretical justification
+
+## Priors Selection
+
+-   Don't want to pick a single value
+
+-   But uniform might not be good
+
+-   Take an empirical approach
+
+## Modifications to TS
+
+-   Time-varying constraints (e.g., road closures in shortest path problem)
+
+-   Contextual decisionmaking, also called a contextual bandit (e.g., observing a weather report prior to select path)
+
+-   Baseline performance: ensure performance exceeds some baseline by constraining the possible actions
+
+-   Nonstationary: maybe beliefs evolve over time
+
+-   Concurrence: can share observations
+
+    -   Ex. a system provides different versions of a service to different users
+
+## Other Types of Bandits
+
+-   Transfer Learning: used when the space of actions $x$ is very large, can use information gained from an action to reduce uncertainty about the other actions
+
+-   Cascading Bandit Model: user looks at each item sequentially and when an item is found attractive, the user exists the system
+
+-   Active learning with neural networks: often with ensembles of models
+
+## A Coding Example
+
+-   Load file on click through rates for ad service company
+-   Code is from: <https://rpubs.com/markloessi/502098>
+
+```{r}
+#| echo: true
+#| code-fold: true
+#| code-summary: "expand for full code"
+library(tidyverse)
+df <- read_csv("ts_tutorial_files/Ads_CTR_Optimisation.csv")
+df
+```
+
+## Random Approach
+
+```{r, echo = F}
+# setup
+N <- 10000
+k <- 10
+ads_selected <- integer(0)
+total_reward <- 0
+```
+
+```{r, echo = F}
+for (n in 1:N) {
+  # randomly sample
+  ad <- sample(1:10, 1) # select arm to show to user
+  ads_selected <- append(ads_selected, ad) # create list of arms
+  reward <- df[n, ad] # observe user behavior
+  total_reward <- total_reward + reward
+}
+total_reward ## total number of users who clicked on the ad
+```
+
+## 
+
+```{r, warning=FALSE, results='hide',message=FALSE}
+#| echo: true
+#| code-fold: true
+#| code-summary: "expand for full code"
+library(ggplot2)
+ggplot(
+  data = tibble("ads" = ads_selected),
+  aes(x = ads)
+) +
+  geom_histogram(stat = "count") +
+  stat_count(
+    binwidth = 1,
+    geom = "text",
+    color = "black",
+    aes(label = after_stat(count)),
+    position = position_stack(vjust = 1.1)
+  ) +
+  scale_x_continuous(breaks = c(1:10)) +
+  labs(x = "arm/action/ad", y = "number selected") +
+  theme_classic()
+```
+
+## Thompson Sampling
+
+```{r, echo = F}
+N <- 100
+k <- 10
+ads_selected <- integer(0)
+numbers_of_rewards_1 <- integer(k) # vector for each arm
+numbers_of_rewards_0 <- integer(k)
+total_reward <- 0
+```
+
+```{r}
+for (n in 1:N) { # for N runs
+  ad <- 0
+  max_random <- 0
+  for (i in 1:k) {
+    # draw from prior distribution for theta
+    # for each arm
+    random_theta <- rbeta(
+      n = 1,
+      shape1 = numbers_of_rewards_1[i] + 1,
+      shape2 = numbers_of_rewards_0[i] + 1
+    )
+    if (random_theta > max_random) {
+      # if arm is better than all the previous ones
+      # this arm is selected, choose theta
+      max_random <- random_theta
+      ad <- i
+    }
+  }
+  # after selecting the argmax, add to selected ad
+  ads_selected <- append(ads_selected, ad)
+
+  # checking with data (what is *observed*)
+  reward <- df[n, ad]
+  if (reward == 1) {
+    numbers_of_rewards_1[ad] <- numbers_of_rewards_1[ad] + 1
+  } else {
+    numbers_of_rewards_0[ad] <- numbers_of_rewards_0[ad] + 1
+  }
+  total_reward <- total_reward + reward
+}
+
+# observed clicks
+numbers_of_rewards_1
+```
+
+## 
+
+```{r, warning=FALSE, results='hide',message=FALSE}
+#| echo: true
+#| code-fold: true
+#| code-summary: "expand for full code"
+tibble("ads" = factor(ads_selected, levels = c(1:10))) %>%
+  group_by(ads) %>%
+  summarize(n = n()) %>%
+  bind_rows(tibble(ads = factor(c(1:6), levels = c(1:10)), n = 0)) %>%
+  ggplot(aes(ads, n, label = if_else(n > 0, n, NaN))) +
+  geom_col() +
+  geom_text(
+    binwidth = 1,
+    geom = "text",
+    color = "black",
+    vjust = -0.5
+  ) +
+  scale_x_discrete(breaks = c(1:10), labels = c(1:10)) +
+  labs(
+    x = "arm/action/ad", y = "number selected",
+    title = "Thompson Sampling"
+  ) +
+  theme_classic()
+```
+
+## 
+
+```{r, warning=FALSE, results='hide',message=FALSE}
+#| echo: true
+#| code-fold: true
+#| code-summary: "expand for full code"
+df %>%
+  summarize(across(everything(), ~ sum(., na.rm = T))) %>%
+  pivot_longer(everything(), names_to = "ads", values_to = "n") %>%
+  mutate(ads = as.factor(str_replace(ads, "Ad ", ""))) %>%
+  ggplot(aes(ads, n, label = if_else(n > 0, n, NaN))) +
+  geom_col() +
+  geom_text(
+    binwidth = 1,
+    geom = "text",
+    color = "black",
+    vjust = -0.5
+  ) +
+  scale_x_discrete(breaks = c(1:10), labels = c(1:10)) +
+  labs(
+    x = "arm/action/ad", y = "number selected",
+    title = "Real clicks observed in the data"
+  ) +
+  theme_classic()
+```
+
+## 
+
+```{r, warning=FALSE, results='hide',message=FALSE}
+#| echo: true
+#| code-fold: true
+#| code-summary: "expand for full code"
+library(RColorBrewer)
+beta_dist <- map2(
+  numbers_of_rewards_1, numbers_of_rewards_0,
+  ~ dbeta(
+    x = seq(0.01, 1, 0.01),
+    shape1 = .x,
+    shape2 = .y
+  )
+)
+
+beta_dist %>%
+  map(as_tibble) %>%
+  reduce(bind_cols) %>%
+  rename_all(~ str_c("ad", c(1:10))) %>%
+  mutate(theta_k_hat = seq(0.01, 1, 0.01)) %>%
+  pivot_longer(-theta_k_hat,
+    names_to = "ads", values_to = "density"
+  ) %>%
+  mutate(ads = factor(ads, levels = str_c("ad", c(1:10)))) %>%
+  ggplot(aes(theta_k_hat, density, color = ads)) +
+  geom_line() +
+  theme_classic() +
+  scale_colour_brewer(palette = "Set3")
+```

@@ -1,0 +1,112 @@
+---
+title: "ASA Presentation: Results"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(here)
+library(readr)
+library(ggplot2)
+```
+
+```{r}
+bandit_main <- read_csv(here("data/immigrants_main_bandit.csv"))
+bandit_main
+
+batch_main <- read_csv(here("data/immigrants_main_batch.csv"))
+batch_main
+
+params_main <- read_csv(here("data/immigrants_main_parameters.csv"))
+params_main
+
+pi_main <- read_csv(here("data/immigrants_main_pi.csv"))
+pi_main
+
+response_main <- read_csv(here("data/immigrants_main_response.csv"))
+response_main
+
+metadata_main <- read_csv(here("data/immigrants_main_metadata.csv"))
+metadata_main
+```
+
+```{r}
+# bayes_result <- foreach(target = c("Min","Max"), .combine = "rbind") %do% {
+#   data %>%
+#     filter(batch_type %in% c("Warmup",paste0("Iterative Batch Phase: ",target))) %>%
+#     group_by(context_label, batch_id) %>%
+#     arrange(batch_id) %>%
+#     mutate(alpha = cumsum(chose_younger) + 10,
+#            beta = cumsum(1 - chose_younger) + 10) %>%
+#     group_by(batch_id, context_label) %>%
+#     slice_tail(n = 1) %>%
+#     mutate(estimate = alpha / (alpha + beta),
+#            ci.min = qbeta(.025, shape1 = alpha, shape2 = beta),
+#            ci.max = qbeta(.975, shape1 = alpha, shape2 = beta)) %>%
+#     mutate(target = target)
+# }
+
+params_main %>% 
+  filter(batch_id == max(batch_id)) %>% 
+  summarize(alpha = sum(alpha),
+            beta = sum(beta)) %>% 
+  rowSums()
+
+params_main %>%
+  group_by(batch_id) %>% 
+  mutate(alpha_total = sum(alpha)) %>% 
+  mutate(beta_total = sum(beta)) %>% 
+  ungroup() %>% 
+  mutate(num_participants = rowSums(select(., c("alpha_total", "beta_total"))) - 32) %>% 
+  filter(arm_id %in% c(7, 10)) %>% 
+  mutate(estimate = alpha / (alpha + beta),
+           ci.min = qbeta(.025, shape1 = alpha, shape2 = beta),
+           ci.max = qbeta(.975, shape1 = alpha, shape2 = beta)) %>%
+  ggplot(aes(x = num_participants, y = estimate, 
+             ymin = ci.min, ymax = ci.max)) +
+  geom_line() + 
+  geom_ribbon(alpha = .2) +
+  facet_wrap( ~ arm_id) +
+  xlim(1847, 7400) +
+  ylab("Estimated P(Chooses Applicant\nwith a College Degree)") +
+  xlab("Total Number of Participants in the Study") +
+  theme_classic()
+```
+
+```{r}
+bayes_result %>%
+  ggplot(aes(x = batch_id, y = estimate, 
+             ymin = ci.min, ymax = ci.max)) +
+  geom_line() + 
+  geom_ribbon(alpha = .2) +
+  facet_grid(target ~ context_label) +
+  ylab("Estimated P(Chooses Younger)") +
+  xlab("Batch Number")
+```
+
+```{r}
+bandit_main %>% 
+  rename(arm_id = id) %>% 
+  left_join(metadata_main, by=c("arm_id")) %>% 
+  filter(arm_id %in% c(7, 10))
+```
+
+
+```{r}
+responses_main <- read_csv(here("data/immigrants_main_response.csv"))
+responses_max <- read_csv(here("data/immigrants_max_response.csv")) |> mutate(phase = "validation_max")
+responses_min <- read_csv(here("data/immigrants_min_response.csv")) |> mutate(phase = "validation_min")
+
+responses <- responses_main |>
+  bind_rows(responses_max) |>
+  bind_rows(responses_min) |>
+  filter(!garbage)
+```
+
+```{r}
+responses
+```
+
+
