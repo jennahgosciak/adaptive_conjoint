@@ -9,8 +9,8 @@ df_job_app_clean <- read_csv("./data/job_applicants_data_clean_2025_08_01.csv") 
   rename(arm_id = context,
          arm_label = context_label)
 
-# Within each context, determine which percent chose each signal
-df_chose_signal <- df_job_app_clean %>% 
+# Prepare for computing choices
+df_job_app_clean <- df_job_app_clean %>% 
   pivot_longer(c(str_c("Q", 1:8, "_orig")), names_to = "order", values_to = "selection") %>% 
   filter(!is.na(selection)) %>% 
   mutate(chose_cand1 = if_else(selection == 'Candidate 1', 1, 0),
@@ -29,9 +29,28 @@ df_chose_signal <- df_job_app_clean %>%
                                  TRUE ~ 0),
          chose_exp1 = case_when((cand1_exp_signal == exp1) & (chose_cand1 == 1) ~ 1,
                                  (cand1_exp_signal != exp1) & (chose_cand1 == 0) ~ 1,
-                                 TRUE ~ 0)) %>% 
+                                 TRUE ~ 0))
+
+distinct_labels <- df_job_app_clean %>% 
+  # note: volunteer1 is always shown first
+  distinct(cand1_educ_signal, cand1_exp_signal, cand1_name_signal, volunteer1)  %>% 
+  mutate(label = as.integer(row_number()))
+
+df_job_app_clean %>% 
+  left_join(distinct_labels,
+            by = c("cand1_educ_signal", "cand1_exp_signal",
+                   "cand1_name_signal", "volunteer1")) %>% 
+  group_by(arm_id, arm_label, label) %>% 
+  summarize(n = n()) %>% 
+  ggplot() +
+  geom_col(aes(label, n)) +
+  facet_wrap(~arm_label) +
+  labels(x = "Unique combination of order X treatment")
+
+# Within each context, determine which percent chose each signal
+df_chose_signal <- df_job_app_clean %>% 
   group_by(arm_id, arm_label, education1, name1, exp1,
-           education2, name2, exp2, exp1_desc, exp2_desc) %>% 
+           education2, name2, exp2, exp1_desc, exp2_desc, chose_mother) %>% 
   summarize(across(c(chose_cand1, chose_educ1, chose_name1, chose_exp1), .fns = lst(mean = ~mean(.),
                                                                                      n = ~n()))) %>% 
   verify(chose_cand1_n == chose_educ1_n) %>% 
