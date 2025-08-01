@@ -10,3 +10,4 @@ automate_candidates_files/
 .DS_Store
 .Rprofile
 renv/
+*.yml
