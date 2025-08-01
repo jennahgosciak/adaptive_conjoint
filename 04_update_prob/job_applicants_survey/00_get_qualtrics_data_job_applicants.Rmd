@@ -51,7 +51,8 @@ df %>%
 df <- df %>%
   mutate(StartDate_clean = ymd_hms(StartDate)) %>%
   verify(is.na(StartDate_clean) == is.na(StartDate)) %>%
-  filter(StartDate_clean >= ymd_hms("2024-02-25-18-00-00"))
+  filter(StartDate_clean >= ymd_hms("2024-02-25-18-00-00")) %>% 
+  filter(StartDate_clean < ymd_hms("2025-01-01-00-00-00"))
 
 df %>%
   nrow()
@@ -294,7 +295,7 @@ df %>%
   group_by(batch_type, batch_id) %>%
   summarize(n = n())
 
-1951+1948
+# 1951+1948
 ```
 
 ```{r}
@@ -591,13 +592,22 @@ df_clean <- df_clean %>%
 
 
 ```{r}
-df_clean %>%
-  select(unique_id, context, context_label, batch_id, batch_type, chose_mother, race, age, female, hispanic) %>%
-  saveRDS("../../02_output/job_applicants_data_clean.RDS")
+df_clean %>% 
+  head()
+```
+
+```{r}
+date_today <- str_replace_all(Sys.Date(), "-", "_")
 
 df_clean %>%
-  select(unique_id, context, context_label, batch_id, batch_type, chose_mother, race, age, female, hispanic) %>%
-  write_csv("../../02_output/job_applicants_data_clean.csv")
+  select(unique_id, context, context_label, batch_id, batch_type, chose_mother, race, age, female, hispanic, everything()) %>%
+  select(-ResponseId, -`Prolific ID Q`) %>% 
+  saveRDS(str_glue("../../02_output/job_applicants_data_clean_{date_today}.RDS"))
+
+df_clean %>%
+  select(unique_id, context, context_label, batch_id, batch_type, chose_mother, race, age, female, hispanic, everything()) %>%
+  select(-ResponseId, -`Prolific ID Q`) %>% 
+  write_csv(str_glue("../../02_output/job_applicants_data_clean_{date_today}.csv"))
 ```
 
 
