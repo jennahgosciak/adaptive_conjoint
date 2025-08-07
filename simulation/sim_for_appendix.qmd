@@ -144,7 +144,7 @@ adaptive_estimator <- function(warmup_n, adaptive_n, arms = theta$arm) {
 ```
 
 
-Write a function that calls the above to make all 2 $\times$ 2 cells of estimates that invovle:
+Write a function that calls the above to make all 2 $\times$ 2 cells of estimates that involve:
 
 1) One-sample estimation vs
 2) Selection followed by a separate validation set
