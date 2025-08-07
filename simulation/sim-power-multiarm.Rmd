@@ -198,10 +198,10 @@ adaptive_warmupfixed <- function(n, true_p) {
 # testing for fixed warmup
 n_sim <- 20
 tic()
-mean_estimates_warmupfixed <- future_map_dfr(1:100, ~adaptive_warmupfixed(1000, true_p), seed=TRUE) %>% 
-  bind_rows(future_map_dfr(1:100, ~adaptive_warmupfixed(3000, true_p), seed=TRUE)) %>% 
-  bind_rows(future_map_dfr(1:100, ~adaptive_warmupfixed(5000, true_p), seed=TRUE)) %>% 
-  bind_rows(future_map_dfr(1:100, ~adaptive_warmupfixed(7000, true_p), seed=TRUE))
+mean_estimates_warmupfixed <- future_map_dfr(1:n_sim, ~adaptive_warmupfixed(1000, true_p), seed=TRUE) %>% 
+  bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed(3000, true_p), seed=TRUE)) %>% 
+  bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed(5000, true_p), seed=TRUE)) %>% 
+  bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed(7000, true_p), seed=TRUE))
 toc()
 mean_estimates_warmupfixed
 ```
