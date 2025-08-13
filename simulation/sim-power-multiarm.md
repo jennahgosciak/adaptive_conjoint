@@ -1,11 +1,10 @@
 sim-power-multiarm
 ================
-2025-08-07
+2025-08-13
 
 ## Static/fixed 16-arm experiment
 
 ``` r
-mde <- 0.75 - 0.64
 arms <- c(1:16)
 true_p <- c(c(0.64, 0.75), runif(length(arms)-2, 0.66, 0.73))
 
@@ -31,41 +30,125 @@ format_sample_df <- function(sample_draws) {
     mutate(context = ((row_number()-1) %% 16) + 1)
 }
 
-produce_est <- function(n) {
+produce_est2 <- function(n, true_p, num_sim=100) {
     # print("#############")
     # print(str_glue("N={n}"))
 
   est <- lst()
-  for (sim in c(1:500)) {
+  for (sim in c(1:num_sim)) {
     outcomes <- draw_sample(n, true_p)
     outcomes_df <- outcomes %>% 
       format_sample_df()
     
     outcomes_df_grpd <- outcomes_df %>% 
       group_by(context) %>% 
-      summarize(mean_est = mean(value)) %>% 
+      summarize(mean_est = mean(value),
+                y1 = sum(value==1),
+                y0 = sum(value==0)) %>% 
       mutate(n_sim = sim) %>% 
-      ungroup()
-
-    test_res <- outcomes_df %>% 
-      filter(context %in% c(1,2)) %>% 
-      t.test(value ~ context, data = .)
+      ungroup() 
     
-    est[[sim]] <- outcomes_df_grpd %>% 
-      mutate(reject = case_when(test_res$p.value < 0.05 & context == 1 ~ 1, 
-                                test_res$p.value >= 0.05 & context == 1 ~ 0,
-                                TRUE ~ NA))
+    est[[sim]] <- outcomes_df_grpd
   }
   est_df <- bind_rows(est) %>% 
-    mutate(n_size = n,
-           power = mean(reject, na.rm = TRUE))
+    mutate(n_size = n)
+  return(est_df)
+}
+
+produce_est <- function(n, true_p, num_sim=100) {
+    # print("#############")
+    # print(str_glue("N={n}"))
+
+  est <- lst()
+  for (sim in c(1:num_sim)) {
+    outcomes <- draw_sample(n, true_p)
+    outcomes_df <- outcomes %>% 
+      format_sample_df()
+    
+    outcomes_df_grpd <- outcomes_df %>% 
+      group_by(context) %>% 
+      summarize(mean_est = mean(value),
+                y1 = sum(value==1),
+                y0 = sum(value==0)) %>% 
+      mutate(n_sim = sim) %>% 
+      ungroup()  %>% 
+      mutate(theta_star = map2(.x = y1, .y = y0, 
+                               .f = \(x,y) rbeta(1000, 
+                                                 x + 1, y + 1))) %>% 
+            unnest(theta_star)  %>% 
+      group_by(context) %>% 
+      mutate(index = 1:1000) %>% 
+      arrange(index, context) %>% 
+      group_by(index, n_sim) %>% 
+      summarize(max_arm = which.max(theta_star)) %>% 
+      group_by(max_arm, n_sim) %>% 
+      summarize(prob = n()/1000)
+    
+    est[[sim]] <- outcomes_df_grpd
+  }
+  est_df <- bind_rows(est) %>% 
+    mutate(n_size = n)
   return(est_df)
 }
 ```
 
+## Produce simulations for a fixed experiment
+
 ``` r
-est_df <- map_dfr(seq(100,10000,1000), ~produce_est(.))
+# est_df <- map_dfr(seq(100,10000,1000), ~produce_est(.))
+# 
+# # using Bayes approach from Ian
+# est_df_bayes <- cbind(est_df, map2_dfr(est_df$y1, est_df$y0, ~tibble(theta = rbeta(100, 1 + .x, 1 + .y)) %>%
+#   summarize(
+#       theta_hat = mean(theta),
+#       theta_ci_min = quantile(theta, .025),
+#       theta_ci_max = quantile(theta, .975))))
+```
+
+``` r
+#true_p <- c(c(0.64, 0.75), runif(length(arms)-2, 0.66, 0.73))
+#true_p <- seq(0.6, 0.7, length.out = 16)
+true_p <- seq(0.3, 0.7, length.out = 16)
+true_p
+```
+
+    ##  [1] 0.3000000 0.3266667 0.3533333 0.3800000 0.4066667 0.4333333 0.4600000
+    ##  [8] 0.4866667 0.5133333 0.5400000 0.5666667 0.5933333 0.6200000 0.6466667
+    ## [15] 0.6733333 0.7000000
+
+``` r
+est_df <- map_dfr(seq(10,4000,500), ~produce_est(., true_p))
+
 est_df %>% 
+  mutate(n_total = n_size*16) %>% 
+  group_by(n_total, max_arm) %>% 
+  summarize(mean_prob = mean(prob),
+            prob_ci_min = quantile(prob, 0.025),
+            prob_ci_max = quantile(prob, 0.975)) %>% 
+  ggplot(aes(n_total, mean_prob)) +
+  geom_point() +
+  geom_hline(yintercept=0.95, color='red') +
+  facet_wrap(~max_arm) +
+  scale_y_continuous(limits=c(0,1.05))
+```
+
+![](sim-power-multiarm_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+``` r
+# using Bayes approach from Ian
+# est_df_bayes <- map2_dfr(est_df$y1, est_df$y0, ~tibble(theta = rbeta(100, 1 + .x, 1 + .y)) %>%
+#   summarize(
+#       theta_hat = mean(theta),
+#       theta_ci_min = quantile(theta, .025),
+#       theta_ci_max = quantile(theta, .975))))
+# 
+# est_df_bayes
+```
+
+``` r
+est_df2 <- map_dfr(seq(10,4000,500), ~produce_est2(., true_p))
+
+est_df2 %>% 
   group_by(n_size, context) %>% 
   summarize(mean = mean(mean_est),
          min = min(mean_est),
@@ -97,7 +180,50 @@ est_df %>%
     ## `summarise()` has grouped output by 'n_size'. You can override using the
     ## `.groups` argument.
 
-![](sim-power-multiarm_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](sim-power-multiarm_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+``` r
+est_df2 <- map_dfr(seq(100,1000,100), ~produce_est2(., true_p))
+
+est_df_bayes <- cbind(est_df2, map2_dfr(est_df2$y1, est_df2$y0, ~tibble(theta = rbeta(100, 1 + .x, 1 + .y)) %>%
+  summarize(
+      theta_hat = mean(theta),
+      theta_ci_min = quantile(theta, .025),
+      theta_ci_max = quantile(theta, .975))))
+
+est_df_bayes %>% 
+  head()
+```
+
+    ##   context mean_est y1 y0 n_sim n_size theta_hat theta_ci_min theta_ci_max
+    ## 1       1     0.38 38 62     1    100 0.3860305    0.2947836    0.4498183
+    ## 2       2     0.32 32 68     1    100 0.3258626    0.2339353    0.4168421
+    ## 3       3     0.43 43 57     1    100 0.4319795    0.3368525    0.5318795
+    ## 4       4     0.39 39 61     1    100 0.3846457    0.3056051    0.4731690
+    ## 5       5     0.40 40 60     1    100 0.3942660    0.3066683    0.4831356
+    ## 6       6     0.37 37 63     1    100 0.3741231    0.2932189    0.4843723
+
+``` r
+unique(est_df_bayes$n_size) %>% 
+  head()
+```
+
+    ## [1] 100 200 300 400 500 600
+
+``` r
+est_df_bayes %>% 
+  filter(context %in% c(1,2)) %>% 
+  mutate(total_n = 16*n_size) %>% 
+  filter(n_size %in% c(100, 200, 400, 800, 1000)) %>% 
+  ggplot(aes(n_sim, theta_hat)) +
+  geom_ribbon(aes(n_sim, ymin=theta_ci_min, ymax=theta_ci_max), fill='gray', alpha=0.8) +
+  geom_point() +
+  facet_grid(cols = vars(context),
+             rows = vars(total_n)) +
+  labs(y = "Estimated Theta")
+```
+
+![](sim-power-multiarm_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ## Adaptive experiment simulation
 
@@ -426,7 +552,7 @@ mean_estimates_warmupfixed <- future_map_dfr(1:n_sim, ~adaptive_warmupfixed(1000
 toc()
 ```
 
-    ## 1264.773 sec elapsed
+    ## 3314.433 sec elapsed
 
 ``` r
 mean_estimates_warmupfixed
@@ -435,16 +561,16 @@ mean_estimates_warmupfixed
     ## # A tibble: 1,280 × 6
     ##    context chose1 chose0 chose_n mean_est n_adaptive
     ##      <dbl>  <int>  <dbl>   <dbl>    <dbl>      <dbl>
-    ##  1       1    110     68     178    0.618       1000
-    ##  2       2    151     44     195    0.774       1000
-    ##  3       3    126     65     191    0.660       1000
-    ##  4       4    126     60     186    0.677       1000
-    ##  5       5    122     67     189    0.646       1000
-    ##  6       6    134     56     190    0.705       1000
-    ##  7       7    139     54     193    0.720       1000
-    ##  8       8    125     52     177    0.706       1000
-    ##  9       9    147     46     193    0.762       1000
-    ## 10      10    133     53     186    0.715       1000
+    ##  1       1     51    127     178    0.287       1000
+    ##  2       2     61    116     177    0.345       1000
+    ##  3       3     71    125     196    0.362       1000
+    ##  4       4     71    120     191    0.372       1000
+    ##  5       5     70    114     184    0.380       1000
+    ##  6       6     74    109     183    0.404       1000
+    ##  7       7     82    110     192    0.427       1000
+    ##  8       8     92    100     192    0.479       1000
+    ##  9       9     95     98     193    0.492       1000
+    ## 10      10    106     90     196    0.541       1000
     ## # ℹ 1,270 more rows
 
 ``` r
@@ -478,4 +604,4 @@ mean_estimates_warmupfixed  %>%
        x = 'Total number of participants\n(fixed warmup phase n=2,000)')
 ```
 
-![](sim-power-multiarm_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](sim-power-multiarm_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->

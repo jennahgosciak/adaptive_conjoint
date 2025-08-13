@@ -1,0 +1,145 @@
+---
+title: "Simulation for Adaptive Conjoint Appendix"
+format: pdf
+---
+
+```{r, message = F, warning = F}
+library(tidyverse)
+theme_set(theme_bw())
+library(foreach)
+library(doParallel)
+library(doRNG)
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+```
+
+Define true parameter to learn.
+
+```{r}
+theta <- tibble(
+  arm = 1:5,
+  theta = seq(.3,.7,.1)
+)
+```
+
+Define an estimator that samples arms with equal probabilities.
+
+```{r}
+estimator <- function(method = "equal") {
+  # Initialize max probability
+  max_prob <- 0
+  
+  # Initialize aggregate data
+  data_aggregated <- theta |>
+    mutate(y0 = 0, y1 = 0)
+  
+  while (max_prob < .95) {
+    
+    # Sample a case
+    if (method == "equal") {
+      chosen <- data_aggregated |>
+        slice_sample(n = 1)
+    } else if (method == "adaptive") {
+      chosen <- data_aggregated |>
+        mutate(theta_star = rbeta(n(), y1 + 1, y0 + 1)) |>
+        arrange(theta_star) |>
+        slice_tail(n = 1) |>
+        select(-theta_star)
+    } else {
+      stop("Method should be 'equal' or 'adaptive'")
+    }
+    
+    new_case <- chosen |>
+      # Generate outcome
+      mutate(y = rbinom(n(), 1, theta)) |>
+      # Increment the aggregate data
+      mutate(
+        y0 = ifelse(y == 0, y0 + 1, y0),
+        y1 = ifelse(y == 1, y1 + 1, y1)
+      ) |>
+      select(-y)
+    
+    data_aggregated <- data_aggregated |>
+      # Drop old row for new case
+      anti_join(new_case, by = join_by(arm)) |>
+      # Append updated row for new case
+      bind_rows(new_case) |>
+      arrange(arm)
+    
+    n_total <- data_aggregated |> summarize(n = sum(y0) + sum(y1)) |> pull(n)
+    if (n_total %% 200 == 0) {
+      probs <- data_aggregated |>
+        mutate(theta_star = map2(.x = y1, .y = y0, .f = \(x,y) rbeta(1000, x + 1, y + 1))) |>
+        unnest(theta_star) |>
+        mutate(sim_index = rep(x = 1:1000, times = max(arm))) |>
+        # Within each simulation, keep the highest theta
+        group_by(sim_index) |>
+        arrange(sim_index, theta_star) |>
+        slice_tail(n = 1) |>
+        ungroup() |>
+        count(arm) |>
+        mutate(prob = n / sum(n)) |>
+        select(-n)
+      max_prob <- max(probs$prob)
+    }
+  }
+  
+  return(
+    tibble(n_total = n_total, method = method) |>
+      mutate(data_aggregated = list(data_aggregated),
+             probs = list(probs))
+  )
+}
+
+
+t0 <- Sys.time()
+set.seed(90266)
+result <-  foreach(method_value = c("equal","adaptive"), .combine = "rbind") %do% {
+  foreach(rep = 1:1000, .packages = "tidyverse", .combine = "rbind") %dorng% {
+    estimator(method = method_value)
+  }
+}
+spent <- difftime(t0, Sys.time())
+#every_10 <- difftime(t0, Sys.time())
+#every_100 <- difftime(t0, Sys.time())
+
+result_aggregated <- result |>
+  group_by(method) |>
+  summarize(
+    mean_n = mean(n_total),
+    se = sd(n_total) / sqrt(n())
+  )
+
+# Mean number of cases required
+result_aggregated |>
+  mutate(
+    ci.min = mean_n - qnorm(.975) * se,
+    ci.max = mean_n + qnorm(.975) * se
+  )
+# Difference in mean number of cases required
+result_aggregated |>
+  select(1:3) |>
+  pivot_longer(cols = -method) |>
+  pivot_wider(names_from = "method", values_from = "value") |>
+  mutate(
+    estimate = case_when(
+      name == "mean_n" ~ equal - adaptive,
+      name == "se" ~ sqrt(equal ^ 2 + adaptive ^ 2)
+    )
+  ) |>
+  select(name, estimate) |>
+  pivot_wider(names_from = "name", values_from = "estimate") |>
+  mutate(
+    ci.min = mean_n - qnorm(.975) * se,
+    ci.max = mean_n + qnorm(.975) * se
+  )
+
+result |>
+  ggplot(aes(x = n_total, fill = method)) +
+  geom_histogram(alpha = .8, bins = 30) +
+  facet_wrap(~method, ncol = 1) +
+  ggtitle("Sample size to have 95% posterior\nprobability of an arm being the max")
+ggsave("figures/sample_size_histogram.png", height = 3, width = 4)
+
+```
+

@@ -11,12 +11,17 @@ library(tictoc)
 plan(multisession, workers = 2)
 knitr::opts_chunk$set(echo = TRUE)
 
+theme_set(theme_bw())
+library(foreach)
+library(doParallel)
+library(doRNG)
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
 ```
 
 ## Static/fixed 16-arm experiment
 
 ```{r}
-mde <- 0.75 - 0.64
 arms <- c(1:16)
 true_p <- c(c(0.64, 0.75), runif(length(arms)-2, 0.66, 0.73))
 
@@ -42,41 +47,115 @@ format_sample_df <- function(sample_draws) {
     mutate(context = ((row_number()-1) %% 16) + 1)
 }
 
-produce_est <- function(n) {
+produce_est2 <- function(n, true_p, num_sim=100) {
     # print("#############")
     # print(str_glue("N={n}"))
 
   est <- lst()
-  for (sim in c(1:500)) {
+  for (sim in c(1:num_sim)) {
     outcomes <- draw_sample(n, true_p)
     outcomes_df <- outcomes %>% 
       format_sample_df()
     
     outcomes_df_grpd <- outcomes_df %>% 
       group_by(context) %>% 
-      summarize(mean_est = mean(value)) %>% 
+      summarize(mean_est = mean(value),
+                y1 = sum(value==1),
+                y0 = sum(value==0)) %>% 
       mutate(n_sim = sim) %>% 
-      ungroup()
-
-    test_res <- outcomes_df %>% 
-      filter(context %in% c(1,2)) %>% 
-      t.test(value ~ context, data = .)
+      ungroup() 
     
-    est[[sim]] <- outcomes_df_grpd %>% 
-      mutate(reject = case_when(test_res$p.value < 0.05 & context == 1 ~ 1, 
-                                test_res$p.value >= 0.05 & context == 1 ~ 0,
-                                TRUE ~ NA))
+    est[[sim]] <- outcomes_df_grpd
   }
   est_df <- bind_rows(est) %>% 
-    mutate(n_size = n,
-           power = mean(reject, na.rm = TRUE))
+    mutate(n_size = n)
+  return(est_df)
+}
+
+produce_est <- function(n, true_p, num_sim=100) {
+    # print("#############")
+    # print(str_glue("N={n}"))
+
+  est <- lst()
+  for (sim in c(1:num_sim)) {
+    outcomes <- draw_sample(n, true_p)
+    outcomes_df <- outcomes %>% 
+      format_sample_df()
+    
+    outcomes_df_grpd <- outcomes_df %>% 
+      group_by(context) %>% 
+      summarize(mean_est = mean(value),
+                y1 = sum(value==1),
+                y0 = sum(value==0)) %>% 
+      mutate(n_sim = sim) %>% 
+      ungroup()  %>% 
+      mutate(theta_star = map2(.x = y1, .y = y0, 
+                               .f = \(x,y) rbeta(1000, 
+                                                 x + 1, y + 1))) %>% 
+            unnest(theta_star)  %>% 
+      group_by(context) %>% 
+      mutate(index = 1:1000) %>% 
+      arrange(index, context) %>% 
+      group_by(index, n_sim) %>% 
+      summarize(max_arm = which.max(theta_star)) %>% 
+      group_by(max_arm, n_sim) %>% 
+      summarize(prob = n()/1000)
+    
+    est[[sim]] <- outcomes_df_grpd
+  }
+  est_df <- bind_rows(est) %>% 
+    mutate(n_size = n)
   return(est_df)
 }
 ```
 
+## Produce simulations for a fixed experiment
+
 ```{r}
-est_df <- map_dfr(seq(100,10000,1000), ~produce_est(.))
+# est_df <- map_dfr(seq(100,10000,1000), ~produce_est(.))
+# 
+# # using Bayes approach from Ian
+# est_df_bayes <- cbind(est_df, map2_dfr(est_df$y1, est_df$y0, ~tibble(theta = rbeta(100, 1 + .x, 1 + .y)) %>%
+#   summarize(
+#       theta_hat = mean(theta),
+#       theta_ci_min = quantile(theta, .025),
+#       theta_ci_max = quantile(theta, .975))))
+```
+
+```{r, warning=FALSE, message=FALSE}
+#true_p <- c(c(0.64, 0.75), runif(length(arms)-2, 0.66, 0.73))
+#true_p <- seq(0.6, 0.7, length.out = 16)
+true_p <- seq(0.3, 0.7, length.out = 16)
+true_p
+
+est_df <- map_dfr(seq(10,4000,500), ~produce_est(., true_p))
+
 est_df %>% 
+  mutate(n_total = n_size*16) %>% 
+  group_by(n_total, max_arm) %>% 
+  summarize(mean_prob = mean(prob),
+            prob_ci_min = quantile(prob, 0.025),
+            prob_ci_max = quantile(prob, 0.975)) %>% 
+  ggplot(aes(n_total, mean_prob)) +
+  geom_point() +
+  geom_hline(yintercept=0.95, color='red') +
+  facet_wrap(~max_arm) +
+  scale_y_continuous(limits=c(0,1.05))
+
+# using Bayes approach from Ian
+# est_df_bayes <- map2_dfr(est_df$y1, est_df$y0, ~tibble(theta = rbeta(100, 1 + .x, 1 + .y)) %>%
+#   summarize(
+#       theta_hat = mean(theta),
+#       theta_ci_min = quantile(theta, .025),
+#       theta_ci_max = quantile(theta, .975))))
+# 
+# est_df_bayes
+```
+
+```{r}
+est_df2 <- map_dfr(seq(10,4000,500), ~produce_est2(., true_p))
+
+est_df2 %>% 
   group_by(n_size, context) %>% 
   summarize(mean = mean(mean_est),
          min = min(mean_est),
@@ -104,6 +183,34 @@ est_df %>%
   labs(y = 'Mean arm estimate variation',
        x = 'Total number of participants')
 ```
+
+```{r, fig.width=10, fig.length=12}
+est_df2 <- map_dfr(seq(100,1000,100), ~produce_est2(., true_p))
+
+est_df_bayes <- cbind(est_df2, map2_dfr(est_df2$y1, est_df2$y0, ~tibble(theta = rbeta(100, 1 + .x, 1 + .y)) %>%
+  summarize(
+      theta_hat = mean(theta),
+      theta_ci_min = quantile(theta, .025),
+      theta_ci_max = quantile(theta, .975))))
+
+est_df_bayes %>% 
+  head()
+
+unique(est_df_bayes$n_size) %>% 
+  head()
+
+est_df_bayes %>% 
+  filter(context %in% c(1,2)) %>% 
+  mutate(total_n = 16*n_size) %>% 
+  filter(n_size %in% c(100, 200, 400, 800, 1000)) %>% 
+  ggplot(aes(n_sim, theta_hat)) +
+  geom_ribbon(aes(n_sim, ymin=theta_ci_min, ymax=theta_ci_max), fill='gray', alpha=0.8) +
+  geom_point() +
+  facet_grid(cols = vars(context),
+             rows = vars(total_n)) +
+  labs(y = "Estimated Theta")
+```
+
 
 ## Adaptive experiment simulation
 
