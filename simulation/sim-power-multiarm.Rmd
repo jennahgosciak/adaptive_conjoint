@@ -8,13 +8,14 @@ date: "`r Sys.Date()`"
 library(tidyverse)
 library(furrr)
 library(tictoc)
-plan(multisession, workers = 2)
+plan(multisession, workers = 8)
 knitr::opts_chunk$set(echo = TRUE)
 
 theme_set(theme_bw())
 library(foreach)
 library(doParallel)
 library(doRNG)
+library(assertr)
 cl <- makeCluster(detectCores())
 registerDoParallel(cl)
 ```
@@ -22,40 +23,34 @@ registerDoParallel(cl)
 ## Static/fixed 16-arm experiment
 
 ```{r}
-arms <- c(1:16)
-true_p <- c(c(0.64, 0.75), runif(length(arms)-2, 0.66, 0.73))
-
 draw_sample <- function(n_size, true_p) {
   # return(unlist(map(true_p, ~rbinom(n=1, size=1, prob=.))))
   return(rbinom(n=n_size*length(true_p), size=1, prob=true_p))
 }
 
 draw_adaptive_sample <- function(pi, true_p) {
-  profile_draw <- rmultinom(1, 1, rep(1,16)/1)
+  profile_draw <- rmultinom(1, 1, pi)
   stopifnot(sum(profile_draw)==1)
   context <- which.max(profile_draw)
   
-  output <- rep(NA, 16)
+  output <- rep(NA, length(true_p))
   draw <- rbinom(n=1, size=1, prob=true_p[context])
   output[context] <- draw
   return(output)
 }
 
-format_sample_df <- function(sample_draws) {
+format_sample_df <- function(sample_draws, true_p) {
   sample_draws %>%
     as_tibble() %>%
-    mutate(context = ((row_number()-1) %% 16) + 1)
+    mutate(context = ((row_number()-1) %% length(true_p)) + 1)
 }
 
 produce_est2 <- function(n, true_p, num_sim=100) {
-    # print("#############")
-    # print(str_glue("N={n}"))
-
   est <- lst()
   for (sim in c(1:num_sim)) {
     outcomes <- draw_sample(n, true_p)
     outcomes_df <- outcomes %>% 
-      format_sample_df()
+      format_sample_df(true_p)
     
     outcomes_df_grpd <- outcomes_df %>% 
       group_by(context) %>% 
@@ -72,7 +67,8 @@ produce_est2 <- function(n, true_p, num_sim=100) {
   return(est_df)
 }
 
-produce_est <- function(n, true_p, num_sim=100) {
+produce_est <- function(n, true_p, num_sim=1000) {
+  print(length(true_p))
     # print("#############")
     # print(str_glue("N={n}"))
 
@@ -80,7 +76,7 @@ produce_est <- function(n, true_p, num_sim=100) {
   for (sim in c(1:num_sim)) {
     outcomes <- draw_sample(n, true_p)
     outcomes_df <- outcomes %>% 
-      format_sample_df()
+      format_sample_df(true_p)
     
     outcomes_df_grpd <- outcomes_df %>% 
       group_by(context) %>% 
@@ -107,6 +103,52 @@ produce_est <- function(n, true_p, num_sim=100) {
     mutate(n_size = n)
   return(est_df)
 }
+
+produce_avgn <- function(n_increment, true_p, num_sim=1000) {
+  est <- lst()
+  for (sim in c(1:num_sim)) {
+    max_prob <- 0
+    n <- 10
+    while (max_prob < 0.95) {
+      outcomes <- draw_sample(n, true_p)
+      outcomes_df <- outcomes %>%
+        format_sample_df(true_p)
+
+      outcomes_df_grpd <- outcomes_df %>%
+        group_by(context) %>%
+        summarize(mean_est = mean(value),
+                  y1 = sum(value==1),
+                  y0 = sum(value==0)) %>%
+        mutate(n_sim = sim,
+               n = n) %>%
+        ungroup()  %>%
+        mutate(theta_star = map2(.x = y1, .y = y0,
+                                 .f = \(x,y) rbeta(1000,
+                                                   x + 1, y + 1))) %>%
+              unnest(theta_star)  %>%
+        group_by(context, n) %>%
+        mutate(index = 1:1000) %>%
+        arrange(index, context) %>%
+        group_by(index, n_sim, n) %>%
+        summarize(max_arm = which.max(theta_star)) %>%
+        group_by(max_arm, n_sim, n) %>%
+        summarize(prob = n()/1000) %>%
+        ungroup() %>%
+        filter(max_arm == length(true_p)) %>%
+        mutate(num_arms = length(true_p))
+      
+        max_prob <- if_else(!is.na(outcomes_df_grpd$prob[1]),
+        outcomes_df_grpd$prob[1], max_prob)
+        n <- n + n_increment
+    }
+    print(max_prob)
+    est[[sim]] <- outcomes_df_grpd
+
+  }
+  est_df <- bind_rows(est) %>%
+    mutate(n_size = n)
+  return(est_df)
+}
 ```
 
 ## Produce simulations for a fixed experiment
@@ -122,22 +164,26 @@ produce_est <- function(n, true_p, num_sim=100) {
 #       theta_ci_max = quantile(theta, .975))))
 ```
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, include=FALSE}
 #true_p <- c(c(0.64, 0.75), runif(length(arms)-2, 0.66, 0.73))
 #true_p <- seq(0.6, 0.7, length.out = 16)
-true_p <- seq(0.3, 0.7, length.out = 16)
+true_p <- seq(0.3, 0.7, length.out = 9)
 true_p
 
-est_df <- map_dfr(seq(10,4000,500), ~produce_est(., true_p))
+est_df <- map_dfr(seq(10,510,500), ~produce_est(., true_p))
+est_df
+```
 
+```{r}
 est_df %>% 
-  mutate(n_total = n_size*16) %>% 
+  mutate(n_total = n_size*length(true_p)) %>% 
   group_by(n_total, max_arm) %>% 
   summarize(mean_prob = mean(prob),
             prob_ci_min = quantile(prob, 0.025),
             prob_ci_max = quantile(prob, 0.975)) %>% 
   ggplot(aes(n_total, mean_prob)) +
   geom_point() +
+  geom_errorbar(aes(ymin = prob_ci_min, ymax = prob_ci_max)) +
   geom_hline(yintercept=0.95, color='red') +
   facet_wrap(~max_arm) +
   scale_y_continuous(limits=c(0,1.05))
@@ -153,64 +199,94 @@ est_df %>%
 ```
 
 ```{r}
-est_df2 <- map_dfr(seq(10,4000,500), ~produce_est2(., true_p))
-
-est_df2 %>% 
-  group_by(n_size, context) %>% 
-  summarize(mean = mean(mean_est),
-         min = min(mean_est),
-         max = max(mean_est)) %>% 
-  group_by(n_size) %>% 
-  mutate(max_est = max(mean),
-         max_est_arm = which.max(mean)) %>% 
-  #filter(row %in% c(1,2)) %>% 
-  mutate(context_label = if_else(context==1, "Min arm", "Max arm")) %>% 
-  mutate(total_n = 16*n_size) %>% 
-  mutate(context = factor(context)) %>% 
-  ungroup() %>% 
-  ggplot() +
-  #geom_hline(aes(yintercept=0.7), color='red', linetype='dashed') +
-  geom_ribbon(data = ~filter(., (context %in% c(3:16))),
-                            aes(total_n, ymin=min, ymax=max, fill=context), alpha=0.3) +
-  geom_ribbon(data = ~filter(., (context %in% c(1,2))),
-                            aes(total_n, ymin=min, ymax=max, group=context), alpha=0.6) +
-  geom_line(data = ~filter(., (context %in% c(3:16))),
-            aes(total_n, mean, color=context), alpha=0.3) +
-  geom_line(data = ~filter(., (context %in% c(1,2))),
-            aes(total_n, mean, group=context)) +
-  theme_classic() +
-  #facet_grid(cols = vars(row_label)) +
-  labs(y = 'Mean arm estimate variation',
-       x = 'Total number of participants')
+# est_df2 <- map_dfr(seq(10,4000,500), ~produce_est2(., true_p))
+# 
+# est_df2 %>% 
+#   group_by(n_size, context) %>% 
+#   summarize(mean = mean(mean_est),
+#          min = min(mean_est),
+#          max = max(mean_est)) %>% 
+#   group_by(n_size) %>% 
+#   mutate(max_est = max(mean),
+#          max_est_arm = which.max(mean)) %>% 
+#   #filter(row %in% c(1,2)) %>% 
+#   mutate(context_label = if_else(context==1, "Min arm", "Max arm")) %>% 
+#   mutate(total_n = 16*n_size) %>% 
+#   mutate(context = factor(context)) %>% 
+#   ungroup() %>% 
+#   ggplot() +
+#   #geom_hline(aes(yintercept=0.7), color='red', linetype='dashed') +
+#   geom_ribbon(data = ~filter(., (context %in% c(2:15))),
+#                             aes(total_n, ymin=min, ymax=max, fill=context), alpha=0.3) +
+#   geom_ribbon(data = ~filter(., (context %in% c(1,16))),
+#                             aes(total_n, ymin=min, ymax=max, group=context), alpha=0.6) +
+#   geom_line(data = ~filter(., (context %in% c(2:15))),
+#             aes(total_n, mean, color=context), alpha=0.3) +
+#   geom_line(data = ~filter(., (context %in% c(1,16))),
+#             aes(total_n, mean, group=context)) +
+#   theme_classic() +
+#   #facet_grid(cols = vars(row_label)) +
+#   labs(y = 'Mean arm estimate variation',
+#        x = 'Total number of participants')
 ```
 
 ```{r, fig.width=10, fig.length=12}
-est_df2 <- map_dfr(seq(100,1000,100), ~produce_est2(., true_p))
-
-est_df_bayes <- cbind(est_df2, map2_dfr(est_df2$y1, est_df2$y0, ~tibble(theta = rbeta(100, 1 + .x, 1 + .y)) %>%
-  summarize(
-      theta_hat = mean(theta),
-      theta_ci_min = quantile(theta, .025),
-      theta_ci_max = quantile(theta, .975))))
-
-est_df_bayes %>% 
-  head()
-
-unique(est_df_bayes$n_size) %>% 
-  head()
-
-est_df_bayes %>% 
-  filter(context %in% c(1,2)) %>% 
-  mutate(total_n = 16*n_size) %>% 
-  filter(n_size %in% c(100, 200, 400, 800, 1000)) %>% 
-  ggplot(aes(n_sim, theta_hat)) +
-  geom_ribbon(aes(n_sim, ymin=theta_ci_min, ymax=theta_ci_max), fill='gray', alpha=0.8) +
-  geom_point() +
-  facet_grid(cols = vars(context),
-             rows = vars(total_n)) +
-  labs(y = "Estimated Theta")
+# est_df2 <- map_dfr(seq(100,1000,100), ~produce_est2(., true_p))
+# 
+# est_df_bayes <- cbind(est_df2, map2_dfr(est_df2$y1, est_df2$y0, ~tibble(theta = rbeta(100, 1 + .x, 1 + .y)) %>%
+#   summarize(
+#       theta_hat = mean(theta),
+#       theta_ci_min = quantile(theta, .025),
+#       theta_ci_max = quantile(theta, .975))))
+# 
+# est_df_bayes %>% 
+#   head()
+# 
+# unique(est_df_bayes$n_size) %>% 
+#   head()
+# 
+# est_df_bayes %>% 
+#   filter(context %in% c(1,2)) %>% 
+#   mutate(total_n = 16*n_size) %>% 
+#   filter(n_size %in% c(100, 200, 400, 800, 1000)) %>% 
+#   ggplot(aes(n_sim, theta_hat)) +
+#   geom_ribbon(aes(n_sim, ymin=theta_ci_min, 
+#                   ymax=theta_ci_max), fill='gray', alpha=0.8) +
+#   geom_point() +
+#   facet_grid(cols = vars(context),
+#              rows = vars(total_n)) +
+#   labs(y = "Estimated Theta")
 ```
 
+```{r, include=FALSE}
+set.seed(1234)
+est_avgn <- suppressMessages(future_map_dfr(c(9, 12, 16, 18, 20), 
+                    ~produce_avgn(200, seq(0.3, 0.7, length.out = .), 
+                         num_sim = 100)))
+
+est_avgn
+
+n_equal_summary <- est_avgn %>% 
+  mutate(total_n = n*num_arms) %>% 
+  group_by(num_arms) %>% 
+  summarize(mean_n = mean(total_n),
+            ci_low = mean_n - qnorm(0.975) * sd(total_n) / sqrt(n()),
+            ci_high = mean_n + qnorm(0.975) * sd(total_n) / sqrt(n()))
+```
+
+```{r}
+n_equal_summary %>% 
+  ggplot(aes(num_arms, mean_n)) +
+  geom_point() +
+  geom_line() +
+  geom_errorbar(aes(ymin = ci_low, ymax = ci_high)) +
+  scale_y_continuous(limits=c(0, 35000), breaks=seq(0,35000, 5000)) +
+  scale_x_continuous(breaks=c(9, 12, 16, 18, 20)) +
+  labs(x = 'Number of arms',
+       y = 'Mean # of samples to obtain 95% posterior probability')
+
+ggsave('./sample_size_uniform.pdf')
+```
 
 ## Adaptive experiment simulation
 
@@ -260,29 +336,33 @@ update_ts <- function(df, num_sim, num_contexts, type) {
   return(pi)
 }
 
-adaptive_phase <- function(warmup_df, n_total, n_sim=1000) {
-  pi <- rep(1, 16)/16
+adaptive_phase <- function(warmup_df, n_total, true_p, n_sim=1000) {
+  pi <- rep(1, length(true_p))/length(true_p)
   df <- warmup_df
   for (i in c(1:n_total)) {
     adaptive_draw <- draw_adaptive_sample(pi, true_p) %>% 
-      format_sample_df() %>% 
+      format_sample_df(true_p) %>% 
       rename(chose_educ = value)
     
     df <- bind_rows(df, adaptive_draw)
-    pi <- update_ts(df, n_sim, 16, "max")
+    pi <- update_ts(df, n_sim, length(true_p), "max")
+    if (max(pi) >= 0.95) {
+      break
+    }
     stopifnot(abs(sum(pi)-1) < 0.05)
   }
   outcomes <- df %>% 
-    update_outcomes(16)
+    update_outcomes(length(true_p)) %>% 
+    mutate(n_i = i)
   
   return(lst(outcomes, pi))
 }
 
 full_experiment <- function(n_warmup, n_adaptive, true_p) {
-  warmup_df <- draw_sample(n_warmup/16, true_p) %>% 
-    format_sample_df() %>% 
+  warmup_df <- draw_sample(round(n_warmup/length(true_p)), true_p) %>% 
+    format_sample_df(true_p) %>% 
     rename(chose_educ = value)
-  return(adaptive_phase(warmup_df, n_adaptive))
+  return(adaptive_phase(warmup_df, n_adaptive, true_p))
 }
 ```
 
@@ -290,7 +370,7 @@ full_experiment <- function(n_warmup, n_adaptive, true_p) {
 adaptive_warmupfixed <- function(n, true_p) {
   print("###########")
   print(str_glue("Running for n={n}"))
-  adaptive_res <- full_experiment(125*16, n, true_p)
+  adaptive_res <- full_experiment(125*length(true_p), n, true_p)
   final_pi <- adaptive_res$pi
   final_outcomes <- adaptive_res$outcomes
   mean_estimates_df <- final_outcomes %>% 
@@ -299,19 +379,105 @@ adaptive_warmupfixed <- function(n, true_p) {
            mean_est = chose1 / chose_n) %>% 
     ungroup() %>% 
     mutate(n_adaptive = n)
+  
   return(mean_estimates_df)
 }
 
-# testing for fixed warmup
-n_sim <- 20
-tic()
-mean_estimates_warmupfixed <- future_map_dfr(1:n_sim, ~adaptive_warmupfixed(1000, true_p), seed=TRUE) %>% 
-  bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed(3000, true_p), seed=TRUE)) %>% 
-  bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed(5000, true_p), seed=TRUE)) %>% 
-  bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed(7000, true_p), seed=TRUE))
-toc()
-mean_estimates_warmupfixed
+adaptive_warmupfixed2 <- function(n, true_p) {
+  print("###########")
+  print(str_glue("Running for n={n}"))
+  adaptive_res <- full_experiment(100, n, true_p)
+  final_pi <- adaptive_res$pi
+  final_outcomes <- adaptive_res$outcomes
+  mean_estimates_df <- final_outcomes %>% 
+    rowwise() %>% 
+    mutate(chose_n = chose1 + chose0,
+           mean_est = chose1 / chose_n) %>% 
+    arrange(context) %>% 
+    cbind(., tibble(pi = final_pi))  %>% 
+    ungroup() %>% 
+    mutate(n_adaptive = n,
+           n_total = n_i + 125*length(true_p))
+  
+  return(mean_estimates_df)
+}
+
 ```
+
+```{r}
+# testing for fixed warmup
+# n_sim <- 10
+# tic()
+# mean_estimates_warmupfixed <- future_map_dfr(1:n_sim, ~adaptive_warmupfixed(1000, true_p), seed=TRUE) %>% 
+#   bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed(3000, true_p), seed=TRUE)) %>% 
+#   bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed(5000, true_p), seed=TRUE)) %>% 
+#   bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed(7000, true_p), seed=TRUE))
+# toc()
+# mean_estimates_warmupfixed
+```
+
+```{r, include=FALSE}
+# n_sim <- 10
+# tic()
+# mean_estimates_warmupfixed_2 <- future_map_dfr(1:n_sim, ~adaptive_warmupfixed2(1000, true_p), seed=TRUE) %>% 
+#   bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed2(3000, true_p), seed=TRUE)) %>% 
+#   bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed2(5000, true_p), seed=TRUE)) %>% 
+#   bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed2(7000, true_p), seed=TRUE))
+# toc()
+# 
+# mean_estimates_warmupfixed_2
+```
+
+
+```{r, include=TRUE}
+set.seed(1234)
+n_sim <- 100
+tic()
+
+mean_estimates_warmupfixed_3 <- future_map_dfr(1:n_sim, ~adaptive_warmupfixed2(50000, seq(0.3, 0.7, length.out = 9)), 
+                                               .options=furrr_options(seed=TRUE)) %>% 
+  mutate(num_arms = 9) %>% 
+  filter(context == num_arms) %>% 
+  bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed2(50000, seq(0.3, 0.7, length.out = 12)), .options=furrr_options(seed=TRUE)) %>% 
+  mutate(num_arms = 12) %>% 
+  filter(context == num_arms)) %>% 
+  bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed2(50000, seq(0.3, 0.7, length.out = 16)), .options=furrr_options(seed=TRUE)) %>% 
+  mutate(num_arms = 16) %>% 
+  filter(context == num_arms)) %>% 
+  bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed2(50000, seq(0.3, 0.7, length.out = 20)), .options=furrr_options(seed=TRUE)) %>% 
+  mutate(num_arms = 20) %>% 
+  filter(context == num_arms))
+toc()
+
+mean_estimates_warmupfixed_3
+```
+
+```{r}
+n_adaptive_summary <- mean_estimates_warmupfixed_3 %>% 
+  mutate(n_total = 100 + n_i) %>% 
+  group_by(num_arms) %>% 
+  summarize(mean_n = mean(n_total),
+            ci_low = mean_n - qnorm(0.975) * sd(n_total) / sqrt(n()),
+            ci_high = mean_n + qnorm(0.975) * sd(n_total) / sqrt(n())) %>% 
+  mutate(method = 'adaptive')
+
+n_adaptive_summary %>% 
+  summarize(max_n = max(ci_high))
+
+n_equal_summary %>% 
+  mutate(method = 'equal') %>% 
+  bind_rows(n_adaptive_summary) %>% 
+  ggplot(aes(num_arms, mean_n, color=method)) +
+  geom_point() +
+  geom_line() +
+  geom_errorbar(aes(ymin = ci_low, ymax = ci_high)) +
+  scale_y_continuous(limits=c(0, 30000)) +
+  scale_x_continuous(breaks=c(9, 12, 16, 18, 20)) +
+  labs(x = 'Number of arms',
+       y = 'Mean # of samples to obtain 95% posterior probability')
+ggsave('./sample_size_adaptive.pdf')
+```
+
 
 ```{r, fig.width=26, message=FALSE}
 mean_estimates_warmupfixed  %>% 
@@ -330,18 +496,32 @@ mean_estimates_warmupfixed  %>%
   ungroup() %>% 
   ggplot() +
   #geom_hline(aes(yintercept=0.7), color='red', linetype='dashed') +
-  geom_ribbon(data = ~filter(., (context %in% c(3:16))),
+  geom_ribbon(data = ~filter(., (context %in% c(2:15))),
                             aes(n_adaptive, ymin=min, ymax=max, fill=context), alpha=0.3) +
-  geom_ribbon(data = ~filter(., (context %in% c(1,2))),
+  geom_ribbon(data = ~filter(., (context %in% c(1,16))),
                             aes(n_adaptive, ymin=min, ymax=max, group=context), alpha=0.6) +
-  geom_line(data = ~filter(., (context %in% c(3:16))),
+  geom_line(data = ~filter(., (context %in% c(2:15))),
             aes(n_adaptive, mean, color=context), alpha=0.3) +
-  geom_line(data = ~filter(., (context %in% c(1,2))),
+  geom_line(data = ~filter(., (context %in% c(1,16))),
             aes(n_adaptive, mean, group=context)) +
   theme_classic() +
   facet_grid(cols = vars(context)) +
   labs(y = 'Mean arm estimate variation',
        x = 'Total number of participants\n(fixed warmup phase n=2,000)')
+```
+```{r}
+# mean_estimates_warmupfixed_2  %>% 
+#   mutate(n_total = n_adaptive + (125*16)) %>% 
+#   group_by(n_total, context) %>% 
+#   summarize(mean_prob = mean(pi),
+#             prob_ci_min = quantile(pi, 0.025),
+#             prob_ci_max = quantile(pi, 0.975)) %>% 
+#   ggplot(aes(n_total, mean_prob)) +
+#   geom_point() +
+#   geom_errorbar(aes(ymin = prob_ci_min, ymax = prob_ci_max)) +
+#   geom_hline(yintercept=0.95, color='red') +
+#   facet_wrap(~context) +
+#   scale_y_continuous(limits=c(0,1.05))
 ```
 
 
