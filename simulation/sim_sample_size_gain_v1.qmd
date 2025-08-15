@@ -17,8 +17,8 @@ Define true parameter to learn.
 
 ```{r}
 theta <- tibble(
-  arm = 1:5,
-  theta = seq(.3,.7,.1)
+  arm = 1:16,
+  theta = seq(.3,.7,length.out=16)
 )
 ```
 
@@ -95,7 +95,7 @@ estimator <- function(method = "equal") {
 t0 <- Sys.time()
 set.seed(90266)
 result <-  foreach(method_value = c("equal","adaptive"), .combine = "rbind") %do% {
-  foreach(rep = 1:1000, .packages = "tidyverse", .combine = "rbind") %dorng% {
+  foreach(rep = 1:100, .packages = "tidyverse", .combine = "rbind") %dorng% {
     estimator(method = method_value)
   }
 }
