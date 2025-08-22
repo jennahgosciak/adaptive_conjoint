@@ -1,11 +1,12 @@
 library(tidyverse)
 library(ggplot2)
+library(here)
 
 #########
 # Produces figures for appendix D
 
-outcomes500 <- readRDS("./data/simulation-data/fixed_sample_adaptive_sim_1000_500.RDS")
-outcomes1000 <- readRDS("./data/simulation-data/fixed_sample_adaptive_sim_1000_1000.RDS")
+outcomes500 <- readRDS(here("data/simulation-data/fixed_sample_adaptive_sim_1000_500.RDS"))
+outcomes1000 <- readRDS(here("data/simulation-data/fixed_sample_adaptive_sim_1000_1000.RDS"))
 outcomes500 %>% 
   mutate(n_resp = 'Number of respondents: 500') %>% 
   bind_rows(outcomes1000 %>% 
@@ -35,10 +36,10 @@ outcomes500 %>%
                      labels=c("0", "25%", "50%", "75%", "100%")) +
   facet_wrap(~n_resp)
 
-ggsave("./figures/fixed_sample_100_across_arms.pdf", width=8, height=6)
+ggsave(here("figures/fixed_sample_100_across_arms.pdf"), width=8, height=6)
 
 #########
-df_outcomes_adaptive <- readRDS("./data/simulation-data/fixed_effect_adaptive_sim_1000.RDS")
+df_outcomes_adaptive <- readRDS(here("data/simulation-data/fixed_effect_adaptive_sim_1000.RDS"))
 
 n_adaptive_summary <- df_outcomes_adaptive %>% 
   filter(num_arms == context) %>% 
@@ -57,7 +58,7 @@ df_outcomes_adaptive %>%
   group_by(num_arms, context) %>% 
   summarize(mean_y = mean(y_total))
 
-df_outcomes_equal <- readRDS("./data/simulation-data/fixed_effect_equal_sim_1000.RDS")
+df_outcomes_equal <- readRDS(here("data/simulation-data/fixed_effect_equal_sim_1000.RDS"))
 n_equal_summary <- df_outcomes_equal %>% 
   filter(num_arms == context) %>% 
   group_by(num_arms) %>% 
@@ -92,7 +93,7 @@ n_adaptive_summary %>%
   theme_bw() +
   labs(color = "Sampling type")
 
-ggsave('./figures/sample_size_adaptive_comparison_1000sim.pdf', width=10, height=10)
+ggsave(here('figures/sample_size_adaptive_comparison_1000sim.pdf'), width=10, height=10)
 
 n_adaptive_summary %>% 
   bind_rows(n_equal_summary) %>% 

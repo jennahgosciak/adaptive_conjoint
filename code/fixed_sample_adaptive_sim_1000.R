@@ -186,4 +186,4 @@ outcomes
 
 
 outcomes %>%
-  saveRDS(str_glue("./data/simulation-data/fixed_sample_adaptive_sim_1000_{number_of_respondents}.RDS"))
+  saveRDS(here(str_glue("data/simulation-data/fixed_sample_adaptive_sim_1000_{number_of_respondents}.RDS")))

@@ -1,3 +1,4 @@
+library(assertr)
 library(readr)
 library(here)
 library(dplyr)
@@ -5,7 +6,7 @@ library(ggplot2)
 library(forcats)
 
 # Load cleaned job applicants file
-df_job_app_clean <- read_csv("./data/job_applicants_data_clean_2025_08_01.csv") %>% 
+df_job_app_clean <- read_csv(here("/data/job_applicants_data_clean_2025_08_01.csv")) %>% 
   rename(arm_id = context,
          arm_label = context_label)
 
@@ -174,7 +175,7 @@ df_chose_signal %>%
   )
 
 ggsave(
-  "figures/signals_effects_text_jobapplicants.pdf",
+  here("figures/signals_effects_text_jobapplicants.pdf"),
   height = 4.2, width = 8.68
 )
 
