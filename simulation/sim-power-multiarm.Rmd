@@ -68,7 +68,7 @@ produce_est2 <- function(n, true_p, num_sim=100) {
 }
 
 produce_est <- function(n, true_p, num_sim=1000) {
-  print(length(true_p))
+  # print(length(true_p))
     # print("#############")
     # print(str_glue("N={n}"))
 
@@ -141,7 +141,7 @@ produce_avgn <- function(n_increment, true_p, num_sim=1000) {
         outcomes_df_grpd$prob[1], max_prob)
         n <- n + n_increment
     }
-    print(max_prob)
+    # print(max_prob)
     est[[sim]] <- outcomes_df_grpd
 
   }
@@ -150,6 +150,8 @@ produce_avgn <- function(n_increment, true_p, num_sim=1000) {
   return(est_df)
 }
 ```
+
+
 
 ## Produce simulations for a fixed experiment
 
@@ -167,26 +169,26 @@ produce_avgn <- function(n_increment, true_p, num_sim=1000) {
 ```{r, warning=FALSE, message=FALSE, include=FALSE}
 #true_p <- c(c(0.64, 0.75), runif(length(arms)-2, 0.66, 0.73))
 #true_p <- seq(0.6, 0.7, length.out = 16)
-true_p <- seq(0.3, 0.7, length.out = 9)
-true_p
-
-est_df <- map_dfr(seq(10,510,500), ~produce_est(., true_p))
-est_df
+# true_p <- seq(0.3, 0.7, length.out = 9)
+# true_p
+# 
+# est_df <- map_dfr(seq(10,510,500), ~produce_est(., true_p))
+# est_df
 ```
 
 ```{r}
-est_df %>% 
-  mutate(n_total = n_size*length(true_p)) %>% 
-  group_by(n_total, max_arm) %>% 
-  summarize(mean_prob = mean(prob),
-            prob_ci_min = quantile(prob, 0.025),
-            prob_ci_max = quantile(prob, 0.975)) %>% 
-  ggplot(aes(n_total, mean_prob)) +
-  geom_point() +
-  geom_errorbar(aes(ymin = prob_ci_min, ymax = prob_ci_max)) +
-  geom_hline(yintercept=0.95, color='red') +
-  facet_wrap(~max_arm) +
-  scale_y_continuous(limits=c(0,1.05))
+# est_df %>% 
+#   mutate(n_total = n_size*length(true_p)) %>% 
+#   group_by(n_total, max_arm) %>% 
+#   summarize(mean_prob = mean(prob),
+#             prob_ci_min = quantile(prob, 0.025),
+#             prob_ci_max = quantile(prob, 0.975)) %>% 
+#   ggplot(aes(n_total, mean_prob)) +
+#   geom_point() +
+#   geom_errorbar(aes(ymin = prob_ci_min, ymax = prob_ci_max)) +
+#   geom_hline(yintercept=0.95, color='red') +
+#   facet_wrap(~max_arm) +
+#   scale_y_continuous(limits=c(0,1.05))
 
 # using Bayes approach from Ian
 # est_df_bayes <- map2_dfr(est_df$y1, est_df$y0, ~tibble(theta = rbeta(100, 1 + .x, 1 + .y)) %>%
@@ -260,9 +262,9 @@ est_df %>%
 
 ```{r, include=FALSE}
 set.seed(1234)
-est_avgn <- suppressMessages(future_map_dfr(c(9, 12, 16, 18, 20), 
-                    ~produce_avgn(200, seq(0.3, 0.7, length.out = .), 
-                         num_sim = 100)))
+est_avgn <- suppressMessages(future_map_dfr(c(9, 12, 16, 18, 21, 30), 
+                    ~produce_avgn(10, c(seq(0.3, 0.65, length.out = .-1), 0.7), 
+                         num_sim = 100), .options=furrr_options(seed=TRUE)))
 
 est_avgn
 
@@ -280,7 +282,7 @@ n_equal_summary %>%
   geom_point() +
   geom_line() +
   geom_errorbar(aes(ymin = ci_low, ymax = ci_high)) +
-  scale_y_continuous(limits=c(0, 35000), breaks=seq(0,35000, 5000)) +
+  scale_y_continuous(limits=c(0, 10000), breaks=seq(0,10000, 1000)) +
   scale_x_continuous(breaks=c(9, 12, 16, 18, 20)) +
   labs(x = 'Number of arms',
        y = 'Mean # of samples to obtain 95% posterior probability')
@@ -331,13 +333,14 @@ update_ts <- function(df, num_sim, num_contexts, type) {
   # print(arg)
   # print(table(cut(arg, 0:num_contexts)))
   pi <- unname(table(cut(arg, 0:num_contexts)) / num_sim)
+  # print(pi)
   #print(str_c("PDF: ", str_c(pi, collapse = ",")))
   stopifnot(length(pi) == num_contexts)
   return(pi)
 }
 
-adaptive_phase <- function(warmup_df, n_total, true_p, n_sim=1000) {
-  pi <- rep(1, length(true_p))/length(true_p)
+adaptive_phase <- function(warmup_df, n_total, true_p, n_sim=1) {
+  pi <- rep(n_sim, length(true_p))/length(true_p)
   df <- warmup_df
   for (i in c(1:n_total)) {
     adaptive_draw <- draw_adaptive_sample(pi, true_p) %>% 
@@ -345,11 +348,17 @@ adaptive_phase <- function(warmup_df, n_total, true_p, n_sim=1000) {
       rename(chose_educ = value)
     
     df <- bind_rows(df, adaptive_draw)
-    pi <- update_ts(df, n_sim, length(true_p), "max")
-    if (max(pi) >= 0.95) {
-      break
+    
+    if ((i %% 200) == 0) {
+      pi <- update_ts(df, 1000, length(true_p), "max")
+      print(pi)
+      if (max(pi) >= 0.95) {
+        break
+      }
+    } else {
+      pi <- update_ts(df, 1, length(true_p), "max")
     }
-    stopifnot(abs(sum(pi)-1) < 0.05)
+    # stopifnot(abs(sum(pi)-1) < 0.05)
   }
   outcomes <- df %>% 
     update_outcomes(length(true_p)) %>% 
@@ -384,8 +393,8 @@ adaptive_warmupfixed <- function(n, true_p) {
 }
 
 adaptive_warmupfixed2 <- function(n, true_p) {
-  print("###########")
-  print(str_glue("Running for n={n}"))
+  # print("###########")
+  # print(str_glue("Running for n={n}"))
   adaptive_res <- full_experiment(100, n, true_p)
   final_pi <- adaptive_res$pi
   final_outcomes <- adaptive_res$outcomes
@@ -397,7 +406,7 @@ adaptive_warmupfixed2 <- function(n, true_p) {
     cbind(., tibble(pi = final_pi))  %>% 
     ungroup() %>% 
     mutate(n_adaptive = n,
-           n_total = n_i + 125*length(true_p))
+           n_total = n_i + 100)
   
   return(mean_estimates_df)
 }
@@ -426,30 +435,51 @@ adaptive_warmupfixed2 <- function(n, true_p) {
 # toc()
 # 
 # mean_estimates_warmupfixed_2
+
+mean_estimates_warmupfixed_3 <- future_map_dfr(1:n_sim, ~adaptive_warmupfixed2(50000, seq(0.3, 0.7, length.out = 9)), 
+                                               .options=furrr_options(seed=TRUE), .progress = TRUE)
 ```
 
 
 ```{r, include=TRUE}
 set.seed(1234)
-n_sim <- 100
-tic()
+library(progressr)
+run_with_progress <- function(n_sim, n_arms) {
+  with_progress({
+    # Initialize a progressor
+    p <- progressor(steps = length(n_sim))
+    
+    res <- future_map_dfr(1:n_sim, ~{
+      p()
+      Sys.sleep(0.05) 
+      adaptive_warmupfixed2(50000, c(seq(0.2, 0.6, length.out = n_arms-1), 0.7))
+    },.options=furrr_options(seed=TRUE))
+  })
+  return(res)
+}
 
-mean_estimates_warmupfixed_3 <- future_map_dfr(1:n_sim, ~adaptive_warmupfixed2(50000, seq(0.3, 0.7, length.out = 9)), 
-                                               .options=furrr_options(seed=TRUE)) %>% 
+mean_estimates_warmupfixed9 <- run_with_progress(100, 9)
+mean_estimates_warmupfixed9
+
+# mean_estimates_warmupfixed21 <- run_with_progress(1, 21)
+# adaptive_warmupfixed2(50000, c(seq(0.2, 0.6, length.out = 20), 0.7))
+```
+
+```{r}
+%>% 
   mutate(num_arms = 9) %>% 
   filter(context == num_arms) %>% 
   bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed2(50000, seq(0.3, 0.7, length.out = 12)), .options=furrr_options(seed=TRUE)) %>% 
   mutate(num_arms = 12) %>% 
   filter(context == num_arms)) %>% 
-  bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed2(50000, seq(0.3, 0.7, length.out = 16)), .options=furrr_options(seed=TRUE)) %>% 
+  bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed2(50000, seq(0.3, 0.7, length.out = 16)), .options=furrr_options(seed=TRUE), .progress = TRUE) %>% 
   mutate(num_arms = 16) %>% 
   filter(context == num_arms)) %>% 
-  bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed2(50000, seq(0.3, 0.7, length.out = 20)), .options=furrr_options(seed=TRUE)) %>% 
+  bind_rows(future_map_dfr(1:n_sim, ~adaptive_warmupfixed2(50000, seq(0.3, 0.7, length.out = 20)), .options=furrr_options(seed=TRUE), .progress = TRUE) %>% 
   mutate(num_arms = 20) %>% 
   filter(context == num_arms))
+})
 toc()
-
-mean_estimates_warmupfixed_3
 ```
 
 ```{r}
@@ -475,6 +505,7 @@ n_equal_summary %>%
   scale_x_continuous(breaks=c(9, 12, 16, 18, 20)) +
   labs(x = 'Number of arms',
        y = 'Mean # of samples to obtain 95% posterior probability')
+
 ggsave('./sample_size_adaptive.pdf')
 ```
 
