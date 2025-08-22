@@ -132,4 +132,4 @@ outcomes <- run_with_progress(n_sim, 9) %>%
 outcomes
 
 outcomes %>%
-  saveRDS("../data/fixed_effect_adaptive_sim_1000.RDS")
+  saveRDS("./data/simulation-data/fixed_effect_adaptive_sim_1000.RDS")
