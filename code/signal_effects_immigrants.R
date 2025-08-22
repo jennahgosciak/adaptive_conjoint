@@ -1,3 +1,4 @@
+
 library(readr)
 library(here)
 library(dplyr)
@@ -28,7 +29,7 @@ immigrants_response <- read_csv(
   )
 
 # Within each context, determine the percent to choose option 1
-# (which we will call Signal B in the graphs)
+# (which we will call Primary Signal in the graphs)
 chose_option_1 <- immigrants_response |>
   group_by(arm_id) |>
   summarize(
@@ -44,17 +45,17 @@ chose_option_1 <- immigrants_response |>
   arrange(chose_option_1) |>
   mutate(ranked_context_position = 1:n()) |>
   # The name will be used in the graph
-  # to say the percent choosing Signal B
+  # to say the percent choosing the primary signal
   # within this context
   mutate(
     ranked_name = paste0(
       "Context ",ranked_context_position,": ",
-      round(100*chose_option_1),"% Chose Signal B"
+      round(100*chose_option_1),"% Chose Primary Signal"
     ),
     ranked_name = fct_reorder(ranked_name, ranked_context_position)
   )
 
-# Bar graph: Rate of choosing option 1 (Signal B)
+# Bar graph: Rate of choosing option 1 (Primary Signal)
 chose_option_1 |>
   ggplot(aes(x = -ranked_context_position, y = chose_option_1)) +
   geom_hline(yintercept = .5, linetype = "dashed") +
@@ -66,18 +67,20 @@ chose_option_1 |>
   coord_flip() +
   scale_x_continuous(breaks = -(1:16), labels = \(x) paste0("Context ",-x)) +
   scale_y_continuous(
-    name = "Proportion Choosing Signal Vector B (vs A)",
+    name = "Proportion Choosing the Profile\nwith the Primary Signal Vector\n(designation as primary vs secondary signal is arbitrary)",
     labels = scales::label_percent(accuracy = 1)
   ) +
   theme(axis.title.y = element_blank(),
         panel.grid = element_blank())
+
 ggsave(
-  "figures/signals_effects_2.pdf",
-  height = 6, width = 4
+  filename = here("figures","signal_effects_immigrant_bars.pdf"),
+  height = 6, 
+  width = 4
 )
 
 # Signal values graph: Text in facets showing the values
-# of Signal A and Signal B within each context
+# of Primary Signal and Secondary Signal within each context
 immigrants_metadata |>
   pivot_longer(cols = c("prior_trips", "origin", "reason", "profession")) |>
   #filter(arm_id == 1) |>
@@ -90,7 +93,7 @@ immigrants_metadata |>
   left_join(chose_option_1, by = join_by(arm_id)) |>
   ggplot() +
   geom_text(
-    aes(y = y, x = option, label = value),
+    aes(y = y, x = 1 - option, label = value),
     hjust = 0,
     size = 2.5
   ) +
@@ -98,17 +101,17 @@ immigrants_metadata |>
   ylim(c(.5,5.5)) +
   annotate(
     geom = "text", fontface = "bold",
-    x = 0,
+    x = 1,
     y = 5,
-    label = "Signal A",
+    label = "Secondary Signal",
     hjust = 0,
     size = 2.5
   ) +
   annotate(
     geom = "text", fontface = "bold",
-    x = 1,
+    x = 0,
     y = 5,
-    label = "Signal B",
+    label = "Primary Signal",
     hjust = 0,
     size = 2.5
   ) +
@@ -126,7 +129,8 @@ immigrants_metadata |>
   )
 
 ggsave(
-  "figures/signals_effects_1.pdf",
-  height = 15, width = 6.5
+  filename = here("figures","signal_effects_immigrant_profiles.pdf"),
+  height = 15, 
+  width = 6.5
 )
 
