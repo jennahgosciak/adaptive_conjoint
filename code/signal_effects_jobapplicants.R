@@ -4,9 +4,11 @@ library(here)
 library(dplyr)
 library(ggplot2)
 library(forcats)
+library(tidyr)
+library(stringr)
 
 # Load cleaned job applicants file
-df_job_app_clean <- read_csv(here("/data/job_applicants_data_clean_2025_08_01.csv")) %>% 
+df_job_app_clean <- read_csv(here("data/job_applicants_data_clean_2025_08_01.csv")) %>% 
   rename(arm_id = context,
          arm_label = context_label)
 
@@ -37,21 +39,10 @@ distinct_labels <- df_job_app_clean %>%
   distinct(cand1_educ_signal, cand1_exp_signal, cand1_name_signal, volunteer1)  %>% 
   mutate(label = as.integer(row_number()))
 
-df_job_app_clean %>% 
-  left_join(distinct_labels,
-            by = c("cand1_educ_signal", "cand1_exp_signal",
-                   "cand1_name_signal", "volunteer1")) %>% 
-  group_by(arm_id, arm_label, label) %>% 
-  summarize(n = n()) %>% 
-  ggplot() +
-  geom_col(aes(label, n)) +
-  facet_wrap(~arm_label) +
-  labels(x = "Unique combination of order X treatment")
-
 # Within each context, determine which percent chose each signal
 df_chose_signal <- df_job_app_clean %>% 
   group_by(arm_id, arm_label, education1, name1, exp1,
-           education2, name2, exp2, exp1_desc, exp2_desc, chose_mother) %>% 
+           education2, name2, exp2, exp1_desc, exp2_desc) %>% 
   summarize(across(c(chose_cand1, chose_educ1, chose_name1, chose_exp1), .fns = lst(mean = ~mean(.),
                                                                                      n = ~n()))) %>% 
   verify(chose_cand1_n == chose_educ1_n) %>% 
@@ -66,26 +57,20 @@ df_chose_signal <- df_job_app_clean %>%
     ci.min = chose_signal_est - qnorm(.975) * se,
     ci.max = chose_signal_est + qnorm(.975) * se
   ) %>% 
-  group_by(signal_type) %>% 
-  arrange(chose_signal_est) %>% 
-  mutate(ranked_context_position = row_number()) %>% 
-  # The name will be used in the graph
-  # to say the percent choosing Signal B
-  # within this context
+  # begin new code that doesn't change context definitions
   mutate(
-    ranked_name = paste0(
-      round(100*chose_signal_est),"% Chose Signal 1"
+    context_name = paste0(
+      round(100*chose_signal_est),"% Chose Primary Signal"
     ),
-    ranked_name = fct_reorder(ranked_name, ranked_context_position),
-    signal_type_label = case_when(signal_type == 'chose_cand1_mean' ~ 'Candidate 1',
-                            signal_type == 'chose_educ1_mean' ~ paste0('Education'),
-                            signal_type == 'chose_exp1_mean' ~ paste0('Experience'),
-                            signal_type == 'chose_name1_mean' ~ paste0('Name')
-  ))
+    signal_type_label = case_when(signal_type == 'chose_cand1_mean' ~ 'Chose Left\nProfile',
+                                  signal_type == 'chose_educ1_mean' ~ paste0('Chose Primary Signal\nof Education'),
+                                  signal_type == 'chose_exp1_mean' ~ paste0('Chose Primary Signal\nof Experience'),
+                                  signal_type == 'chose_name1_mean' ~ paste0('Chose Primary Signal\nof Name'))
+  )
 
 # Bar graph: Rate of choosing each signal
 df_chose_signal %>% 
-  ggplot(aes(x = -ranked_context_position, y = chose_signal_est)) +
+  ggplot(aes(x = -arm_id, y = chose_signal_est)) +
   geom_hline(yintercept = .5, linetype = "dashed") +
   geom_bar(stat = "identity", alpha = .6) +
   geom_errorbar(aes(ymin = ci.min, ymax = ci.max), width = .2) +
@@ -95,7 +80,7 @@ df_chose_signal %>%
   coord_flip() +
   scale_x_continuous(breaks = -(1:4), labels = \(x) paste0("Context ",-x)) +
   scale_y_continuous(
-    name = "Proportion Choosing Signal 1",
+    name = "Proportion Choosing Primary Signal\n(primary and secondary distinction is arbitrary)",
     labels = scales::label_percent(accuracy = 1)
   ) +
   facet_wrap(~signal_type_label) +
@@ -118,7 +103,6 @@ df_distinct_signals <- df_chose_signal %>%
   mutate(signal_order = if_else(as.numeric(str_extract(name, "[0-9]+"))==1, 1,
                                            0),
          signal_name = str_extract(name, "[A-z]+")) %>% 
-  #mutate(value = str_replace_all(value, "\\|", "\n")) %>%
   mutate(signal_type = case_when(signal_name == 'education' ~ 'chose_educ1_mean',
                                  signal_name == 'exp' ~ 'chose_exp1_mean',
                                  signal_name == 'name' ~ 'chose_name1_mean')) %>% 
@@ -126,7 +110,7 @@ df_distinct_signals <- df_chose_signal %>%
 
 df_chose_signal %>% 
   select(arm_id, arm_label, n, signal_type, signal_type_label, chose_signal_est,
-         ranked_name, ranked_context_position) %>% 
+         context_name) %>%
   mutate(arm_label_full = str_c("Context: ", arm_id, "\nRace : ", 
                                 str_replace(arm_label, "_", "\nRank : "))) %>% 
   left_join(df_distinct_signals, ., by=c("arm_id", "signal_type")) %>% 
@@ -138,14 +122,15 @@ df_chose_signal %>%
     size = 1.5
   ) +
   geom_text(
-    aes(y = 2, x = x, label=ranked_name),
+    aes(y = 2, x = x, label=context_name),
     hjust = 0,
     size = 1.5,
     fontface = "bold"
   ) +
   facet_grid(rows = vars(arm_label_full),
              cols = vars(signal_type_label),
-             scales = "free_y"
+             scales = "free_y",
+             labeller = as_labeller(\(x) str_remove(x,"Chose Primary Signal\nof "))
   ) +
   xlim(c(0,7)) +
   ylim(c(-0.5,2.5)) +
