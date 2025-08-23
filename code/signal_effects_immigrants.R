@@ -4,6 +4,7 @@ library(here)
 library(dplyr)
 library(ggplot2)
 library(forcats)
+library(tidyr)
 
 # Load metadata for which signals go with each assignment
 immigrants_metadata <- read_csv(
@@ -67,7 +68,7 @@ chose_option_1 |>
   coord_flip() +
   scale_x_continuous(breaks = -(1:16), labels = \(x) paste0("Context ",-x)) +
   scale_y_continuous(
-    name = "Proportion Choosing the Profile\nwith the Primary Signal Vector\n(designation as primary vs secondary signal is arbitrary)",
+    name = "Proportion Choosing the Profile\nwith the Primary Signal Vector\n(designation as primary vs\nsecondary signal is arbitrary)",
     labels = scales::label_percent(accuracy = 1)
   ) +
   theme(axis.title.y = element_blank(),
