@@ -1,9 +1,17 @@
 library(tidyverse)
 library(ggplot2)
 
+diffpt5 <- TRUE
+if (diffpt5 == TRUE) {
+  figext <- "_diffpt5"
+  ylim2 <- 18000
+} else {
+  figext <- ""
+  ylim2 <- 8000
+}
 #########
-outcomes500 <- readRDS("./simulation/sim-data/fixed_sample_adaptive_sim_1000_500_diffpt5.RDS")
-outcomes1000 <- readRDS("./simulation/sim-data/fixed_sample_adaptive_sim_1000_1000_diffpt5.RDS")
+outcomes500 <- readRDS(str_glue("./simulation/sim-data/fixed_sample_adaptive_sim_1000_500{figext}.RDS"))
+outcomes1000 <- readRDS(str_glue("./simulation/sim-data/fixed_sample_adaptive_sim_1000_1000{figext}.RDS"))
 outcomes500 %>% 
   mutate(n_resp = 'Number of respondents: 500') %>% 
   bind_rows(outcomes1000 %>% 
@@ -21,7 +29,7 @@ outcomes500 %>%
   geom_point() +
   geom_line() +
   geom_errorbar(aes(ymin = ci_low, ymax=ci_high, color=type), width=0.3) +
-  geom_text(aes(y = mean_correct + 0.05,
+  geom_text(aes(y = ci_high + 0.05,
                 label = str_c(round(100*mean_correct), "%")),
             size=3) +
   theme_bw() +
@@ -33,13 +41,14 @@ outcomes500 %>%
                      labels=c("0", "25%", "50%", "75%", "100%")) +
   facet_wrap(~n_resp)
 
-ggsave("./simulation/fixed_sample_100_across_arms.pdf", width=8, height=6)
+ggsave(str_glue("./simulation/figures/fixed_sample_100_across_arms{figext}.pdf"), width=8, height=6)
 
 #########
-df_outcomes_adaptive <- readRDS("./simulation/sim-data/fixed_effect_adaptive_sim_1000.RDS")
+df_outcomes_adaptive <- readRDS(str_glue("./simulation/sim-data/fixed_effect_adaptive_sim_1000{figext}.RDS"))
 
 n_adaptive_summary <- df_outcomes_adaptive %>% 
-  mutate(n_total = n_total - 1 + 100) %>% 
+  mutate(n_total = n_total + 100) %>% 
+  filter(num_arms == context) %>% 
   group_by(num_arms) %>% 
   summarize(mean_n = mean(n_total),
             ci_low = mean_n - qnorm(0.975) * sd(n_total) / sqrt(n()),
@@ -54,8 +63,9 @@ df_outcomes_adaptive %>%
   group_by(num_arms, context) %>% 
   summarize(mean_y = mean(y_total))
 
-df_outcomes_equal <- readRDS("./simulation/sim-data/fixed_effect_equal_sim_1000.RDS")
+df_outcomes_equal <- readRDS(str_glue("./simulation/sim-data/fixed_effect_equal_sim_1000{figext}.RDS"))
 n_equal_summary <- df_outcomes_equal %>% 
+  filter(num_arms == context) %>% 
   group_by(num_arms) %>% 
   summarize(mean_n = mean(n_total),
             ci_low = mean_n - qnorm(0.975) * sd(n_total) / sqrt(n()),
@@ -76,19 +86,20 @@ n_adaptive_summary %>%
   geom_point() +
   geom_line() +
   geom_errorbar(aes(ymin = ci_low, ymax = ci_high), width=0.5) +
-  geom_text(aes(y = mean_n + 260,
+  geom_text(aes(y = ci_high + 200,
                 label = format(round(mean_n), big.mark = ",", scientific = FALSE)),
             size=3) +
-  scale_y_continuous(limits=c(0, 7000),
-                     breaks = c(0, 2000, 4000, 6000),
-                     labels = c("0", "2,000", "4,000", "6,000")) +
+  scale_y_continuous(limits=c(0, ylim2),
+                     # breaks = c(0, 2000, 4000, 6000),
+                     # labels = c("0", "2,000", "4,000", "6,000")
+                     label = scales::comma) +
   scale_x_continuous(breaks=seq(9,30,3)) +
   labs(x = 'Number of contexts',
        y = 'Mean number of samples to obtain 95% posterior probability') +
   theme_bw() +
   labs(color = "Sampling type")
 
-ggsave('./simulation/sample_size_adaptive_comparison_1000sim.pdf', width=10, height=10)
+ggsave(str_glue('./simulation/figures/sample_size_adaptive_comparison_1000sim{figext}.pdf'), width=10, height=10)
 
 n_adaptive_summary %>% 
   bind_rows(n_equal_summary) %>% 
@@ -97,3 +108,9 @@ n_adaptive_summary %>%
   mutate(diff = mean_n_Fixed - mean_n_Adaptive) %>% 
   ggplot(aes(num_arms, diff)) +
   geom_line()
+
+df_2400_accuracy <- readRDS(str_glue("./simulation/sim-data/fixed_sample_adaptive_sim_1000_2400{figext}.RDS"))
+df_2400_accuracy %>% 
+  filter(context == num_arms, num_arms == 24) %>% 
+  group_by(type) %>% 
+  summarize(pct_accuracy = mean(chose_correct))
