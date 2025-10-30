@@ -1,5 +1,9 @@
 #  Adaptive Randomization in Conjoint Survey Experiments
 
+<!-- badges: start -->
+[![Launch RStudio Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jennahgosciak/adaptive_conjoint/main?urlpath=rstudio)
+<!-- badges: end -->
+
 ## Folder structure:
 * `/data`: Data collected from all experiments.
 * `/code`: Code for replicating figures from collected data.

@@ -1,4 +1,4 @@
-FROM posit/r-base:4.5.1-noble
+FROM rocker/binder:4
 COPY renv.lock renv.lock
 RUN for d in /usr/local/lib/R/etc /usr/lib/R/etc; do \
       mkdir -p "$d" 2>/dev/null || true; \
@@ -10,3 +10,4 @@ RUN R -e "dist <- pak::system_r_platform_data()[['distribution']]; rel <- pak::s
 RUN R -e "renv::restore()"
 COPY . /adaptive_conjoint
 
+COPY --chown=${NB_USER} . /home/rstudio
