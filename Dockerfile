@@ -10,4 +10,4 @@ RUN R -e "dist <- pak::system_r_platform_data()[['distribution']]; rel <- pak::s
 RUN R -e "renv::restore()"
 COPY . /adaptive_conjoint
 
-COPY --chown=${NB_USER} . ${HOME}
+COPY --chown=${NB_USER} . /home/rstudio
