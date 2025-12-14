@@ -12,10 +12,6 @@ on.exit({
 
 .start_time <- Sys.time()
 
-# Install all dependencies
-cat("\n---------------------------- ./code/install_dependencies.R ---\n")
-source("./code/install_dependencies.R")
-
 # Replicate all figures from the immigrants experiment
 cat("\n---------------------------- ./code/immigrants_plots.R -------\n")
 source("./code/immigrants_plots.R")
@@ -31,18 +27,20 @@ source("./code/appendix_c.R")
 # Replicate simulations for Appendix D
 
 # ----------------------------------------------------------------------------------------------------
+
 ### NOTE: This part is what takes BY FAR the longest (hours of compute).
-### If you comment out lines 39, 42, and 45, the figures will still replicate
-### using the saved intermediate files and will run in ~ 1 minute.
+### If you uncomment lines 39, 42, and 45, the simulations for Appendix D will replicate.
+### However, we recommend just using the saved intermediate files and this will run in ~ 1 minute.
 
-cat("\n---------------------------- ./code/appendix_d_simulations_fixed_effect_adaptive_1000.R --\n")
-source("./code/appendix_d_simulations_fixed_effect_adaptive_1000.R")
+# cat("\n---------------------------- ./code/appendix_d_simulations_fixed_effect_adaptive_1000.R --\n")
+# source("./code/appendix_d_simulations_fixed_effect_adaptive_1000.R")
 
-cat("\n---------------------------- ./code/appendix_d_simulations_fixed_effect_equal_1000.R -----\n")
-source("./code/appendix_d_simulations_fixed_effect_equal_1000.R")
+# cat("\n---------------------------- ./code/appendix_d_simulations_fixed_effect_equal_1000.R -----\n")
+# source("./code/appendix_d_simulations_fixed_effect_equal_1000.R")
 
-cat("\n---------------------------- ./code/appendix_d_simulations_fixed_sample_adaptive_1000.R -----\n")
-source("./code/appendix_d_simulations_fixed_sample_adaptive_1000.R")
+# cat("\n---------------------------- ./code/appendix_d_simulations_fixed_sample_adaptive_1000.R -----\n")
+# source("./code/appendix_d_simulations_fixed_sample_adaptive_1000.R")
+
 # ----------------------------------------------------------------------------------------------------
 
 # Replicate figures in Appendix D
