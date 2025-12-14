@@ -4,55 +4,17 @@
 [![Launch RStudio Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jennahgosciak/adaptive_conjoint/main?urlpath=rstudio)
 <!-- badges: end -->
 
-## Folder structure:
-* `/data`: Data collected from all experiments.
-* `/code`: Code for replicating figures from collected data.
-* `/figures`: Output folder for figures.
+## Data and code description
 
-## Replicating figures
+All raw data collected from our experiments can be found in the `data/` directory.
+This comprises all data needed to replicate the figures in the paper (except
+poststratification weights; see below). Corresponding code can be found in the
+`code/` directory. All figures are in the `figures/` directory.
 
-Either of the methods below require Docker to be installed
-(these approaches may not work on Windows).
-All resulting figures will be stored in the `adaptive_conjoint/figures/` directory.
-
-### Using R
-
-All figures can be replicated using R.
-
-```r
-install.packages(pkgs = c("here", "jetty"))
-
-# Replicate results in ./code/immigrants_plots.R
-jetty::run_script(
-  file = here::here("code/immigrants_plots.R"),
-  context = here::here(),
-  install_dependencies = TRUE,
-  r_profile = NULL
-)
-
-# Replicate results in ./code/job_applicants_plots.R
-jetty::run_script(
-  file = here::here("code/job_applicants_plots.R"),
-  context = here::here(),
-  install_dependencies = TRUE,
-  r_profile = NULL
-)
-```
-
-### Using Docker
-
-If desired, you can also use Docker directly to replicate the figures.
-
-Set `adaptive_conjoint/` as your working directory. Then execute the
-following Docker command:
-```
-docker run --rm -v ./figures:/adaptive_conjoint/figures/ djmolitor/adaptive_conjoint /bin/bash -c "cd /adaptive_conjoint/ && Rscript code/immigrants_plots.R && Rscript code/job_applicants_plots.R"
-```
-
-## Generating poststratification weights
+### Generating poststratification weights
 
 > [!NOTE]  
-> The poststratification weights used to generate all figures in this paper
+> The poststratification weights used to generate Appendix Figure 10 in this paper
 > are stored at `data/ipums_strata_sizes.RDS`. You don’t need to regenerate
 > them to reproduce the figures, but if you’d like to, follow the steps below.
 
@@ -81,3 +43,113 @@ weights, the script takes the following steps:
     - `weight sum(PERWT)`
     - `num = n()`
     - Then recompute `weight`, outside the summarize so that it is a fraction of the total weight =  `weight / sum(weight)`
+
+## Computational requirements (and versions used)
+
+So as to not pollute the global environment, we recommend replicating this project
+within an R project using renv. This way all dependencies will be installed in a
+separate local environment.
+
+- R (4.5.1)
+- R packages:
+    - askpass (1.2.1)
+    - assertr (3.0.1)
+    - dplyr (1.1.4)
+    - forcats (1.0.1)
+    - furrr (0.3.1)
+    - ggplot2 (4.0.1)
+    - ggtext (0.1.2)
+    - gtsummary (2.4.0)
+    - here (1.0.2)
+    - ipumsr (0.9.0)
+    - modelr (0.1.11)
+    - progressr (0.16.0)
+    - readr (2.1.5)
+    - stringr (1.5.2)
+    - tidyr (1.3.1)
+
+### Hardware specification
+
+All figures were generated on a Macbook Pro (M3 Max) running MacOS Sequoia, with 36 GB of RAM
+and 14 cores. We utilize 13 cores for parallelizing our appendix simulations. Each core used
+~ 2 GB of RAM when running simulations, equaling a total of ~ 26 GB of RAM. On some (many?)
+machines, this may be prohibitive. In this case, each of the simulation scripts has an
+easily-changed parameter for number of cores used that can be set to as few as 1 (in which
+case total RAM needed for the analysis should be ~ 3GB). However, this will likely cause the
+simulation run time to increase prohibitively (> 1 day at a minimum). Required disk space
+for all replication files (including data) is < 50 MB. The computing time on
+the Macbook Pro took ~ 684 minutes (11.4 hours).
+> [!NOTE]  
+> The VAST majority of compute time is required by the simulation scripts for
+> the appendix simulations. These scripts are the ones beginning with
+> `code/appendix_d_simulations_{...}.R`. All figures can be replicated without re-running
+> the simulations because we have stored the intermediate simulation results in the
+> `data/simulation-data/` directory. You can comment out the corresponding simulation
+> scripts in `main.R` and the replication should generate all figures and in a fraction of
+> the time (~ 1 minute). However, in it's current form, `code/main.R` will replicate
+> everything, including the time-intensive simulations.
+
+## Replicating figures
+
+To replicate figures, execute the `code/main.R` script from your shell of choice:
+```r
+Rscript ./code/main.R
+```
+
+## Table of contents
+```
+.
+├── code
+│   ├── appendix_c.R                                         # Plot Appendix C figures
+│   ├── appendix_d_plots.R                                   # Plot Appendix D figures
+│   ├── appendix_d_simulations_fixed_effect_adaptive_1000.R  # Run simulations for figure 14
+│   ├── appendix_d_simulations_fixed_effect_equal_1000.R     # Run simulations for figure 14
+│   ├── appendix_d_simulations_fixed_sample_adaptive_1000.R  # Run simulations for figure 13
+│   ├── appendix_e.R                                         # Simulate model described in Appendix E
+│   ├── download_ps_weights.R                                # Re-generate poststratification weights (not necessary)
+│   ├── immigrants_plots.R                                   # Plot main example figures (figure 5, 6, 10, 11)
+│   └── job_applicants_plots.R                               # Plot supplementary example figures (figures 9, 12)
+├── data
+│   ├── immigrants_main_bandit.csv     # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_main_batch.csv      # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_main_metadata.csv   # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_main_noconsent.csv  # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_main_parameters.csv # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_main_pi.csv         # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_main_response.csv   # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_max_bandit.csv      # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_max_batch.csv       # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_max_metadata.csv    # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_max_noconsent.csv   # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_max_parameters.csv  # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_max_pi.csv          # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_max_response.csv    # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_min_bandit.csv      # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_min_batch.csv       # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_min_metadata.csv    # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_min_noconsent.csv   # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_min_parameters.csv  # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_min_pi.csv          # Raw data from the immigrants (primary) experiment
+│   ├── immigrants_min_response.csv    # Raw data from the immigrants (primary) experiment
+│   ├── ipums_strata_sizes.RDS         # Poststratification weights for Figure 10
+│   ├── job_app_clean_all_phases.csv   # Clean data from the job applicants experiment
+|   ├── job_applicants_data_clean_2025_08_01.csv # Same data as above but more columns included
+│   ├── README.md                      # More detail on the data!
+│   └── simulation-data
+│       ├── fixed_effect_adaptive_sim_1000.RDS       # Simulation results for Appendix D, Figure 14
+│       ├── fixed_effect_equal_sim_1000.RDS          # Simulation results for Appendix D, Figure 14
+│       ├── fixed_sample_adaptive_sim_1000_1000.RDS  # Simulation results for Appendix D, Figure 13
+│       └── fixed_sample_adaptive_sim_1000_500.RDS   # Simulation results for Appendix D, Figure 13
+├── figures
+│   ├── figure10.png
+│   ├── figure11a.png
+│   ├── figure11b.png
+│   ├── figure12a.png
+│   ├── figure12b.png
+│   ├── figure13.png
+│   ├── figure14.png
+│   ├── figure5.png
+│   ├── figure6.png
+│   └── figure9.png
+└── README.md
+```
