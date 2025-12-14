@@ -52,7 +52,7 @@ estimated_discrim_all_job_app <- ggplot(
   coord_flip() +
   theme_minimal() +
   theme(
-    axis.text.y = element_markdown(hjust = 0),
+    axis.text.y.left = element_markdown(hjust = 0),
     panel.background = element_rect(fill = "white", color = NA),
     plot.background = element_rect(fill = "white", color = NA)
   ) +
@@ -61,7 +61,7 @@ estimated_discrim_all_job_app <- ggplot(
 
 ggsave(
   plot = estimated_discrim_all_job_app,
-  filename = here("figures", "estimated_discrimination_all_job_app.png"),
+  filename = here("figures", "figure9.png"),
   width = 7,
   height = 4,
   dpi = 500

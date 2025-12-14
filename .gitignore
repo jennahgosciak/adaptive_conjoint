@@ -11,3 +11,4 @@ automate_candidates_files/
 .Rprofile
 renv/
 *.yml
+replication/

@@ -1,8 +1,4 @@
-
-# Simulation in which two-way interactions miss things
-sink(file = here("figures","appendix_interaction_simulation.txt"))
-
-library(tidyverse)
+library(dplyr)
 
 print("True values of theta given X")
 
@@ -43,5 +39,3 @@ rbind(
   threeway = range(predict(lm(theta ~ x1 + x2 + x3 + x1:x2 + x1:x3 + x2:x3 + x1:x2:x3, data = truth))),
   truth = range(truth$theta)
 )
-
-sink()

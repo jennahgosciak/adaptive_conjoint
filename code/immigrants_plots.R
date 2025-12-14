@@ -2,7 +2,6 @@ library(dplyr)
 library(forcats)
 library(ggplot2)
 library(ggtext)
-library(gtsummary)
 library(here)
 library(modelr)
 library(readr)
@@ -232,27 +231,6 @@ poststratified_estimates <- function(df, arm = "max") {
   return(df_post_bootstrap)
 }
 
-# Descriptive statistics table --------------------------------------
-
-descriptive_stats <- responses |>
-  bind_rows(responses_validation_max) |>
-  bind_rows(responses_validation_min) |>
-  filter(!garbage) |>
-  select(phase_cleaned, age, ends_with("_cleaned")) |>
-  tbl_summary(
-    by = phase_cleaned,
-    label = list(
-      age ~ "Age",
-      ethnicity_cleaned ~ "Ethnicity",
-      race_cleaned ~ "Race",
-      sex_cleaned ~ "Sex"
-    )
-  ) |>
-  bold_labels() |>
-  as_gt()
-
-gt::gtsave(descriptive_stats, here("figures", "descriptive_stats.tex"))
-
 # Plots -------------------------------------------------------------
 
 # Generate post-stratified estimates from the validation phase
@@ -465,7 +443,7 @@ params_comparison <- bind_rows(params_main_min_max, params_validation) |>
     )
   )
 
-### Figure (2): Estimates of $theta_c$ for all contexts
+### Figure (5): Estimates of $theta_c$ for all contexts
 estimated_discrim_all_plot <- ggplot(
     params_main_final_batch,
     aes(x = fct_reorder(x_lab, mu), y = mu, ymin = lb, ymax = ub, color = highlight)
@@ -483,7 +461,7 @@ estimated_discrim_all_plot <- ggplot(
   coord_flip() +
   theme_minimal() +
   theme(
-    axis.text.y = element_markdown(hjust = 0),
+    axis.text.y.left = element_markdown(),
     panel.background = element_rect(fill = "white", color = NA),
     plot.background = element_rect(fill = "white", color = NA)
   ) +
@@ -493,13 +471,13 @@ estimated_discrim_all_plot <- ggplot(
 
 ggsave(
   plot = estimated_discrim_all_plot,
-  filename = here("figures", "estimated_discrimination_all.png"),
+  filename = here("figures", "figure5.png"),
   width = 10,
   height = 10,
   dpi = 500
 )
 
-### Figure (3): Estimates of $theta_c$ for the most/least discrim. contexts
+### Figure (6): Estimates of $theta_c$ for the most/least discrim. contexts
 estimated_discrim_max_min_plot <- ggplot(
     params_comparison |>
       filter(phase != "Poststratified") |>
@@ -508,12 +486,18 @@ estimated_discrim_max_min_plot <- ggplot(
   ) +
   geom_point(position = position_dodge(width = 0.3)) +
   geom_errorbar(width = 0.05, position = position_dodge(width = 0.3)) +
+  geom_text(
+    aes(label = phase, y = ub + 0.005),
+    position = position_dodge(width = 0.3),
+    hjust = 0
+  ) +
   coord_flip() +
   theme_minimal() +
+  scale_y_continuous(limits = c(0.6, 0.86)) +
   theme(
-    # axis.text.x = element_markdown(hjust = 0, margin = margin(l = -40)),
-    axis.text.y = element_markdown(hjust = 0),
-    legend.title = element_blank(),
+    axis.text.y.left = element_markdown(hjust = 0),
+    legend.position = "none",
+    # panel.grid.minor = element_blank(),
     panel.background = element_rect(fill = "white", color = NA),
     plot.background = element_rect(fill = "white", color = NA)
   ) +
@@ -521,101 +505,13 @@ estimated_discrim_max_min_plot <- ggplot(
 
 ggsave(
   plot = estimated_discrim_max_min_plot,
-  filename = here("figures", "estimated_discrimination_max_min.png"),
+  filename = here("figures", "figure6.png"),
   width = 8,
   height = 3,
   dpi = 500
 )
 
-### Figure (4): Certainty of estimates over time
-params_main_filtered <- params_main |> 
-  filter(batch_id %in% pull(filter(responses, !garbage), batch_id)) |>
-  left_join(
-    select(distinct(responses, batch_id, .keep_all = TRUE), batch_id, phase),
-    by = "batch_id"
-  ) |>
-  filter(phase != "warmup") |>
-  arrange(batch_id, arm_id) |>
-  mutate(
-    mu = alpha/(alpha + beta),
-    lb = qbeta(0.025, alpha, beta),
-    ub = qbeta(0.975, alpha, beta),
-    width = ub - lb
-  ) |>
-  group_by(batch_id) |>
-  mutate(group_id = cur_group_id()) |>
-  ungroup() |>
-  group_by(phase) |>
-  mutate(max_batch_id = max(batch_id)) |>
-  ungroup()
-
-ci_width_all <- params_main_filtered |>
-  filter(!arm_id %in% c(10, 7)) |>
-  ggplot(aes(x = group_id, y = width, group = arm_id)) +
-  geom_line(color = "gray80") +
-  geom_line(
-    data = params_main_filtered |> 
-      filter(arm_id == 10) |>
-      mutate(Context = "Min"),
-    aes(color = Context)
-  ) +
-  geom_line(
-    data = params_main_filtered |> 
-      filter(arm_id == 7) |>
-      mutate(Context = "Max"),
-    aes(color = Context)
-  ) +
-  geom_vline(
-    xintercept = params_main_filtered |>
-      filter(phase == "max") |>
-      pull(max_batch_id) |>
-      first(),
-    color = "black",
-    linetype = "dashed"
-  ) +
-  theme_minimal() +
-  labs(
-    x = "Progress through adaptive phase",
-    y = "Credible interval width"
-  )
-
-ggsave(
-  plot = ci_width_all,
-  filename = here("figures", "ci_width_all.png"),
-  width = 6,
-  height = 4,
-  dpi = 500
-)
-
-ci_max_min_df <- params_main_filtered |>
-  filter(arm_id == 7 & phase == "max" | arm_id == 10 & phase == "min") |>
-  group_by(arm_id) |>
-  mutate(progress = 1:n()) |>
-  ungroup()
-
-ci_width_max_min <- ci_max_min_df |>
-  mutate(
-    context = case_when(
-      arm_id == 10 ~ "Context with least discrimination",
-      TRUE ~ "Context with most discrimination"
-    )
-  ) |>
-  ggplot(aes(x = progress, y = mu, ymin = lb, ymax = ub)) +
-  geom_ribbon(alpha = 0.2) +
-  geom_line(linewidth = 0.5) +
-  facet_wrap(~ context, nrow = 1) +
-  theme_minimal() +
-  labs(x = "", y = "Posterior expected probability credible interval")
-
-ggsave(
-  plot = ci_width_max_min,
-  filename = here("figures", "ci_width_max_min.png"),
-  width = 6,
-  height = 4,
-  dpi = 500
-)
-
-## Appendix figures
+## Figure 10 (Appendix)
 estimated_discrim_max_min_appendix_plot <- ggplot(
   params_comparison |>
     mutate(phase = as.character(phase)),
@@ -630,13 +526,13 @@ theme(
   legend.title = element_blank(),
   panel.background = element_rect(fill = "white", color = NA),
   plot.background = element_rect(fill = "white", color = NA),
-  axis.text.y = element_markdown(hjust = 0),
+  axis.text.y.left = element_markdown(hjust = 0),
 ) +
 labs(x = "", y = "Probability of preferring the college-educated immigrant")
 
 ggsave(
   plot = estimated_discrim_max_min_appendix_plot,
-  filename = here("figures", "estimated_discrimination_max_min_appendix.png"),
+  filename = here("figures", "figure10.png"),
   width = 8,
   height = 3,
   dpi = 500

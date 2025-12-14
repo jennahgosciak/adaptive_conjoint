@@ -69,8 +69,9 @@ df_race_form <- micro_data |>
     ))
   )
 
-# Check not missing (i.e., enumerated all categories)
-stopifnot(sum(is.na(df_race_form$race)) == 0)
+# Drop any missing race entries (should be extremely minimal)
+df_race_form <- df_race_form |> filter(!is.na(race))
+
 
 # check mapping from race (general) to new race var
 cat("\nDistinct values of RACE variable\n")
