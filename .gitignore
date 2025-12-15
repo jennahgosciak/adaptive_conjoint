@@ -1,4 +1,5 @@
 .RHistory
+.Renviron
 .RProj*
 *.RData
 *.docx
