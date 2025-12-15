@@ -11,3 +11,5 @@ build(
   dh_username = Sys.getenv("DOCKER_UNAME"),
   dh_password = Sys.getenv("DOCKER_PWD")
 )
+
+binderize()
