@@ -4,6 +4,8 @@
 [![Launch RStudio Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jennahgosciak/adaptive_conjoint/main?urlpath=rstudio)
 <!-- badges: end -->
 
+Replication materials for [Adaptive Randomization in Conjoint Survey Experiments (Gosciak, Molitor, and Lundberg; 2025).](https://doi.org/10.31235/osf.io/69y2j_v2)
+
 ## Data and code description
 
 All raw data collected from our experiments can be found in the `data/` directory.
@@ -61,7 +63,7 @@ Rscript code/main.R
 
 > [!NOTE]
 > Currently the code to replicate all the simulations in Appendix D are commented out
-> because they take a long time to run, and we have saved the intermediate results from
+> because they take a long time to run and we have saved the intermediate results from
 > those simulations in the `data/simulation-data/` directory. If you _really_ want to
 > re-run the simulations, uncomment the relevant lines in `code/main.R`.
 
