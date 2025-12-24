@@ -21,8 +21,8 @@ pkg_install(c(
   "here@1.0.2",
   "ipumsr@0.9.0",
   "modelr@0.1.11",
-  "progressr@0.16.0",
-  "readr@2.1.5",
-  "stringr@1.5.2",
-  "tidyr@1.3.1"
+  "progressr@0.18.0",
+  "readr@2.1.6",
+  "stringr@1.6.0",
+  "tidyr@1.3.2"
 ))

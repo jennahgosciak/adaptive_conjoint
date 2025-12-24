@@ -13,7 +13,7 @@ poststratification weights; see below). Corresponding code can be found in the
 
 ### Generating poststratification weights
 
-> [!NOTE]  
+> [!NOTE]
 > The poststratification weights used to generate Appendix Figure 10 in this paper
 > are stored at `data/ipums_strata_sizes.RDS`. You don’t need to regenerate
 > them to reproduce the figures, but if you’d like to, follow the steps below.
@@ -44,57 +44,31 @@ weights, the script takes the following steps:
     - `num = n()`
     - Then recompute `weight`, outside the summarize so that it is a fraction of the total weight =  `weight / sum(weight)`
 
-## Computational requirements (and versions used)
+## Installing packages (with pinned versions)
 
-So as to not pollute the global environment, we recommend replicating this project
-within an R project using renv. This way all dependencies will be installed in a
-separate local environment.
-
-- R (4.5.1)
-- R packages:
-    - askpass (1.2.1)
-    - assertr (3.0.1)
-    - dplyr (1.1.4)
-    - forcats (1.0.1)
-    - furrr (0.3.1)
-    - ggplot2 (4.0.1)
-    - ggtext (0.1.2)
-    - gtsummary (2.4.0)
-    - here (1.0.2)
-    - ipumsr (0.9.0)
-    - modelr (0.1.11)
-    - progressr (0.16.0)
-    - readr (2.1.5)
-    - stringr (1.5.2)
-    - tidyr (1.3.1)
-
-### Hardware specification
-
-All figures were generated on a Macbook Pro (M3 Max) running MacOS Sequoia, with 36 GB of RAM
-and 14 cores. We utilize 13 cores for parallelizing our appendix simulations. Each core used
-~ 2 GB of RAM when running simulations, equaling a total of ~ 26 GB of RAM. On some (many?)
-machines, this may be prohibitive. In this case, each of the simulation scripts has an
-easily-changed parameter for number of cores used that can be set to as few as 1 (in which
-case total RAM needed for the analysis should be ~ 3GB). However, this will likely cause the
-simulation run time to increase prohibitively (> 1 day at a minimum). Required disk space
-for all replication files (including data) is < 50 MB. The computing time on
-the Macbook Pro took ~ 684 minutes (11.4 hours).
-> [!NOTE]  
-> The VAST majority of compute time is required by the simulation scripts for
-> the appendix simulations. These scripts are the ones beginning with
-> `code/appendix_d_simulations_{...}.R`. All figures can be replicated without re-running
-> the simulations because we have stored the intermediate simulation results in the
-> `data/simulation-data/` directory. You can comment out the corresponding simulation
-> scripts in `main.R` and the replication should generate all figures and in a fraction of
-> the time (~ 1 minute). However, in it's current form, `code/main.R` will replicate
-> everything, including the time-intensive simulations.
+To install the required packages with specific versions used in the analysis,
+execute the following:
+```
+Rscript code/install_dependencies.R
+```
 
 ## Replicating figures
 
-To replicate figures, execute the `code/main.R` script from your shell of choice:
-```r
-Rscript ./code/main.R
+Once packages have been installed, replicate the figures with the following:
 ```
+Rscript code/main.R
+```
+
+> [!NOTE]
+> Currently the code to replicate all the simulations in Appendix D are commented out
+> because they take a long time to run, and we have saved the intermediate results from
+> those simulations in the `data/simulation-data/` directory. If you _really_ want to
+> re-run the simulations, uncomment the relevant lines in `code/main.R`.
+
+## Docker image
+
+A Dockerfile is provided for a Docker image with R and all necessary packages installed.
+This image is also available on DockerHub at `djmolitor/adaptive_conjoint`.
 
 ## Table of contents
 ```
@@ -106,9 +80,12 @@ Rscript ./code/main.R
 │   ├── appendix_d_simulations_fixed_effect_equal_1000.R     # Run simulations for figure 14
 │   ├── appendix_d_simulations_fixed_sample_adaptive_1000.R  # Run simulations for figure 13
 │   ├── appendix_e.R                                         # Simulate model described in Appendix E
+│   ├── docker.R                                             # Code to generate a corresponding Docker image
 │   ├── download_ps_weights.R                                # Re-generate poststratification weights (not necessary)
 │   ├── immigrants_plots.R                                   # Plot main example figures (figure 5, 6, 10, 11)
-│   └── job_applicants_plots.R                               # Plot supplementary example figures (figures 9, 12)
+│   ├── install_dependencies.R                               # Install required R packages with pinned versions
+│   ├── job_applicants_plots.R                               # Plot supplementary example figures (figures 9, 12)
+│   └── main.R                                               # Main script to replicate all figures
 ├── data
 │   ├── immigrants_main_bandit.csv     # Raw data from the immigrants (primary) experiment
 │   ├── immigrants_main_batch.csv      # Raw data from the immigrants (primary) experiment
@@ -140,6 +117,7 @@ Rscript ./code/main.R
 │       ├── fixed_effect_equal_sim_1000.RDS          # Simulation results for Appendix D, Figure 14
 │       ├── fixed_sample_adaptive_sim_1000_1000.RDS  # Simulation results for Appendix D, Figure 13
 │       └── fixed_sample_adaptive_sim_1000_500.RDS   # Simulation results for Appendix D, Figure 13
+├── Dockerfile  # Dockerfile to build an image with all dependencies installed
 ├── figures
 │   ├── figure10.png
 │   ├── figure11a.png
@@ -151,5 +129,6 @@ Rscript ./code/main.R
 │   ├── figure5.png
 │   ├── figure6.png
 │   └── figure9.png
+├── renv.lock  # renv lockfile with pinned package versions
 └── README.md
 ```

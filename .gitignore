@@ -13,3 +13,4 @@ automate_candidates_files/
 renv/
 *.yml
 replication/
+log.txt
