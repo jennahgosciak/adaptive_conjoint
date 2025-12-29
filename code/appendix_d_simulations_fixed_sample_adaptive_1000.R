@@ -1,4 +1,5 @@
 library(dplyr)
+library(stringr)
 library(here)
 library(furrr)
 library(progressr)
@@ -10,7 +11,7 @@ plan(multisession, workers = n_cores)
 
 for (number_of_respondents in c(500, 1000)) {
   # change this parameter to change the number of simulations
-  n_sim <- 1000
+  n_sim <- 100
 
   draw_adaptive_sample <- function(pi, true_p) {
     profile_draw <- rmultinom(1, 1, pi)
@@ -23,13 +24,7 @@ for (number_of_respondents in c(500, 1000)) {
     return(output)
   }
 
-  format_sample_df <- function(sample_draws, true_p) {
-    sample_draws |>
-      as_tibble() |>
-      mutate(context = ((row_number()-1) %% length(true_p)) + 1)
-  }
-
-  warmup_phase <- function(n_total, true_p, n_sim=1000) {
+  warmup_phase <- function(n_total, true_p, n_sim=100) {
     pi_equal <- rep(1, length(true_p))/length(true_p)
     
     n <- 0
@@ -50,7 +45,7 @@ for (number_of_respondents in c(500, 1000)) {
       n <- n + 1
     }
     outcomes <- df |> 
-      left_join(tibble(context = 1:length(true_p)), ., by = join_by(context)) |>
+      right_join(tibble(context = 1:length(true_p)), by = join_by(context)) |>
       group_by(context) |>
       summarize(y0 = sum(y0, na.rm = TRUE),
                 y1 = sum(y1, na.rm = TRUE)) |> 
@@ -68,7 +63,7 @@ for (number_of_respondents in c(500, 1000)) {
       summarize(n = n()) |> 
       ungroup() |> 
       mutate(pi = n / n_sim) |> 
-      left_join(tibble(max_arm = 1:length(true_p)), ., by = join_by(max_arm)) |>
+      right_join(tibble(max_arm = 1:length(true_p)), by = join_by(max_arm)) |>
       mutate(pi = if_else(is.na(pi),0,pi)) |> 
       pull(pi)
 
@@ -82,7 +77,7 @@ for (number_of_respondents in c(500, 1000)) {
     return(outcomes)
   }
 
-  adaptive_phase <- function(true_p, num_warmup=100, num_total=number_of_respondents-100, n_sim=1000) {
+  adaptive_phase <- function(true_p, num_warmup=100, num_total=number_of_respondents-100, n_sim=10) {
     df <- warmup_phase(num_warmup, true_p)
     
     pi <- rep(1, length(true_p))/length(true_p)
@@ -116,7 +111,7 @@ for (number_of_respondents in c(500, 1000)) {
           summarize(n = n()) |> 
           ungroup() |> 
           mutate(pi = n / n_sim) |> 
-          left_join(tibble(max_arm = 1:length(true_p)), ., by = join_by(max_arm)) |>
+          right_join(tibble(max_arm = 1:length(true_p)), by = join_by(max_arm)) |>
           mutate(pi = if_else(is.na(pi),0,pi)) |> 
           pull(pi)
       } else {
@@ -124,7 +119,7 @@ for (number_of_respondents in c(500, 1000)) {
           group_by(context) |> 
           summarize(y1 = sum(y1),
                     y0 = sum(y0)) |> 
-          left_join(tibble(context = 1:length(true_p)), ., by = join_by(context)) |>
+          right_join(tibble(context = 1:length(true_p)), by = join_by(context)) |>
           mutate(y1 = if_else(is.na(y1),0,y1),
                 y0 = if_else(is.na(y0),0,y0)) |> 
           mutate(theta_star = rbeta(n(), y1 + 1, y0 + 1)) |> 
@@ -152,6 +147,7 @@ for (number_of_respondents in c(500, 1000)) {
   set.seed(1234)
   run_with_progress <- function(n_sim, n_arms) {
     true_p <- c(seq(0.3, 0.65, length.out = n_arms-1), 0.7)
+    print(length(true_p))
     
     with_progress({
       # Initialize a progressor

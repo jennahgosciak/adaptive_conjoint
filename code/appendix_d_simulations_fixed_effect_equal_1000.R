@@ -8,9 +8,9 @@ n_cores <- parallel::detectCores()-1
 plan(multisession, workers = n_cores)
 
 ## change this parameter to change the number of simulations
-n_sim <- 1000
+n_sim <- 10
 
-warmup_phase <- function(true_p, n_sim=1000) {
+warmup_phase <- function(true_p, n_sim=10) {
   pi_equal <- rep(1, length(true_p))/length(true_p)
   
   n <- 0
@@ -32,7 +32,7 @@ warmup_phase <- function(true_p, n_sim=1000) {
     
     if ((n %% 100) == 0) {
       pi <- df |>
-        left_join(tibble(context = 1:length(true_p)), ., by = join_by(context)) |>
+        right_join(tibble(context = 1:length(true_p)), by = join_by(context)) |>
         group_by(context) |> 
         summarize(y1 = sum(y1, na.rm = TRUE),
                   y0 = sum(y0, na.rm = TRUE)) |> 
@@ -47,7 +47,7 @@ warmup_phase <- function(true_p, n_sim=1000) {
         summarize(n = n()) |> 
         ungroup() |> 
         mutate(pi = n / n_sim) |> 
-        left_join(tibble(max_arm = 1:length(true_p)), ., by = join_by(max_arm)) |>
+        right_join(tibble(max_arm = 1:length(true_p)), by = join_by(max_arm)) |>
         mutate(pi = if_else(is.na(pi),0,pi)) |> 
         pull(pi)
       
@@ -58,7 +58,7 @@ warmup_phase <- function(true_p, n_sim=1000) {
     }
   }
   outcomes <- df |> 
-    left_join(tibble(context = 1:length(true_p)), ., by = join_by(context)) |>
+    right_join(tibble(context = 1:length(true_p)), by = join_by(context)) |>
     group_by(context) |>
     summarize(y0 = sum(y0, na.rm = TRUE),
               y1 = sum(y1, na.rm = TRUE)) |> 
@@ -74,6 +74,7 @@ warmup_phase <- function(true_p, n_sim=1000) {
 set.seed(1234)
 run_with_progress <- function(n_sim, n_arms) {
   true_p <- c(seq(0.3, 0.65, length.out = n_arms-1), 0.7)
+  print(length(true_p))
   
   with_progress({
     # Initialize a progressor
