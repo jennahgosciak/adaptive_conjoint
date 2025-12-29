@@ -5,8 +5,8 @@ library(here)
 #########
 # Produces figures for appendix D
 
-outcomes500 <- readRDS(here("data/simulation-data/fixed_sample_adaptive_sim_1000_500.RDS"))
-outcomes1000 <- readRDS(here("data/simulation-data/fixed_sample_adaptive_sim_1000_1000.RDS"))
+outcomes500 <- readRDS(here("data/simulation-data/fixed_sample_adaptive_sim_1000_500_diffpt5.RDS"))
+outcomes1000 <- readRDS(here("data/simulation-data/fixed_sample_adaptive_sim_1000_1000_diffpt5.RDS"))
 outcomes500 %>% 
   mutate(n_resp = 'Number of respondents: 500') %>% 
   bind_rows(outcomes1000 %>% 
@@ -36,7 +36,7 @@ outcomes500 %>%
                      labels=c("0", "25%", "50%", "75%", "100%")) +
   facet_wrap(~n_resp)
 
-ggsave(here("figures/fixed_sample_100_across_arms.pdf"), width=8, height=6)
+ggsave(here("figures/fixed_sample_100_across_arms_diffpt5.pdf"), width=8, height=6)
 
 #########
 df_outcomes_adaptive <- readRDS(here("data/simulation-data/fixed_effect_adaptive_sim_1000.RDS"))
