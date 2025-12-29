@@ -9,7 +9,7 @@ n_cores <- parallel::detectCores()-1
 plan(multisession, workers = n_cores)
 
 ## change this parameter to change the number of simulations
-n_sim <- 1000
+n_sim <- 10
 
 warmup_phase <- function(n_total, true_p) {
   pi <- rep(1, length(true_p))/length(true_p)
@@ -39,7 +39,8 @@ warmup_phase <- function(n_total, true_p) {
   return(outcomes)
 }
 
-adaptive_phase <- function(true_p, n_sim=1000) {
+adaptive_phase <- function(true_p, n_sim=10) {
+  print(length(true_p))
   df <- warmup_phase(100, true_p)
   
   pi <- rep(1, length(true_p))/length(true_p)
@@ -72,11 +73,11 @@ adaptive_phase <- function(true_p, n_sim=1000) {
         summarize(n = n()) |> 
         ungroup() |> 
         mutate(pi = n / n_sim) |> 
-        left_join(tibble(max_arm = 1:length(true_p)), ., by = join_by(max_arm)) |>
+        right_join(tibble(max_arm = 1:length(true_p)), by = join_by(max_arm)) |>
         mutate(pi = if_else(is.na(pi),0,pi)) |> 
         pull(pi)
-      
-      if (max(pi) >= 0.95) {
+
+      if (max(pi) >= 0.8) {
         max_reached <- TRUE
       }
     } else {
@@ -84,7 +85,7 @@ adaptive_phase <- function(true_p, n_sim=1000) {
         group_by(context) |> 
         summarize(y1 = sum(y1),
                   y0 = sum(y0)) |> 
-        left_join(tibble(context = 1:length(true_p)), ., by = join_by(context)) |>
+        right_join(tibble(context = 1:length(true_p)), by = join_by(context)) |>
         mutate(y1 = if_else(is.na(y1),0,y1),
                y0 = if_else(is.na(y0),0,y0)) |> 
         mutate(theta_star = rbeta(n(), y1 + 1, y0 + 1)) |> 
