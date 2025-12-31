@@ -11,7 +11,7 @@ plan(multisession, workers = n_cores)
 
 for (number_of_respondents in c(500, 1000)) {
   # change this parameter to change the number of simulations
-  n_sim <- 100
+  n_sim <- 1000
   
   draw_adaptive_sample <- function(pi, true_p) {
     profile_draw <- rmultinom(1, 1, pi)
@@ -180,6 +180,7 @@ for (number_of_respondents in c(500, 1000)) {
     bind_rows(run_with_progress(n_sim, 30)) |>
     mutate(n_resp = number_of_respondents)
   outcomes
+  
   
   outcomes |>
     saveRDS(here(str_glue("data/simulation-data/fixed_sample_adaptive_sim_1000_{number_of_respondents}.RDS")))
