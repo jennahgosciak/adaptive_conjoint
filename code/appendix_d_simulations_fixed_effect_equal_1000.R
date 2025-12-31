@@ -34,6 +34,7 @@ warmup_phase <- function(true_p, n_sim=1000) {
     if ((n %% 100) == 0) {
       pi <- df |>
         right_join(tibble(context = 1:length(true_p)), by = join_by(context)) |>
+        arrange(context) |>
         group_by(context) |> 
         summarize(y1 = sum(y1, na.rm = TRUE),
                   y0 = sum(y0, na.rm = TRUE)) |> 
@@ -50,6 +51,7 @@ warmup_phase <- function(true_p, n_sim=1000) {
         mutate(pi = n / n_sim) |> 
         right_join(tibble(max_arm = 1:length(true_p)), by = join_by(max_arm)) |>
         mutate(pi = if_else(is.na(pi),0,pi)) |> 
+        arrange(max_arm) |>
         pull(pi)
       
       stopifnot(length(pi)==length(true_p))
