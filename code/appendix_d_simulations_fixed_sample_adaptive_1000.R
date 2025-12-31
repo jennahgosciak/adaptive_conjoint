@@ -24,7 +24,8 @@ for (number_of_respondents in c(500, 1000)) {
     return(output)
   }
   
-  warmup_phase <- function(n_total, true_p, n_sim=1000) {
+  warmup_phase <- function(n_total, true_p, n_sim=1000, seed = NULL) {
+    if (!is.null(seed)) set.seed(seed)
     pi_equal <- rep(1, length(true_p))/length(true_p)
     
     n <- 0
@@ -77,7 +78,8 @@ for (number_of_respondents in c(500, 1000)) {
     return(outcomes)
   }
   
-  adaptive_phase <- function(true_p, num_warmup=100, num_total=number_of_respondents-100, n_sim=1000) {
+  adaptive_phase <- function(true_p, num_warmup=100, num_total=number_of_respondents-100, n_sim=1000, seed) {
+    set.seed(seed)
     df <- warmup_phase(num_warmup, true_p)
     
     pi <- rep(1, length(true_p))/length(true_p)
@@ -145,8 +147,9 @@ for (number_of_respondents in c(500, 1000)) {
   }
   
   
-  set.seed(1234)
   run_with_progress <- function(n_sim, n_arms) {
+    set.seed(815555)
+    seed_seq <- sample(1L:1e6L, n_sim)
     true_p <- c(seq(0.3, 0.65, length.out = n_arms-1), 0.7)
     print(length(true_p))
     
@@ -154,14 +157,18 @@ for (number_of_respondents in c(500, 1000)) {
       # Initialize a progressor
       p <- progressor(steps = length(n_sim))
       
-      res <- future_map_dfr(1:n_sim, ~{
+      res <- future_map_dfr(seed_seq, function(x){
         Sys.sleep(0.05)
-        ap <- adaptive_phase(true_p)
+        ap <- adaptive_phase(true_p, seed = x)
         # p()
         return(ap)
       },.options=furrr_options(seed=TRUE))
     })
-    res_equal <- future_map_dfr(1:n_sim, ~warmup_phase(number_of_respondents, true_p),.options=furrr_options(seed=TRUE)) |> 
+    res_equal <- future_map_dfr(
+      seed_seq,
+      function(x) warmup_phase(number_of_respondents, true_p, seed = x),
+      .options=furrr_options(seed=TRUE)
+    ) |> 
       mutate(type='Equal')
     
     res <- res |>

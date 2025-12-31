@@ -39,7 +39,8 @@ warmup_phase <- function(n_total, true_p) {
   return(outcomes)
 }
 
-adaptive_phase <- function(true_p, n_sim=1000) {
+adaptive_phase <- function(true_p, n_sim=1000, seed) {
+  set.seed(seed)
   print(length(true_p))
   df <- warmup_phase(100, true_p)
   
@@ -110,18 +111,19 @@ adaptive_phase <- function(true_p, n_sim=1000) {
   return(outcomes)
 }
 
-set.seed(1234)
 run_with_progress <- function(n_sim, n_arms) {
+  set.seed(384624)
+  seed_seq <- sample(1L:1e6L, n_sim)
   true_p <- c(seq(0.3, 0.65, length.out = n_arms-1), 0.7)
   
   with_progress({
     # Initialize a progressor
     p <- progressor(steps = length(n_sim))
     
-    res <- future_map_dfr(1:n_sim, ~{
+    res <- future_map_dfr(seed_seq, function(x){
       #p()
       Sys.sleep(0.05)
-      adaptive_phase(true_p)
+      adaptive_phase(true_p, seed = x)
     },.options=furrr_options(seed=TRUE))
   })
   return(res)

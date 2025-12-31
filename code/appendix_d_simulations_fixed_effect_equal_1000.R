@@ -11,7 +11,8 @@ plan(multisession, workers = n_cores)
 ## change this parameter to change the number of simulations
 n_sim <- 1000
 
-warmup_phase <- function(true_p, n_sim=1000) {
+warmup_phase <- function(true_p, n_sim=1000, seed) {
+  set.seed(seed)
   pi_equal <- rep(1, length(true_p))/length(true_p)
   
   n <- 0
@@ -74,8 +75,9 @@ warmup_phase <- function(true_p, n_sim=1000) {
   return(outcomes)
 }
 
-set.seed(1234)
 run_with_progress <- function(n_sim, n_arms) {
+  set.seed(344371)
+  seed_seq <- sample(1L:1e6L, n_sim)
   true_p <- c(seq(0.3, 0.65, length.out = n_arms-1), 0.7)
   print(length(true_p))
   
@@ -83,10 +85,10 @@ run_with_progress <- function(n_sim, n_arms) {
     # Initialize a progressor
     p <- progressor(steps = length(n_sim))
     
-    res <- future_map_dfr(1:n_sim, ~{
+    res <- future_map_dfr(seed_seq, function(x){
       # p()
       Sys.sleep(0.05)
-      warmup_phase(true_p)
+      warmup_phase(true_p, seed = x)
     },.options=furrr_options(seed=TRUE))
   })
   return(res)
