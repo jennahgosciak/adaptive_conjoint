@@ -2,15 +2,16 @@ library(dplyr)
 library(here)
 library(furrr)
 library(progressr)
+library(tidyr)
 
 ## Change this parameter to change the number of cores for parallelization
-n_cores <- parallel::detectCores()-1
+n_cores <- min(parallel::detectCores()-1, 120)
 plan(multisession, workers = n_cores)
 
 ## change this parameter to change the number of simulations
-n_sim <- 10
+n_sim <- 1000
 
-warmup_phase <- function(true_p, n_sim=10) {
+warmup_phase <- function(true_p, n_sim=1000) {
   pi_equal <- rep(1, length(true_p))/length(true_p)
   
   n <- 0
@@ -33,6 +34,7 @@ warmup_phase <- function(true_p, n_sim=10) {
     if ((n %% 100) == 0) {
       pi <- df |>
         right_join(tibble(context = 1:length(true_p)), by = join_by(context)) |>
+        arrange(context) |>
         group_by(context) |> 
         summarize(y1 = sum(y1, na.rm = TRUE),
                   y0 = sum(y0, na.rm = TRUE)) |> 
@@ -49,6 +51,7 @@ warmup_phase <- function(true_p, n_sim=10) {
         mutate(pi = n / n_sim) |> 
         right_join(tibble(max_arm = 1:length(true_p)), by = join_by(max_arm)) |>
         mutate(pi = if_else(is.na(pi),0,pi)) |> 
+        arrange(max_arm) |>
         pull(pi)
       
       stopifnot(length(pi)==length(true_p))
@@ -79,7 +82,7 @@ run_with_progress <- function(n_sim, n_arms) {
   with_progress({
     # Initialize a progressor
     p <- progressor(steps = length(n_sim))
-
+    
     res <- future_map_dfr(1:n_sim, ~{
       # p()
       Sys.sleep(0.05)
