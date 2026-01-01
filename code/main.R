@@ -32,14 +32,14 @@ source("./code/appendix_c.R")
 ### If you uncomment lines 36, 39, and 42, the simulations for Appendix D will replicate.
 ### However, we recommend just using the saved intermediate files and this will run in ~ 1 minute.
 
-# cat("\n---------------------------- ./code/appendix_d_simulations_fixed_effect_adaptive_1000.R --\n")
-# source("./code/appendix_d_simulations_fixed_effect_adaptive_1000.R")
+cat("\n---------------------------- ./code/appendix_d_simulations_fixed_effect_adaptive_1000.R --\n")
+source("./code/appendix_d_simulations_fixed_effect_adaptive_1000.R")
 
-# cat("\n---------------------------- ./code/appendix_d_simulations_fixed_effect_equal_1000.R -----\n")
-# source("./code/appendix_d_simulations_fixed_effect_equal_1000.R")
+cat("\n---------------------------- ./code/appendix_d_simulations_fixed_effect_equal_1000.R -----\n")
+source("./code/appendix_d_simulations_fixed_effect_equal_1000.R")
 
-# cat("\n---------------------------- ./code/appendix_d_simulations_fixed_sample_adaptive_1000.R -----\n")
-# source("./code/appendix_d_simulations_fixed_sample_adaptive_1000.R")
+cat("\n---------------------------- ./code/appendix_d_simulations_fixed_sample_adaptive_1000.R -----\n")
+source("./code/appendix_d_simulations_fixed_sample_adaptive_1000.R")
 
 # ----------------------------------------------------------------------------------------------------
 
