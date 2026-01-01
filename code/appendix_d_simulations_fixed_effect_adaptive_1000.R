@@ -41,7 +41,6 @@ warmup_phase <- function(n_total, true_p) {
 
 adaptive_phase <- function(true_p, n_sim=1000, seed) {
   set.seed(seed)
-  print(length(true_p))
   df <- warmup_phase(100, true_p)
   
   pi <- rep(1, length(true_p))/length(true_p)

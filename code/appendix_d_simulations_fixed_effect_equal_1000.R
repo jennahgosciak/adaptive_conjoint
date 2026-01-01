@@ -79,7 +79,6 @@ run_with_progress <- function(n_sim, n_arms) {
   set.seed(344371)
   seed_seq <- sample(1L:1e6L, n_sim)
   true_p <- c(seq(0.3, 0.65, length.out = n_arms-1), 0.7)
-  print(length(true_p))
   
   with_progress({
     # Initialize a progressor
