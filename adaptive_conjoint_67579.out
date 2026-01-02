@@ -5,10 +5,16 @@
 
 ---------------------------- ./code/appendix_c.R -------------
 
+---------------------------- ./code/appendix_d_simulations_fixed_effect_adaptive_1000.R --
+
+---------------------------- ./code/appendix_d_simulations_fixed_effect_equal_1000.R -----
+
+---------------------------- ./code/appendix_d_simulations_fixed_sample_adaptive_1000.R -----
+
 ---------------------------- ./code/appendix_d_plots.R -------
 
 --------------------------------------------------------------
-Timestamp results were generated: 2026-01-01 18:29:20 EST 
+Timestamp results were generated: 2026-01-01 20:47:27 EST 
 
 --------------------------------------------------------------
-Total runtime (minutes): 357.15 
+Total runtime (minutes): 316.83 
