@@ -46,7 +46,20 @@ weights, the script takes the following steps:
     - `num = n()`
     - Then recompute `weight`, outside the summarize so that it is a fraction of the total weight =  `weight / sum(weight)`
 
-## Installing packages (with pinned versions)
+## Replicating figures - Binder
+
+By far the easiest way to replicate the paper figures and interact with the data is to click on the
+[Binder badge](https://mybinder.org/v2/gh/jennahgosciak/adaptive_conjoint/main?urlpath=rstudio)
+in the header of this document. This will bring you to an RStudio instance with all necessary data
+and packages installed. Then replicate all figures by executing
+```
+Rscript code/main.R
+```
+in the terminal.
+
+## Replicating figures - local
+
+### Install packages (with pinned versions)
 
 To install the required packages with specific versions used in the analysis,
 execute the following:
@@ -54,7 +67,7 @@ execute the following:
 Rscript code/install_dependencies.R
 ```
 
-## Replicating figures
+### Replicating figures
 
 Once packages have been installed, replicate the figures with the following:
 ```
@@ -120,17 +133,7 @@ This image is also available on DockerHub at `djmolitor/adaptive_conjoint`.
 │       ├── fixed_sample_adaptive_sim_1000_1000.RDS  # Simulation results for Appendix D, Figure 13
 │       └── fixed_sample_adaptive_sim_1000_500.RDS   # Simulation results for Appendix D, Figure 13
 ├── Dockerfile  # Dockerfile to build an image with all dependencies installed
-├── figures
-│   ├── figure10.png
-│   ├── figure11a.png
-│   ├── figure11b.png
-│   ├── figure12a.png
-│   ├── figure12b.png
-│   ├── figure13.png
-│   ├── figure14.png
-│   ├── figure5.png
-│   ├── figure6.png
-│   └── figure9.png
-├── renv.lock  # renv lockfile with pinned package versions
+├── figures     # Directory where all figures will be saved
+├── renv.lock   # renv lockfile with pinned package versions
 └── README.md
 ```
