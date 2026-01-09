@@ -44,7 +44,6 @@ df_outcomes_adaptive <- readRDS(here("data/simulation-data/fixed_effect_adaptive
 
 n_adaptive_summary <- df_outcomes_adaptive |> 
   filter(num_arms == context) |> 
-  mutate(n_total = n_total - 1 + 100) |> 
   group_by(num_arms) |> 
   summarize(mean_n = mean(n_total),
             ci_low = mean_n - qnorm(0.975) * sd(n_total) / sqrt(n()),

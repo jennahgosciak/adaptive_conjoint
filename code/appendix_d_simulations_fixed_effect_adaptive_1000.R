@@ -14,8 +14,9 @@ n_sim <- 1000
 warmup_phase <- function(n_total, true_p) {
   pi <- rep(1, length(true_p))/length(true_p)
   
-  n <- 1
-  while (n <= n_total) {
+  n <- 0
+  while (n < n_total) {
+    n <- n + 1
     profile_draw <- rmultinom(1, 1, pi)
     context <- which.max(profile_draw)
     new_draw <- tibble(context = context,
@@ -28,7 +29,6 @@ warmup_phase <- function(n_total, true_p) {
     } else {
       df <- bind_rows(df, new_draw)
     }
-    n <- n + 1
   }
   outcomes <- df |> 
     group_by(context) |>
@@ -46,8 +46,9 @@ adaptive_phase <- function(true_p, n_sim=1000, seed) {
   pi <- rep(1, length(true_p))/length(true_p)
   
   max_reached <- FALSE
-  n <- 1
+  n <- 100
   while (max_reached == FALSE) {
+    n <- n + 1
     profile_draw <- rmultinom(1, 1, pi)
     context <- which.max(profile_draw)
     adaptive_draw <- tibble(context = context,
@@ -82,6 +83,8 @@ adaptive_phase <- function(true_p, n_sim=1000, seed) {
         max_reached <- TRUE
       }
     } else {
+
+
       pi <- df |> 
         group_by(context) |> 
         summarize(y1 = sum(y1),
@@ -96,7 +99,6 @@ adaptive_phase <- function(true_p, n_sim=1000, seed) {
     }
     stopifnot(abs(sum(pi)-1) < 0.05)
     stopifnot(length(pi)==length(true_p))
-    n <- n + 1
   }
   outcomes <- df |> 
     group_by(context) |>

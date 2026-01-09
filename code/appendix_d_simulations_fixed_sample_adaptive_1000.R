@@ -127,7 +127,7 @@ for (number_of_respondents in c(500, 1000)) {
                  y0 = if_else(is.na(y0),0,y0)) |> 
           mutate(theta_star = rbeta(n(), y1 + 1, y0 + 1)) |> 
           arrange(context) |> 
-          mutate(max_arm = as.numeric(row_number() == which.max(theta_star))) |>
+          mutate(max_arm = as.numeric(context == which.max(theta_star))) |>
           pull(max_arm)
       }
       stopifnot(abs(sum(pi)-1) < 0.05)

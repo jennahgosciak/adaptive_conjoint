@@ -33,6 +33,7 @@ warmup_phase <- function(true_p, n_sim=1000, seed) {
     }
     
     if ((n %% 100) == 0) {
+
       pi <- df |>
         right_join(tibble(context = 1:length(true_p)), by = join_by(context)) |>
         arrange(context) |>
