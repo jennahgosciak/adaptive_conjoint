@@ -19,8 +19,8 @@ outcomes500 |>
   mutate(type = str_to_sentence(type)) |> 
   group_by(type, num_arms, n_resp) |> 
   summarize(mean_correct = mean(chose_correct),
-            ci_low = mean_correct - (qnorm(0.975) * mean_correct * (1 - mean_correct)) / sqrt(n()),
-            ci_high = mean_correct + (qnorm(0.975) * mean_correct * (1 - mean_correct)) / sqrt(n())) |> 
+            ci_low = mean_correct - (qnorm(0.975) * sqrt(mean_correct * (1 - mean_correct) / n())),
+            ci_high = mean_correct + (qnorm(0.975) * sqrt(mean_correct * (1 - mean_correct) / n()))) |> 
   ggplot(aes(num_arms, mean_correct, color = type)) +
   geom_point() +
   geom_line() +
@@ -34,6 +34,7 @@ outcomes500 |>
        x = "Number of contexts",
        color = "Sampling method") +
   scale_y_continuous(limits = c(0,1.05),
+                     breaks = c(0, 0.25, 0.5, 0.75, 1),
                      labels=c("0", "25%", "50%", "75%", "100%")) +
   facet_wrap(~n_resp)
 
@@ -44,7 +45,6 @@ df_outcomes_adaptive <- readRDS(here("data/simulation-data/fixed_effect_adaptive
 
 n_adaptive_summary <- df_outcomes_adaptive |> 
   filter(num_arms == context) |> 
-  mutate(n_total = n_total - 1 + 100) |> 
   group_by(num_arms) |> 
   summarize(mean_n = mean(n_total),
             ci_low = mean_n - qnorm(0.975) * sd(n_total) / sqrt(n()),
@@ -93,7 +93,6 @@ n_adaptive_summary |>
   labs(x = 'Number of contexts',
        y = 'Mean number of samples to obtain 95% posterior probability') +
   theme_bw() +
-  # theme(panel.grid.minor.x = element_blank()) +
   labs(color = "Sampling type")
 
 ggsave(here('figures/figure14.png'), dpi = 500, width=10, height=10)
