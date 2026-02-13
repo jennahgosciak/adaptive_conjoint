@@ -35,11 +35,12 @@ warmup_phase <- function(true_p, n_sim=1000, seed) {
     if ((n %% 100) == 0) {
 
       pi <- df |>
-        right_join(tibble(context = 1:length(true_p)), by = join_by(context)) |>
+  
         arrange(context) |>
         group_by(context) |> 
         summarize(y1 = sum(y1, na.rm = TRUE),
                   y0 = sum(y0, na.rm = TRUE)) |> 
+        right_join(tibble(context = 1:length(true_p)), by = join_by(context)) |>
         mutate(theta_star = map2(.x = y1, .y = y0, 
                                  .f = \(x,y) rbeta(n_sim, 
                                                    x + 1, y + 1))) |> 
@@ -83,11 +84,10 @@ run_with_progress <- function(n_sim, n_arms) {
   
   with_progress({
     # Initialize a progressor
-    p <- progressor(steps = length(n_sim))
+    p <- progressor(steps = n_sim)
     
     res <- future_map_dfr(seed_seq, function(x){
-      # p()
-      Sys.sleep(0.05)
+      p()
       warmup_phase(true_p, seed = x)
     },.options=furrr_options(seed=TRUE))
   })

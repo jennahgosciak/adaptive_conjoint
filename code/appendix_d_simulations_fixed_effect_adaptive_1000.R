@@ -97,7 +97,7 @@ adaptive_phase <- function(true_p, n_sim=1000, seed) {
         mutate(max_arm = as.numeric(context == which.max(theta_star))) |>
         pull(max_arm)
     }
-    stopifnot(abs(sum(pi)-1) < 0.05)
+    stopifnot(abs(sum(pi)-1) < 0.01)
     stopifnot(length(pi)==length(true_p))
   }
   outcomes <- df |> 
@@ -119,11 +119,10 @@ run_with_progress <- function(n_sim, n_arms) {
   
   with_progress({
     # Initialize a progressor
-    p <- progressor(steps = length(n_sim))
+    p <- progressor(steps = n_sim)
     
     res <- future_map_dfr(seed_seq, function(x){
-      #p()
-      Sys.sleep(0.05)
+      p()
       adaptive_phase(true_p, seed = x)
     },.options=furrr_options(seed=TRUE))
   })
