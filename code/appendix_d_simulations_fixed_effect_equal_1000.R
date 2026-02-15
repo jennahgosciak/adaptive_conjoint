@@ -83,7 +83,7 @@ run_with_progress <- function(n_sim, n_arms) {
   true_p <- c(seq(0.3, 0.65, length.out = n_arms-1), 0.7)
   
   with_progress({
-    # Initialize a progressor
+    # initialize a progressor
     p <- progressor(steps = n_sim)
     
     res <- future_map_dfr(seed_seq, function(x){

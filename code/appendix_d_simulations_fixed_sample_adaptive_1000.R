@@ -123,6 +123,8 @@ adaptive_phase <- function(true_p, num_warmup=100, num_total=number_of_responden
     if (n==num_total) {
       pi <- df |> 
         group_by(context) |> 
+        # ensure we include contexts even if no observations
+        right_join(tibble(context = 1:length(true_p)), by = join_by(context)) |>
         summarize(y1 = sum(y1, na.rm = TRUE),
                   y0 = sum(y0, na.rm = TRUE)) |> 
         # simulate beta distribution for n_sim times
