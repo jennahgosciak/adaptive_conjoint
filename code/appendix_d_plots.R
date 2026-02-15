@@ -15,9 +15,11 @@ outcomes500 |>
   mutate(n_resp = factor(n_resp, levels = c('Number of respondents: 500',
                                             'Number of respondents: 1,000'))) |> 
   mutate(type = if_else(type == 'Equal', 'Fixed', type)) |> 
+  # we only want one row for each simulation, select the row with the max value of true_p (i.e., context == num_arms)
   filter(context == num_arms) |> 
   mutate(type = str_to_sentence(type)) |> 
   group_by(type, num_arms, n_resp) |> 
+  # calculate percent of time chose correctly, 95% confidence intervals
   summarize(mean_correct = mean(chose_correct),
             ci_low = mean_correct - (qnorm(0.975) * sqrt(mean_correct * (1 - mean_correct) / n())),
             ci_high = mean_correct + (qnorm(0.975) * sqrt(mean_correct * (1 - mean_correct) / n()))) |> 
@@ -44,36 +46,27 @@ ggsave(here("figures/figure13.png"), dpi = 500, width=8, height=6)
 df_outcomes_adaptive <- readRDS(here("data/simulation-data/fixed_effect_adaptive_sim_1000.RDS"))
 
 n_adaptive_summary <- df_outcomes_adaptive |> 
+  # we only need one observation per context
+  # select the one with the max value of true_p (i.e., num_arms == context)
   filter(num_arms == context) |> 
   group_by(num_arms) |> 
+  # compute mean and 95% confidence interval for the sample size
   summarize(mean_n = mean(n_total),
             ci_low = mean_n - qnorm(0.975) * sd(n_total) / sqrt(n()),
             ci_high = mean_n + qnorm(0.975) * sd(n_total) / sqrt(n())) |> 
   mutate(method = 'adaptive')
 n_adaptive_summary
 
-df_outcomes_adaptive |> 
-  rowwise() |> 
-  mutate(y_total = y1 + y0) |> 
-  ungroup() |> 
-  group_by(num_arms, context) |> 
-  summarize(mean_y = mean(y_total))
-
 df_outcomes_equal <- readRDS(here("data/simulation-data/fixed_effect_equal_sim_1000.RDS"))
 n_equal_summary <- df_outcomes_equal |> 
+  # we only need one observation per sample size
   filter(num_arms == context) |> 
   group_by(num_arms) |> 
+  # compute mean and 95% confidence interval for the sample size
   summarize(mean_n = mean(n_total),
             ci_low = mean_n - qnorm(0.975) * sd(n_total) / sqrt(n()),
             ci_high = mean_n + qnorm(0.975) * sd(n_total) / sqrt(n())) |> 
   mutate(method = 'equal')
-
-df_outcomes_equal |> 
-  rowwise() |> 
-  mutate(y_total = y1 + y0) |> 
-  ungroup() |> 
-  group_by(num_arms, context) |> 
-  summarize(mean_y = mean(y_total))
 
 n_adaptive_summary |> 
   bind_rows(n_equal_summary) |> 
