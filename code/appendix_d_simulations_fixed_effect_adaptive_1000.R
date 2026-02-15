@@ -85,10 +85,13 @@ adaptive_phase <- function(true_p, n_sim=1000, seed) {
     # produce the full pi vector in batches of 100
     if ((n %% 100) == 0) {
       pi <- df |> 
+        # this right join ensures we have observations for contexts even if no observations
         right_join(tibble(context = 1:length(true_p)), by = join_by(context)) |>
+        arrange(context) |>
         group_by(context) |> 
         summarize(y1 = sum(y1, na.rm = TRUE),
                   y0 = sum(y0, na.rm = TRUE)) |> 
+        # draw from rbeta n_sim (i.e., 1000) times
         mutate(theta_star = map2(.x = y1, .y = y0, 
                                  .f = \(x,y) rbeta(n_sim, 
                                                    x + 1, y + 1))) |> 
@@ -96,7 +99,7 @@ adaptive_phase <- function(true_p, n_sim=1000, seed) {
         # for each simulation, we select the maximum value of theta (across contexts)
         mutate(sim_index = rep(x = 1:n_sim, times = length(true_p))) |> 
         group_by(sim_index) |> 
-        # select the maximum theta arm
+        # select the right arm by the max theta value for each simulation
         summarize(max_arm = which.max(theta_star)) |> 
         # this fraction is the new pi value
         group_by(max_arm) |> 
@@ -152,7 +155,8 @@ adaptive_phase <- function(true_p, n_sim=1000, seed) {
     cbind(pi) |> 
     # n_total should be a multiple of 100
     mutate(n_total = n,
-           num_arms = length(true_p))
+           num_arms = length(true_p)) |> 
+    mutate(chose_correct = if_else(num_arms == which.max(pi), 1, 0))
   
   return(outcomes)
 }
