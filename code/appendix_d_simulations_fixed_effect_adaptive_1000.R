@@ -13,10 +13,7 @@ n_sim <- 1000
 
 warmup_phase <- function(n_total, true_p) {
   # initialize pi as equal probability sampling
-  # pi <- rep(1, length(true_p))/length(true_p)
-  pi <- df |>
-    arrange(context) |>
-    pull(pi)
+  pi <- rep(1, length(true_p))/length(true_p)
   
   n <- 0
   while (n < n_total) {
