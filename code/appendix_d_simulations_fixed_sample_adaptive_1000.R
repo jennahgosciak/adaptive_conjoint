@@ -117,7 +117,6 @@ adaptive_phase <- function(true_p, num_warmup=100, num_total=number_of_responden
     
     # combine with previous responses including warmup
     df <- bind_rows(df, adaptive_draw)
-    print(df)
     
     # if we reach the total (num_total = num_respondents - num_warmup)
     if (n==num_total) {
