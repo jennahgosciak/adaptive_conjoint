@@ -88,7 +88,7 @@ warmup_phase <- function(n_total, true_p, n_sim=1000, seed = NULL) {
   return(outcomes)
 }
 
-adaptive_phase <- function(true_p, num_warmup=100, num_total=number_of_respondents-100, n_sim=1000, seed) {
+adaptive_phase <- function(true_p, num_warmup=100, num_total=number_of_respondents, n_sim=1000, seed) {
   set.seed(seed)
   # first run warmup phase with 100 participants
   df <- warmup_phase(num_warmup, true_p)
@@ -99,7 +99,7 @@ adaptive_phase <- function(true_p, num_warmup=100, num_total=number_of_responden
     arrange(context) |>
     pull(pi)
   
-  n <- 0
+  n <- 100
   # num total = num_respondents - num_warmup
   while (n < num_total) {
     n <- n + 1
@@ -110,53 +110,53 @@ adaptive_phase <- function(true_p, num_warmup=100, num_total=number_of_responden
     # simulate a response based on the true success probability (true_p)
     # for the context we selected
     adaptive_draw <- tibble(context = context,
-                            outcome = rbinom(1,1, prob=true_p[context])) |> 
+                            outcome = rbinom(1,1, prob=true_p[context])) |>
       # initialize y1 and y0
       mutate(y1 = if_else(outcome==1,1,0),
              y0 = if_else(outcome==0,1,0))
-    
+
     # combine with previous responses including warmup
     df <- bind_rows(df, adaptive_draw)
-    
+
     # if we reach the total (num_total = num_respondents - num_warmup)
     if (n==num_total) {
-      pi <- df |> 
-        group_by(context) |> 
+      pi <- df |>
+        group_by(context) |>
         # ensure we include contexts even if no observations
         right_join(tibble(context = 1:length(true_p)), by = join_by(context)) |>
         summarize(y1 = sum(y1, na.rm = TRUE),
-                  y0 = sum(y0, na.rm = TRUE)) |> 
+                  y0 = sum(y0, na.rm = TRUE)) |>
         # simulate beta distribution for n_sim times
-        mutate(theta_star = map2(.x = y1, .y = y0, 
-                                 .f = \(x,y) rbeta(n_sim, 
-                                                   x + 1, y + 1))) |> 
-        unnest(theta_star) |> 
+        mutate(theta_star = map2(.x = y1, .y = y0,
+                                 .f = \(x,y) rbeta(n_sim,
+                                                   x + 1, y + 1))) |>
+        unnest(theta_star) |>
         # for each simulation, we select the maximum value of theta (across contexts)
-        mutate(sim_index = rep(x = 1:n_sim, times = length(true_p))) |> 
+        mutate(sim_index = rep(x = 1:n_sim, times = length(true_p))) |>
         # summarize how many times each context was selected as the max (out of n_sim)
-        group_by(sim_index) |> 
-        summarize(max_arm = which.max(theta_star)) |> 
+        group_by(sim_index) |>
+        summarize(max_arm = which.max(theta_star)) |>
         # this fraction is the new pi value
-        group_by(max_arm) |> 
-        summarize(n = n()) |> 
-        ungroup() |> 
-        mutate(pi = n / n_sim) |> 
+        group_by(max_arm) |>
+        summarize(n = n()) |>
+        ungroup() |>
+        mutate(pi = n / n_sim) |>
         # ensure any contexts not selected are included with 0 pi values
         right_join(tibble(max_arm = 1:length(true_p)), by = join_by(max_arm)) |>
-        mutate(pi = if_else(is.na(pi),0,pi)) |> 
+        mutate(pi = if_else(is.na(pi),0,pi)) |>
         arrange(max_arm) |>
         pull(pi)
     } else {
-      pi <- df |> 
-        group_by(context) |> 
+      pi <- df |>
+        group_by(context) |>
         summarize(y1 = sum(y1),
-                  y0 = sum(y0)) |> 
+                  y0 = sum(y0)) |>
         right_join(tibble(context = 1:length(true_p)), by = join_by(context)) |>
         mutate(y1 = if_else(is.na(y1),0,y1),
-               y0 = if_else(is.na(y0),0,y0)) |> 
+               y0 = if_else(is.na(y0),0,y0)) |>
         # assign contexts, but only drawing once per context
-        mutate(theta_star = rbeta(n(), y1 + 1, y0 + 1)) |> 
-        arrange(context) |> 
+        mutate(theta_star = rbeta(n(), y1 + 1, y0 + 1)) |>
+        arrange(context) |>
         # this should be a binary vector
         # 1 is in the position for the max arm
         mutate(max_arm = as.numeric(context == which.max(theta_star))) |>
@@ -166,21 +166,21 @@ adaptive_phase <- function(true_p, num_warmup=100, num_total=number_of_responden
     stopifnot(abs(sum(pi)-1) < 0.01)
     stopifnot(length(pi)==length(true_p))
   }
-  outcomes <- df |> 
+  outcomes <- df |>
     arrange(context) |>
     group_by(context) |>
     summarize(y0 = sum(y0),
-              y1 = sum(y1)) |> 
-    ungroup() |> 
+              y1 = sum(y1)) |>
+    ungroup() |>
     # add in pi vector
-    cbind(pi) |> 
+    cbind(pi) |>
     # n_total must be equal to 500 or 1000
     mutate(n_total = n + num_warmup,
-           num_arms = length(true_p)) |> 
+           num_arms = length(true_p)) |>
     # binary indicator if the max value of pi would lead us to correctly select
     # the arm with the maximum value of true_p
     mutate(chose_correct = if_else(num_arms == which.max(pi), 1, 0))
-  
+
   return(outcomes)
 }
 
@@ -200,7 +200,7 @@ for (number_of_respondents in c(500, 1000)) {
       p <- progressor(steps = n_sim)
       
       res <- future_map_dfr(seed_seq, function(x){
-        ap <- adaptive_phase(true_p, seed = x)
+        ap <- adaptive_phase(true_p, num_total=number_of_respondents, seed = x)
         p()
         return(ap)
       },.options=furrr_options(seed=TRUE))
