@@ -94,10 +94,7 @@ adaptive_phase <- function(true_p, num_warmup=100, num_total=number_of_responden
   df <- warmup_phase(num_warmup, true_p)
   
   # initialize pi vector with equal probabilities
-  # pi <- rep(1, length(true_p))/length(true_p)
-  pi <- df |>
-    arrange(context) |>
-    pull(pi)
+  pi <- rep(1, length(true_p))/length(true_p)
   
   n <- 100
   # num total = num_respondents - num_warmup
