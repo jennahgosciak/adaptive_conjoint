@@ -14,3 +14,6 @@ renv/
 *.yml
 replication/
 log.txt
+uv.lock
+pyproject.toml
+.env
